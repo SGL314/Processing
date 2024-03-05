@@ -1,0 +1,114 @@
+int[][] grid;
+int n = 100;
+int tam = 900;
+boolean run = false;
+int grid_selected = 0;
+int qt_grids = 0;
+int cor1 = #1CE824;
+int cor2 = #1C38E8;
+int tipo1 = 1;
+int tipo2 = 2;
+
+void setup(){
+  size(1000,1000);
+  frameRate(10);
+  grid = criaGrid();
+}
+
+int[][] criaGrid(){
+  int[][] m = new int[n][n];
+  
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+        m[i][j] = 0;
+        int num = (int) random(6);
+        if (num == 1){
+            m[i][j] = 1;
+        }else if (num == 2){
+            m[i][j] = 2;
+        }
+      }
+    }
+  return m;
+}
+
+void mostraGrid(){
+  float l = width/(float)n;
+  float h = height/(float)n;
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+      stroke(225);
+      if (grid[i][j] == 0){
+        fill(255);
+      }else if (grid[i][j] == 1){
+        fill(cor1);
+      }else{
+        fill(cor2);
+      }
+      rect(j*l, i*h, l, h);
+    }
+  }
+  
+}
+
+int[] sorteiaPos(){
+  int si,sj;
+  while (true){
+    si = (int) (random(n));
+    sj = (int) (random(n));
+    if (grid[si][sj] == 0){
+        break;
+    }
+  }
+  int[] k = {si,sj};
+  return k;
+}
+
+int vizinhosVivos(int tipo,int i, int j){
+  int soma = 0;
+  int len = 1;
+  for(int ki = -len; ki < len+1; ki++){
+    for(int kj = -len; kj < len+1; kj++){
+        if (grid[(n+i+ki)%n][(n+j+kj)%n] == tipo){
+            soma += 1;
+        }
+    }
+  }
+  
+  return soma - 1;
+}
+
+void atualizaGrid(){
+  int[][] novoGrid = new int[n][n];
+  
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+      if (grid[i][j] != 0){
+        int tipo = grid[i][j];
+        int viz = vizinhosVivos(grid[i][j],i,j);
+        if (viz < 4){
+          int si=0,sj=0;
+          while (true){
+            si = (int) (random(n));
+            sj = (int) (random(n));
+            if (grid[si][sj] == 0){
+                break;
+            }
+          }
+          grid[si][sj] = tipo;
+          grid[i][j] = 0;
+        }
+      }
+      
+    }
+  }
+  
+  //grid = novoGrid;
+}
+
+void draw(){
+  mostraGrid();
+  if (true){
+    atualizaGrid();
+  }
+}
