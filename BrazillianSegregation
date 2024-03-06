@@ -1,0 +1,135 @@
+int[][] grid;
+int n =200;
+int tam = 900;
+boolean run = false;
+int grid_selected = 0;
+int qt_grids = 0;
+int c1 = #6C572F; // Preto
+int c2 = #F7E0C3; // Branco
+int c3 = #42E361; // Verde
+int c4 = #4281E3; // Azul
+int c5 = #E3ED5D; // Amarelo
+int cor1 = c3;
+int cor2 = c4;
+int cor3 = c5;
+int tipo1 = 1;
+int tipo2 = 2;
+
+void setup(){
+  size(1000,1000);
+  frameRate(100);
+  grid = criaGrid();
+}
+
+int[][] criaGrid(){
+  int[][] m = new int[n][n];
+  
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+        m[i][j] = 0;
+        int num = (int) random(7);
+        if (num == 1){
+            m[i][j] = 1;
+        }else if (num == 2){
+            m[i][j] = 2;
+        }else if (num == 3){
+          m[i][j] = 3;
+        }
+      }
+    }
+  return m;
+}
+
+void mostraGrid(){
+  float l = width/(float)n;
+  float h = height/(float)n;
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+      stroke(225);
+      if (grid[i][j] == 0){
+        fill(255);
+      }else if (grid[i][j] == 1){
+        fill(cor1);
+      }else if (grid[i][j] == 2){
+        fill(cor2);
+      }else{
+        fill(cor3);
+      }
+      rect(j*l, i*h, l, h);
+    }
+  }
+  
+}
+
+int[] sorteiaPos(){
+  int si,sj;
+  while (true){
+    si = (int) (random(n));
+    sj = (int) (random(n));
+    if (grid[si][sj] == 0){
+        break;
+    }
+  }
+  int[] k = {si,sj};
+  return k;
+}
+
+int vizinhosVivos(int tipo,int i, int j){
+  int soma = 0;
+  int len = 1;
+  for(int ki = -len; ki < len+1; ki++){
+    for(int kj = -len; kj < len+1; kj++){
+        if (grid[(n+i+ki)%n][(n+j+kj)%n] == tipo){
+            soma += 1;
+        }
+    }
+  }
+  
+  return soma - 1;
+}
+
+void atualizaGrid(){
+  int[][] novoGrid = new int[n][n];
+  int s1=0,s2=0,s3=0;
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+      if (grid[i][j] != 0){
+        
+        int tipo = grid[i][j];
+        int viz = vizinhosVivos(grid[i][j],i,j);
+        if (viz < 4){
+          if (tipo==1){
+            s1++;
+          }else if (tipo==2){
+            s2++;
+          }else{
+            s3++;
+          }
+          int si=0,sj=0;
+          while (true){
+            si = (int) (random(n));
+            sj = (int) (random(n));
+            if (grid[si][sj] == 0 && novoGrid[si][sj] == 0){
+              novoGrid[si][sj] = tipo;
+              novoGrid[i][j] = 0;
+                break;
+            }
+          }
+          
+        }else{
+          novoGrid[i][j] = grid[i][j];
+        }
+      }
+      
+    }
+  }
+  println(s1 + " " + s2 + " " + s3);
+  grid = novoGrid;
+}
+
+void draw(){
+  mostraGrid();
+  if (true){
+    atualizaGrid();
+  }
+}
