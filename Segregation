@@ -1,17 +1,21 @@
 int[][] grid;
-int n = 100;
+int n =500;
 int tam = 900;
 boolean run = false;
 int grid_selected = 0;
 int qt_grids = 0;
-int cor1 = #1CE824;
-int cor2 = #1C38E8;
+int c1 = #6C572F; // Preto
+int c2 = #F7E0C3; // Branco
+int c3 = #42E361; // Verde
+int c4 = #4281E3; // Azul
+int cor1 = c3;
+int cor2 = c4;
 int tipo1 = 1;
 int tipo2 = 2;
 
 void setup(){
   size(1000,1000);
-  frameRate(10);
+  frameRate(100);
   grid = criaGrid();
 }
 
@@ -80,30 +84,35 @@ int vizinhosVivos(int tipo,int i, int j){
 
 void atualizaGrid(){
   int[][] novoGrid = new int[n][n];
-  
+  int s = 0;
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
       if (grid[i][j] != 0){
+        
         int tipo = grid[i][j];
         int viz = vizinhosVivos(grid[i][j],i,j);
         if (viz < 4){
+          s++;
           int si=0,sj=0;
           while (true){
             si = (int) (random(n));
             sj = (int) (random(n));
-            if (grid[si][sj] == 0){
+            if (grid[si][sj] == 0 && novoGrid[si][sj] == 0){
+              novoGrid[si][sj] = tipo;
+              novoGrid[i][j] = 0;
                 break;
             }
           }
-          grid[si][sj] = tipo;
-          grid[i][j] = 0;
+          
+        }else{
+          novoGrid[i][j] = grid[i][j];
         }
       }
       
     }
   }
-  
-  //grid = novoGrid;
+  println(s);
+  grid = novoGrid;
 }
 
 void draw(){
