@@ -3,6 +3,7 @@ char[][] gridD;
 int[][][] grids;
 int[][] gridI;
 int n = 200;
+
 float probN = 0.001;
 int tam = 500;
 boolean run = false;
