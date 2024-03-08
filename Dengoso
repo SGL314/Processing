@@ -4,7 +4,6 @@ class Objeto{
     px = ix;
     py = iy;
   }
-    
 }
 
 class Pessoa extends Objeto{
