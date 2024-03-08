@@ -1,0 +1,82 @@
+class Objeto{
+  int px,py;
+  public Objeto(int ix,int iy){
+    px = ix;
+    py = iy;
+  }
+    
+}
+
+class Pessoa extends Objeto{
+  boolean infectada = false, hemorragica = false;
+  float prob_dengueHemo = 1/100f;
+  
+  public Pessoa(int ix, int iy){
+    super(ix, iy);
+  }
+}
+
+class Mosquito extends Objeto{
+  boolean infectado = false;
+  public Mosquito(int ix, int iy){
+    super(ix, iy);
+  }
+}
+
+int corPssNormal = #6FD81A;
+int corPssInfect = #D87D1A;
+int corPssHemor  = #D8241A;
+int corMosNormal = #1A97D8;
+int corMosInfect = #D51AD8;
+
+int tamPss = 4;
+int tamMos = 2;
+
+Pessoa[] pessoas;
+Mosquito[] mosquitos;
+
+void setup(){
+  size(1000,1000);
+  frameRate(100);
+  criaPessoa(1000);
+  criaMosquito(1);
+}
+
+int rd(int n){
+  return (int) random(n);
+}
+
+void criaPessoa(int qt){
+  int rx,ry;
+  pessoas = new Pessoa[qt];
+  for (int i=0;i<qt;i++){
+    rx = rd(width);
+    ry = rd(height);
+    pessoas[i] = Pessoa(rx,ry);
+  }
+}
+
+void criaMosquito(int qt){
+  int rx,ry;
+  mosquitos = new Mosquito[qt];
+  for (int i=0;i<qt;i++){
+    rx = rd(width);
+    ry = rd(height);
+    mosquitos[i] = Mosquito(rx,ry);
+  }
+}
+
+void draw(){
+  int cor;
+  for (Pessoa pss : pessoas){
+    if (!(pss.infectada)){
+      cor = corPssInfect;
+    }else if (pss.infectada){
+      cor = corPssInfect;
+    }else{
+      cor = corPssNormal;
+    }
+    fill(cor);
+    circle(pss.px, pss.py, tamPss);
+  }
+}
