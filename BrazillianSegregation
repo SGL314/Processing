@@ -123,7 +123,7 @@ void atualizaGrid(){
       
     }
   }
-  println(s1 + " " + s2 + " " + s3);
+  println("G: "+s1 + " B:" + s2 + " Y:" + s3);
   grid = novoGrid;
 }
 
