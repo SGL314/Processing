@@ -1,0 +1,57 @@
+int[] array;
+int n = 50;
+int teto;
+
+void setup(){
+    size(500,500);
+    create();
+    thread("SS");
+}
+
+void create(){
+  array = new int[n];
+  teto = 100;
+  for (int i =0;i<n;i++){
+    array[i] = (int) random(teto);
+  }
+}
+           
+
+void SS(){
+    while (true){
+        ShellSort(array);
+        break;
+    }
+}
+
+void ShellSort(int[] arr){
+  n = arr.length;
+  int h = 1;
+  while (h< n/3){
+    h = 3*h + 1;
+  }
+  while (h >= 1){
+      for (int i = h; i<n;i++){
+          int temp = arr[i];
+          int j = i;
+          while (j>= h && arr[j-h] > temp){
+              arr[j] = arr[j-h];
+              j -= h;
+          }
+          arr[j] = temp;
+          delay(100);
+      }
+      h /= 3;
+  }
+}
+        
+void draw(){
+    background(0,0,0);
+    int p=1;
+    for (int v : array){
+        fill(0,0,255);
+        rect(width/n*(p-1),height - height/teto*v,width/n,height/10*v);
+        p+=1;
+    }
+}
+// BY SGL
