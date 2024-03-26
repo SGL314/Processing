@@ -1,9 +1,11 @@
 int[] array;
 int n = 50;
 int teto;
+int pi = 0;
+int pj = 0;
 
 void setup(){
-    size(500,500);
+    size(800,800);
     create();
     thread("SS");
 }
@@ -14,13 +16,15 @@ void create(){
   for (int i =0;i<n;i++){
     array[i] = (int) random(teto);
   }
+  pi = 0;
+  pj = 0;
 }
            
 
 void SS(){
     while (true){
         ShellSort(array);
-        break;
+        create();
     }
 }
 
@@ -32,14 +36,18 @@ void ShellSort(int[] arr){
   }
   while (h >= 1){
       for (int i = h; i<n;i++){
+          pi = i;
+          delay(50);
           int temp = arr[i];
           int j = i;
           while (j>= h && arr[j-h] > temp){
               arr[j] = arr[j-h];
               j -= h;
+              pj = j;
+              delay(50);
           }
           arr[j] = temp;
-          delay(100);
+          delay(50);
       }
       h /= 3;
   }
@@ -50,8 +58,12 @@ void draw(){
     int p=1;
     for (int v : array){
         fill(0,0,255);
+        if (pi == p-1)
+          fill(0,255,0);
+        if (pj == p-1)
+          fill(255,0,0);
+        
         rect(width/n*(p-1),height - height/teto*v,width/n,height/10*v);
         p+=1;
     }
 }
-// BY SGL
