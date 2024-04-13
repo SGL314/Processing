@@ -1,6 +1,6 @@
 Astro[] astros = new Astro[0];
 int coeVel = 10;
-int qt = 1000;
+int qt = 500;
 
 void setup(){
   size(800,800);

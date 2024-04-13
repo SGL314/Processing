@@ -1,6 +1,6 @@
 Astro[] astros = new Astro[0];
 int coeVel = 10;
-int qt = 1000;
+int qt = 5;
 
 void setup(){
   size(800,800);
@@ -10,7 +10,7 @@ void setup(){
 void createAstros(){
   astros = new Astro[qt];
   for (int i=0;i<astros.length;i++){
-    astros[i] = new Astro();
+    astros[i] = new Astro(i);
   }
 }
 
@@ -38,7 +38,7 @@ void org(Astro ast,int pos){
     }
   }
 
-  float last = 100000000;
+  float last = 0;
   for (Astro asti : astros){
     if (asti.r <= last){
       last = asti.r;

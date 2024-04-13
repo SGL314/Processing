@@ -12,6 +12,14 @@ class Astro{
     this.dist = (float)random(width/3)+75+this.r/2;
     this.cor = color((int)random(256),(int)random(256),(int)random(256));
   }
+
+  Astro(int coe){
+    this.omega = ((float)random(1000) +1)/50;
+    this.ang = 0;
+    this.r = 10*coe+5;
+    this.dist = 75 + 20 + 100;
+    this.cor = color((int)random(256),(int)random(256),(int)random(256));
+  }
   
   void update(){
     this.ang += this.omega/frameRate*10;
