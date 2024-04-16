@@ -1,8 +1,7 @@
 Astro[] astros = new Astro[0];
 int coeVel = 10;
 int qt = 2;
-double G = 6.6743*pow(10,-2);
-boolean run = true;
+double G = 6.6743*pow(10,-11);
 
 void setup(){
   size(800,800);
@@ -17,7 +16,7 @@ void createAstros(){
       astros[i].init(qt);
       continue;
     }
-    astros[i] = new Astro(1,0,-75,0.5,180);
+    astros[i] = new Astro(100,0,-200,0.2,180);
     astros[i].init(qt);
   }
 }
@@ -51,9 +50,8 @@ void forces(){
       ang = angulo(a1,a2);
       dist = distLin(a1,a2);
       
-      a2.Vets[p].v = G*a1.massa*a2.massa/pow((float) dist,2);
-      a2.Vets[p].a = ang*PI/180;
-      //print("|" + a1.Vets[p].v);
+      a1.Vets[p].v = G*a1.massa*a2.massa/pow((float) dist,2);
+      a1.Vets[p].a = ang;
     }
   }
   print("|\n");
@@ -85,24 +83,15 @@ void org(Astro ast,int pos){
 
 void draw(){
   translate(height/2,width/2);
-  
+  background(#000000);
   //fill(#FFED4B);
   //ellipse(0,0, 150,150);
   //delay(1000);
-  if (run){
-    background(#000000);
-    forces();
-    
-    for (int i=0;i<astros.length;i++){
-      org(astros[i],i);
-      astros[i].update();
-      astros[i].show();
-    }
-  }
-}
-
-void keyReleased() {
-  if (keyCode == CONTROL){
-    run = (run == false) ? true : false;
+  forces();
+  
+  for (int i=0;i<astros.length;i++){
+    org(astros[i],i);
+    astros[i].update();
+    astros[i].show();
   }
 }
