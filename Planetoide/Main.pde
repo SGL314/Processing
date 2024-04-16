@@ -17,19 +17,7 @@ void createAstros(){
 void org(Astro ast,int pos){
   int cof = 1;
   boolean yes = true;
-
-  // while (cof <= astros.length){
-  //   if (ast.r < astros[astros.length-cof].r){
-  //     Astro take = astros[astros.length-1];
-  //     astros[astros.length-1] = ast;
-  //     astros[pos] = take;
-  //     break;
-  //   }else{
-      
-  //     if (astros.length-cof == pos) break;
-  //     cof += 1;
-  //   }
-  // }
+  
   if (pos < astros.length-1){
     if (ast.r < astros[pos+1].r){
       Astro take = astros[pos+1];
