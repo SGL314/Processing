@@ -1,14 +1,18 @@
 Astro[] astros = new Astro[0];
 int coeVel = 10;
-int qt = 3;
+int qt = 5;
 double G = 6.6743*pow(10,-2);
 boolean run = true;
 float tx=0,ty=0;
 int posObj = 0;
+float coeDil = 1;
+int count = 0;
 
 void setup(){
-  size(800,800);
+  size(1000,1000);
+  background(#000000);
   createAstros();
+  frameRate(50);
   tx = width/2;
   ty = height/2;
 }
@@ -20,11 +24,15 @@ void createAstros(){
       astros[i] = new Astro(10000,0,0);
       astros[i].init(qt);
       continue;
+    }else if (i==1){
+      astros[i] = new Astro(10,0,-75 - (i)*200-10,4-i/2+0.5,180);
+      astros[i].init(qt);
+      continue;
     }
     
     
     
-    astros[i] = new Astro(1000,0,-75 - (i-1)*100,4-i,180);
+    astros[i] = new Astro(1000,0,-75 - (i-1)*200,4-i/2-1,180);
     astros[i].init(qt);
   }
 }
@@ -89,23 +97,30 @@ void org(Astro ast,int pos){
       yes = false;
       break;
     }
+    
   }
   //print(yes, '\n');
 }
 
 void draw(){
-  translate(tx,ty);
-  tx = (float)(-astros[posObj].x+width/2);
-  ty = (float)(-astros[posObj].y+height/2);
+  translate(width/2+tx,height/2+ty);
+  scale(coeDil);
+  background(0);
+  if (posObj != -1){
+    
+    tx = (float)(-astros[posObj].x+width/2)*coeDil;
+    ty = (float)(-astros[posObj].y+height/2)*coeDil;
+    posObj = -1;
+  }
   //tx = (float) astros[qt-1].x;
-  
-  
-  
-  //fill(#FFED4B);
-  //ellipse(0,0, 150,150);
-  //delay(1000);
+  //count += 1;
+  //if (count >= 100){
+    //background(#000000);
+    //count = 0;
+  //}
   if (run){
-    background(#000000);
+    
+    
     forces();
     
     for (int i=0;i<astros.length;i++){
@@ -119,14 +134,35 @@ void draw(){
 void keyReleased() {
   if (keyCode == CONTROL){
     run = (run == false) ? true : false;
-  }else if (keyCode == UP){
+  }else if (keyCode == LEFT){
     posObj += 1;
-  }else if (keyCode == DOWN){
+  }else if (keyCode == RIGHT){
     posObj -= 1;
+  }else if (keyCode == UP){
+    coeDil += 0.02;
+  }else if (keyCode == DOWN){
+    coeDil -= 0.02;
   }
-  if (posObj <0){
-    posObj += qt;
+  
+  if (posObj <-1){
+    posObj += qt+1;
   }else if (posObj >= qt){
     posObj = 0;
   }
+  
+  if (coeDil < 0){
+    coeDil = 0;
+  }
+}
+
+void mouseDragged(){
+  tx += mouseX - pmouseX;
+  
+  ty += mouseY - pmouseY;
+}
+
+void mouseWheel(MouseEvent event) {
+  float e = event.getCount(); 
+  if(e < 0) coeDil+=0.02; 
+  else coeDil-=0.02; 
 }
