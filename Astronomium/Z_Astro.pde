@@ -96,9 +96,9 @@ class Astro{
     fill(this.cor);
     ellipse((float) this.x,(float) this.y,r,r);
     
-    fill(#0000FF);
-    float coe = 33;
-    stroke(128);
-    line((float) this.x,(float) this.y,(float) (this.x+this.velX*coe),(float) (this.y+this.velY*coe));
+    //fill(#0000FF);
+    float coe = 10;
+    //stroke(128);
+    //line((float) this.x*coeDil,(float) this.y*coeDil,(float) (this.x+this.velX*coe)*coeDil,(float) (this.y+this.velY*coe)*coeDil);
   }
 }
