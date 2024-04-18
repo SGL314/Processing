@@ -12,8 +12,13 @@ class Astro{
   Vector[] Vets;
   private double G = 6.6743*pow(10,-11);
   int lineTraj = 0;
+  boolean isStar = false;
+  boolean onLux = false;
   
   ArrayList<Point> rastro = new ArrayList<Point>();
+
+  int lineVel = 0;
+  int lineFor = 0;
 
   public color padcolor(int sum){
     return color((int) random(255-sum)+sum,(int) random(255-sum)+sum,(int) random(255-sum)+sum);
@@ -80,6 +85,10 @@ class Astro{
       if (a != 0 && a != 180)
         compY += v.v*sin((float) v.a);
     }
+    for (Vector vec : Vets){
+      vec.a = 0;
+      vec.v = 0;
+    }
     //print("/" + compX + "/" + compY + "/\n");
     this.cx = compX;
     this.cy = -compY;
@@ -99,15 +108,73 @@ class Astro{
       if(rastro.size() > 1000) rastro.remove(0);
     }
   }
+
+  void sleep(float segs){
+    int m = millis();
+    while (millis()-m<segs*1000);
+  }
+
+  void lux(){
+    stroke(0);
+    float r1=0,r2=0,g1=0,g2=0,b1=0,b2=0,tot = (int) pow(16,6);
+    int dist = 200,p=1,resCor;
+    float varR,varG,varB;
+
+    b1 = (tot+this.cor)%((int)pow(16,2));
+    g1 = (tot+this.cor-b1)/((int)pow(16,2))%((int)pow(16,2));
+    r1 = ((tot+this.cor-b1)/((int)pow(16,2))-g1)/((int)pow(16,2));
+
+    float coeDiscolor = 0.75;
+    float coeDist = 3;
+    dist *= 1;
+
+    r1 *= coeDiscolor;
+    g1 *= coeDiscolor;
+    b1 *= coeDiscolor;
+
+    varR = (r2-r1)/dist;
+    varG = (g2-g1)/dist;
+    varB = (b2-b1)/dist;
+
+    
+    r1=0;
+    g1=0;
+    b1=0;
+    
+
+
+    while (p<=dist){
+      stroke(0);
+      
+      r1 += -varR;
+      g1 += -varG;
+      b1 += -varB;
+      fill(color(r1,g1,b1));
+      //stroke(resCor);
+      
+      print(r1+"," +g1+"," +b1 +" : "+color(r1,g1,b1)+ "\n");
+      //background(resCor);
+      //sleep(0.01);
+      ellipse((float) this.x,(float) this.y,r+dist*coeDist-p*coeDist,r+dist*coeDist-p*coeDist);
+      p++;
+    }
+
+    
+
+  }
   
   void show(){
+    
+
+    
+    if (this.isStar && this.onLux){
+      lux();
+    }
     stroke(0);
     fill(this.cor);
     ellipse((float) this.x,(float) this.y,r,r);
-
-    int lineVel = 0;
-    int lineFor = 1;
     float coe = 10;
+    
 
 
     synchronized(this){
@@ -121,11 +188,11 @@ class Astro{
     }
     
     
-    if (lineVel == 1){
+    if (this.lineVel == 1){
       stroke(#0000FF);
       line((float) this.x,(float) this.y,(float) (this.x+this.velX*coe),(float) (this.y+this.velY*coe));
     }
-    if (lineFor == 1){
+    if (this.lineFor == 1){
       stroke(#FF0000);
       line((float) this.x,(float) this.y,(float) (this.x+this.cx*coe),(float) (this.y+this.cy*coe));
     }
