@@ -1,15 +1,12 @@
 Astro[] astros = new Astro[0];
 int coeVel = 10;
-int qtCentr = 8;
-int qtBlHl = 1;
-int qt = 10;
+int qt = 18;
 double G = 6.6743*pow(10,-2);
 boolean run = false;
 float tx=0,ty=0;
 int posObj = 0;
 float coeDil = 1;
 int count = 0;
-int lineTraj = 0;
 
 void setup(){
   size(1000,1000);
@@ -30,36 +27,30 @@ float sqrt(double val){
 
 void createAstros(){
   astros = new Astro[qt];
-  int coeDist = 30;
+  int coeDist = 33;
   double D=0,V=0,d=0,v=0,a,dx,dy,setAngVel;
-  double velStar = 1;
   for (int i=0;i<astros.length;i++){
     if (i==1){
       D = -75-(i-1)*coeDist;
-      V = -(4-i/2-1-velStar+1);
+      V = 4-i/2-1;
     }
     if (i==0){
-      astros[i] = new Astro(1000,0,0,velStar,0);
+      astros[i] = new Astro(1000,0,0);
       astros[i].init(qt);
       astros[i].cor = #FFF412;
       continue;
-    }else if (i < qtCentr+1){
-      d = -25-(i-1)*coeDist;
-      v = (double) -(sqrt((float) (Pow(V,2) * (D/d)))) * sqrt(astros[0].massa/10000) -velStar;
+    }else if (i < 8){
+      d = -75-(i-1)*coeDist;
+      v = (double) (sqrt((float) (Pow(V,2) * (D/d)))) * sqrt(astros[0].massa/10000);
       astros[i] = new Astro(1,0,(float) d,(float) v,180);
       astros[i].init(qt);
-    }else if (i < qtCentr+1+qtBlHl){
-      v = 0;
-      d = -6000;
-      astros[i] = new Astro(100000,0,(float) d,(float) v,180);
-      astros[i].cor = #0000FF;
-      // astros[i].r /= 3.16;
-      astros[i].init(qt);
     }else{
-      d = -75-((qt-qtCentr-qtBlHl)-1)*coeDist;
+      d = -75-(qt/2-1)*coeDist;
       v = (double) (sqrt((float) (Pow(V,2) * (D/d)))) * sqrt(astros[0].massa/10000);
-      a = 360/((qt-qtCentr-qtBlHl-1)) * (i-(qt-qtCentr-qtBlHl));
+      a = 360/(qt/2) * (i-qt/2);
 
+      
+      
       dx = cos((float)(a*PI/180))*d;
       dy = sin((float)(a*PI/180))*d;
       if (i%2 == 1){
@@ -79,48 +70,6 @@ void createAstros(){
   }
 }
 
-void realloc(int p){
-  qt -= 1;
-  for (int i = p;i<qt;i++){
-    astros[i] = astros[i+1];
-  }
-}
-
-int ind(Astro a){
-  for (int i=0;i<qt;i++){
-    if (astros[i] == a){
-      return i;
-    }
-  }
-  return 0;
-}
-
-void collision(Astro a){
-  Astro sum,sub;
-  int p =0;
-  for (Astro b : astros){
-    if(a == b){
-      continue;
-    }
-    if (distLin(a,b) < a.r/2 + b.r/2){
-      if (a.massa >= b.massa){
-        sum = a;
-        sub = b;
-      }else{
-        sum = b;
-        sub = a;
-      }
-      sum.velX += ((sub.velX - sum.velX)*sub.massa)/sum.massa;
-      sum.velY += ((sub.velY - sum.velY)*sub.massa)/sum.massa;
-      sum.massa += sub.massa;
-      p = ind(sub);
-      realloc(p);
-      sum.r = (pow((float) sum.massa/PI,0.5f)+5/0.5)*0.5;
-      break;
-    }
-  }
-  p++;
-}
 
 double angulo(Astro a,Astro b){
   double dx = a.x - b.x;
@@ -177,15 +126,12 @@ void draw(){
     forces();
     for (int i=0;i<astros.length;i++){
       astros[i].update();
-      collision(astros[i]);
       astros[i].show();
-      astros[i].lineTraj = lineTraj;
     }
   }else{
     background(0);
     for (int i=0;i<astros.length;i++){
       astros[i].show();
-      astros[i].lineTraj = lineTraj;
     }
   }
 }
@@ -206,8 +152,6 @@ void keyReleased() {
     coeDil *= 1.02;
   }else if (keyCode == DOWN){
     coeDil *= 1/1.02;
-  }else if (keyCode == ALT){
-    lineTraj = (lineTraj==0) ? 1: 0;
   }
   
   if (posObj <-1){
