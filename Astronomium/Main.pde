@@ -17,14 +17,20 @@ boolean do_passFrame = false;
 int show_lineVel = 0;
 int show_lineFor = 0;
 int loop = -1;
+float fps = 0;
+int FraRat =1000;
+boolean do_FraRat = false;
+double coeTemp = 1;
 
 void setup(){
   size(1000,1000);
   background(#000000);
   createAstros();
-  frameRate(500);
+  
   tx = width/2;
   ty = height/2;
+  coeDil = 1;
+  thread("counterFps");
 }
 
 double Pow(double a,double b){
@@ -39,9 +45,11 @@ void createAstros(){
   astros = new Astro[qt];
   int coeDist = 200;
   double D=0,V=0,d=0,v=0,a,dx,dy,setAngVel,velOrbit;
-  double velStar = 6; // 6
-  int CoemassBlHl = 1;
-  int CoemassStar = 1;
+  double velStar = -80; // 6
+  double velStar2 = 40;
+  int CoemassBlHl = 0;
+  int CoemassStar = 0;
+  boolean do_simulation = true;
   for (int i=0;i<astros.length;i++){
     if (i==1){
       D = -75-(i-1)*coeDist;
@@ -54,29 +62,35 @@ void createAstros(){
       astros[i].init(qt);
       astros[i].cor = #FFF412;
       if (i == 1){
-        astros[i] = new Astro(100000,0,0,velStar,180);
+        astros[i] = new Astro(100000,0,0,velStar2,180);
         astros[i].y = -30000;
-        astros[i].massa = (1000*pow(10,5)-0.00001)*CoemassStar + 0.001;
+        astros[i].massa = (5*pow(10,6)-0.00001)*CoemassStar + 0.001;
         astros[i].init(qt);
         astros[i].cor = #F23918;
       }
+      astros[i].funcRaw(1);
       astros[i].isStar = true;
     }else if (i < qtCentr+qtStars){
       d = -100-(i-qtStars)*coeDist;
       v = (double) -(sqrt((float) (Pow(V,2) * (D/d)))) * sqrt(astros[0].massa/10000) -velStar;
       astros[i] = new Astro(1000,0,(float) d,(float) v,180);
       astros[i].init(qt);
-      if (i != qtCentr+qtStars-1){
-        //astros[i].velX = -100;
-        //astros[i].massa = 0.0001;
-      }
+      if (do_simulation)
+        if (i != qtCentr+qtStars-1){
+          astros[i].velX = -100;
+          astros[i].massa = 0.0001;
+        }else{
+          astros[i].velX = 0;
+          velStar = 0;
+        }
+      astros[i].funcRaw(2);
     }else if (i < qtCentr+qtStars+qtBlHl){
       v = 0;
       d = -15000;
       astros[i] = new Astro(1000000,0,(float) d,(float) v,180);
       astros[i].cor = #6BD1F7;
-      astros[i].massa = (5*pow(10,6)-1)*CoemassBlHl + 1;
-      // astros[i].r /= 3.16;
+      astros[i].massa = (10*pow(10,6)-1)*CoemassBlHl + 1;
+      astros[i].funcRaw(0);
       astros[i].init(qt);
       astros[i].isStar = true;
     }else if (i < qtCentr+qtStars+qtBlHl+qtMoons){
@@ -85,7 +99,7 @@ void createAstros(){
       d = -100-(i-qtStars-qtBlHl-qtCentr+pos-1)*coeDist-20;
       v = (double) -(sqrt((float) (Pow(V,2) * (D/d)))) * sqrt(astros[0].massa/10000) -velStar-velOrbit;
       astros[i] = new Astro(1,0,(float) d,(float) v,180);
-      astros[i].r *= 0.75;
+      astros[i].funcRaw(2);
       astros[i].init(qt);
     }else{
       
@@ -162,7 +176,7 @@ void collision(Astro a){
       sum.velX += ((sub.velX - sum.velX)*sub.massa)/sum.massa;
       sum.velY += ((sub.velY - sum.velY)*sub.massa)/sum.massa;
       realloc(ind(sub),ind(sum));
-      sum.r = (pow((float) sum.massa/PI,0.5f)+5/0.5)*0.5;
+      sum.funcRaw();
       break;
     }
   }
@@ -198,7 +212,7 @@ void forces(){
       ang = angulo(a1,a2);
       dist = distLin(a1,a2);
       
-      a2.Vets[p].v = G*a1.massa*a2.massa/pow((float) dist,2);
+      a2.Vets[p].v = G*a1.massa*a2.massa/pow((float) dist,2) * coeTemp;
       a2.Vets[p].a = ang*PI/180;
       //print("|" + a1.Vets[p].v);
       
@@ -211,7 +225,9 @@ void forces(){
 
 void draw(){
   boolean onLux = false;
-  
+  if (coeDil < 0.045){
+    onLux = true;
+  }
   
   translate(width/2+tx,height/2+ty);
   scale(coeDil);
@@ -220,20 +236,19 @@ void draw(){
     tx = (float)(-astros[posObj].x*coeDil);
     ty = (float)(-astros[posObj].y*coeDil);
   }
-  if (coeDil > 10){
-    onLux = true;
-  }
+  
 
   // Engine
+  ArrayList<Draw[]> showAfter = new ArrayList<Draw[]>();
   if (run || do_passFrame){
     loop += 1;
     print(loop + "\n");
     background(0);
     forces();
     for (Astro ast : astros){
-      ast.update();
+      ast.update(coeTemp);
       collision(ast);
-      ast.show();
+      showAfter.add(ast.show(coeTemp));
       ast.lineTraj = lineTraj;
       ast.lineVel = show_lineVel;
       ast.lineFor = show_lineFor;
@@ -243,22 +258,41 @@ void draw(){
   }else{
     background(0);
     for (Astro ast : astros){
-      ast.show();
+      showAfter.add(ast.show(coeTemp));
       ast.lineTraj = lineTraj;
       ast.lineVel = show_lineVel;
       ast.lineFor = show_lineFor;
       ast.onLux = onLux;
     }
   }
+  // After
+  for (Draw[] drs : showAfter){
+    for (Draw dr : drs){
+      dr.build();
+    }
+  }
+  // Ecrivent
+  String texto = "coeDil : " + coeDil;
+  float tam = 50;
+  float padding = 10;
+  textSize(tam/(coeDil));
+  fill(#FFFFFF);
+  float difX = -width/2-tx;
+  float difY = -height/2-ty;
+  text(texto,(padding+difX)/coeDil,(difY+height-tam-padding)/(coeDil));
+  ecri("Fps : "+fps,#FFFFFF,10,10,50,10);
+  ecri("FraRat : "+FraRat,#FFFFFF,10,10+50+5,50,10);
+  ecri("coeTemp : "+coeTemp,#00FF00,width-320,10,50,10);
 }
 
 void keyPressed(){
   if (keyCode == CONTROL){
     passFrame = true;
+    do_FraRat = true;
   }
 }
 
-void keyReleased() {
+void keyReleased(){
   if (keyCode == CONTROL){
     run = (run == false) ? true : false;
   }else if (keyCode == LEFT){
@@ -271,9 +305,9 @@ void keyReleased() {
     posObj = -1;
     print(posObj + "\n");
   }else if (keyCode == UP){
-    coeDil *= 1.02;
+    coeTemp += (coeTemp <= 0.1) ? coeTemp/2 : 0.1;
   }else if (keyCode == DOWN){
-    coeDil *= 1/1.02;
+    coeTemp -= (coeTemp <= 0.1) ? coeTemp/2 : 0.1;
   }else if (keyCode == ALT){
     lineTraj = (lineTraj==0) ? 1: 0;
   }
@@ -291,10 +325,13 @@ void keyReleased() {
   }else if (posObj >= qt){
     posObj = -1;
   }
-  
-  if (coeDil < 0){
-    coeDil = 0;
+  if (coeDil < 0.001){
+    coeDil = 0.001;
   }
+  if (coeTemp < 0){
+    coeTemp = 0;
+  }
+  
 }
 
 void mouseDragged(){
@@ -304,6 +341,23 @@ void mouseDragged(){
 
 void mouseWheel(MouseEvent event) {
   float e = event.getCount(); 
-  if(e < 0) coeDil+=0.02; 
-  else coeDil-=0.02; 
+  coeDil-=(coeDil)/2 * (e/sqrt(pow(e,2)));
+  if (coeDil < 0.001){
+    coeDil = 0.001;
+  }
+}
+
+void ecri(String texto,int cor,float x,float y,float tam,float padding){
+  textSize(tam/(coeDil));
+  fill(cor);
+  text(texto,(x-width/2-tx)/coeDil,(-height/2-ty+y+tam)/(coeDil));
+}
+
+void counterFps(){
+  int last;
+  while (true){
+    last = loop;
+    delay(1000);
+    fps = (loop - last);
+  }
 }

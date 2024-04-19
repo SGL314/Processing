@@ -19,15 +19,47 @@ class Astro{
 
   int lineVel = 0;
   int lineFor = 0;
+  int typeFuncRaw = 0;
 
   public color padcolor(int sum){
     return color((int) random(255-sum)+sum,(int) random(255-sum)+sum,(int) random(255-sum)+sum);
+  }
+
+  private void funcRaw(int type){
+    switch (type){
+      case 0: // BlackHole
+        this.r = (pow((float) this.massa/PI,0.5f)+5/0.5)*0.5f/3.1622776601683793319988935444327;
+        break;
+      case 1: // Star
+        this.r = (pow((float) this.massa/PI,0.5f)+5/0.5)*0.5;
+        break;
+      case 2: // Planet
+        this.r = (pow((float) this.massa/PI,0.5f)+5/0.3)*0.3f;
+        break;
+      case 3: // Asteroid
+        this.r = (pow((float) this.massa/PI,0.5f)+5/0.5)*0.5*0.75;
+        break;
+    }
+    this.typeFuncRaw = type;
+  }
+  private void funcRaw(){
+    switch (this.typeFuncRaw){
+      case 0: // Star
+        this.r = (pow((float) this.massa/PI,0.5f)+5/0.3)*0.3f;
+        break;
+      case 1: // Planet
+        this.r = (pow((float) massa/PI,0.5f)+5/0.5)*0.5;
+        break;
+      case 2: // Asteroid
+        this.r = (pow((float) massa/PI,0.5f)+5/0.5)*0.5*0.75;
+        break;
+    }
   }
   
   Astro(double massa,double x,double y){
     this.omega = ((float)random(1000) +1)/50;
     this.ang = 0;
-    this.r = (pow((float) massa/PI,0.5f)+5/0.3)*0.3f;
+    //funcRaw(0);
     this.dist = (float)random(width/3)+75+this.r/2;
     this.cor = padcolor(128);
     this.massa = massa;
@@ -37,7 +69,7 @@ class Astro{
   Astro(double massa,double x,double y,double vel,double angVel){
     this.omega = ((float)random(1000) +1)/50;
     this.ang = 0;
-    this.r = (pow((float) massa/PI,0.5f)+5/0.5)*0.5;
+    //funcRaw(1);
     this.dist = (float)random(width/3)+75+this.r/2;
     this.cor = padcolor(128);
     this.massa = massa;
@@ -97,15 +129,15 @@ class Astro{
     this.velY += -compY/this.massa;
   }
   
-  void update(){
+  void update(double temp){
     double descX=0,descY=0;
     forces();
-    this.x += this.velX;
-    this.y += this.velY;
+    this.x += this.velX * temp;
+    this.y += this.velY * temp;
     
     synchronized(this){
       rastro.add(new Point(this.x,this.y));
-      if(rastro.size() > 1000) rastro.remove(0);
+      if(rastro.size() > 1000/temp) rastro.remove(0);
     }
   }
 
@@ -125,8 +157,8 @@ class Astro{
     r1 = ((tot+this.cor-b1)/((int)pow(16,2))-g1)/((int)pow(16,2));
 
     float coeDiscolor = 0.75;
-    float coeDist = 3;
-    dist *= 1;
+    float coeDist = 20;
+    dist *= 1/coeDist*10;
 
     r1 *= coeDiscolor;
     g1 *= coeDiscolor;
@@ -144,17 +176,11 @@ class Astro{
 
 
     while (p<=dist){
-      stroke(0);
-      
       r1 += -varR;
       g1 += -varG;
       b1 += -varB;
-      fill(color(r1,g1,b1));
-      //stroke(resCor);
-      
-      print(r1+"," +g1+"," +b1 +" : "+color(r1,g1,b1)+ "\n");
-      //background(resCor);
-      //sleep(0.01);
+      noStroke();
+      fill(color(r1,g1,b1,5));
       ellipse((float) this.x,(float) this.y,r+dist*coeDist-p*coeDist,r+dist*coeDist-p*coeDist);
       p++;
     }
@@ -163,21 +189,27 @@ class Astro{
 
   }
   
-  void show(){
-    
-
-    
+  void synch(){
     if (this.isStar && this.onLux){
       lux();
     }
-    stroke(0);
-    fill(this.cor);
-    ellipse((float) this.x,(float) this.y,r,r);
-    float coe = 10;
-    
+    if (this.lineTraj == 0){
+      
 
+      fill(this.cor);
+      stroke(this.cor);
+      for(int k = 0; k < rastro.size(); k++){
+        point((float) rastro.get(k).x, (float)rastro.get(k).y);
+      }
+    }
+  }
 
+  Draw[] show(double temp){
+    float coe = 1f;
     synchronized(this){
+      if (this.isStar && this.onLux){
+        lux();
+      }
       if (this.lineTraj == 0){
         fill(this.cor);
         stroke(this.cor);
@@ -186,15 +218,24 @@ class Astro{
         }
       }
     }
-    
+
+    Draw[] draws = new Draw[3];
+    draws[0] = new Draw("None");
+    draws[1] = new Draw("None");
+    draws[2] = new Draw("None");
+    //draws[0] = new Draw(0,this.cor,(float) this.x,(float) this.y,r,"ellipse");
     
     if (this.lineVel == 1){
-      stroke(#0000FF);
-      line((float) this.x,(float) this.y,(float) (this.x+this.velX*coe),(float) (this.y+this.velY*coe));
+      draws[1] = new Draw(#0000FF,(float) this.x,(float) this.y,(float) (this.x+this.velX*coe),(float) (this.y+this.velY*coe),"line");
     }
     if (this.lineFor == 1){
+      coe /= temp;
       stroke(#FF0000);
       line((float) this.x,(float) this.y,(float) (this.x+this.cx*coe),(float) (this.y+this.cy*coe));
+      //draws[2] = new Draw(#FF0000,(float) this.x,(float) this.y,(float) (this.x+this.cx*coe),(float) (this.y+this.cy*coe),"line");
     }
+    
+    
+    return draws;
   }
 }
