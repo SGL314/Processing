@@ -18,7 +18,7 @@ int show_lineVel = 0;
 int show_lineFor = 0;
 int loop = -1;
 float fps = 0;
-int FraRat =1000;
+int FraRat =100;
 boolean do_FraRat = false;
 double coeTemp = 1;
 
@@ -43,13 +43,14 @@ float sqrt(double val){
 
 void createAstros(){
   astros = new Astro[qt];
-  int coeDist = 200;
+  int coeDist = 250;
   double D=0,V=0,d=0,v=0,a,dx,dy,setAngVel,velOrbit;
-  double velStar = -80; // 6
-  double velStar2 = 40;
+  double velStar = 6; // 6
+  double velStar2 = 4;
   int CoemassBlHl = 0;
-  int CoemassStar = 0;
-  boolean do_simulation = true;
+  int CoemassStar = 1;
+  int CoemassStar2 = 0;
+  boolean do_simulation = false;
   for (int i=0;i<astros.length;i++){
     if (i==1){
       D = -75-(i-1)*coeDist;
@@ -64,7 +65,7 @@ void createAstros(){
       if (i == 1){
         astros[i] = new Astro(100000,0,0,velStar2,180);
         astros[i].y = -30000;
-        astros[i].massa = (5*pow(10,6)-0.00001)*CoemassStar + 0.001;
+        astros[i].massa = (5*pow(10,6)-0.00001)*CoemassStar2 + 0.001;
         astros[i].init(qt);
         astros[i].cor = #F23918;
       }
@@ -98,7 +99,7 @@ void createAstros(){
       int pos = 5;
       d = -100-(i-qtStars-qtBlHl-qtCentr+pos-1)*coeDist-20;
       v = (double) -(sqrt((float) (Pow(V,2) * (D/d)))) * sqrt(astros[0].massa/10000) -velStar-velOrbit;
-      astros[i] = new Astro(1,0,(float) d,(float) v,180);
+      astros[i] = new Astro(0.01,0,(float) d,(float) v,180);
       astros[i].funcRaw(2);
       astros[i].init(qt);
     }else{
@@ -225,7 +226,7 @@ void forces(){
 
 void draw(){
   boolean onLux = false;
-  if (coeDil < 0.045){
+  if (coeDil < 0.063){
     onLux = true;
   }
   
@@ -236,8 +237,6 @@ void draw(){
     tx = (float)(-astros[posObj].x*coeDil);
     ty = (float)(-astros[posObj].y*coeDil);
   }
-  
-
   // Engine
   ArrayList<Draw[]> showAfter = new ArrayList<Draw[]>();
   if (run || do_passFrame){
@@ -282,7 +281,7 @@ void draw(){
   text(texto,(padding+difX)/coeDil,(difY+height-tam-padding)/(coeDil));
   ecri("Fps : "+fps,#FFFFFF,10,10,50,10);
   ecri("FraRat : "+FraRat,#FFFFFF,10,10+50+5,50,10);
-  ecri("coeTemp : "+coeTemp,#00FF00,width-320,10,50,10);
+  ecri("coeTemp : "+coeTemp,#00FF00,width-200,10,25,10);
 }
 
 void keyPressed(){
@@ -306,8 +305,10 @@ void keyReleased(){
     print(posObj + "\n");
   }else if (keyCode == UP){
     coeTemp += (coeTemp <= 0.1) ? coeTemp/2 : 0.1;
+    coeTemp = (double) round((float)coeTemp*100000)/100000;
   }else if (keyCode == DOWN){
     coeTemp -= (coeTemp <= 0.1) ? coeTemp/2 : 0.1;
+    coeTemp = (double) round((float)coeTemp*100000)/100000;
   }else if (keyCode == ALT){
     lineTraj = (lineTraj==0) ? 1: 0;
   }

@@ -16,6 +16,8 @@ class Draw{
         this.stroke = stroke;
         this.x = x;
         this.y = y;
+        this.a = a;
+        this.b = b;
         this.r = r;
         this.type = type;
     }

@@ -223,16 +223,14 @@ class Astro{
     draws[0] = new Draw("None");
     draws[1] = new Draw("None");
     draws[2] = new Draw("None");
-    //draws[0] = new Draw(0,this.cor,(float) this.x,(float) this.y,r,"ellipse");
+    draws[0] = new Draw(0,this.cor,(float) this.x,(float) this.y,this.r,"ellipse");
     
     if (this.lineVel == 1){
       draws[1] = new Draw(#0000FF,(float) this.x,(float) this.y,(float) (this.x+this.velX*coe),(float) (this.y+this.velY*coe),"line");
     }
     if (this.lineFor == 1){
       coe /= temp;
-      stroke(#FF0000);
-      line((float) this.x,(float) this.y,(float) (this.x+this.cx*coe),(float) (this.y+this.cy*coe));
-      //draws[2] = new Draw(#FF0000,(float) this.x,(float) this.y,(float) (this.x+this.cx*coe),(float) (this.y+this.cy*coe),"line");
+      draws[2] = new Draw(#FF0000,(float) this.x,(float) this.y,(float) (this.x+this.cx*coe),(float) (this.y+this.cy*coe),"line");
     }
     
     
