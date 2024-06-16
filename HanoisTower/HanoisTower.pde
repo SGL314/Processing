@@ -11,7 +11,7 @@ int movimentos = 0;
 Stack<Disco> bast1 = new Stack<Disco>();
 Stack<Disco> bast2 = new Stack<Disco>();
 Stack<Disco> bast3 = new Stack<Disco>();
-Stack<Disco> buf = new Stack<Disco>();
+Stack<Disco> buf   = new Stack<Disco>();
 Stack<Disco>[][] configuracao = new Stack[2][3];
 
 void setup(){
@@ -73,6 +73,7 @@ void desenhaDiscos(){
 }
 
 void colocaBuffer(){
+    podePegarAnterior = false;
     if (mouseX < width/4+width/8 && bast1.size() != 0){
         buf.push(bast1.pop());
         coloca_buffer = false;
@@ -89,17 +90,17 @@ void colocaBuffer(){
 }
 
 void puxaBuffer(){
-    podePegarAnterior = true;
     if (mouseX < width/4+width/8){
         if (bast1.size() != 0){
             if (buf.peek().comprimento < bast1.peek().comprimento){
                 bast1.push(buf.pop());
                 if (bast1.peek().bastao != 1){
                     bast1.peek().bastao = 1;
+                    podePegarAnterior = true;
+                    salvaConfiguracao();
                     movimentos++;
                 }
                 coloca_buffer = true;
-                salvaConfiguracao();
                 return;
             }
         }else{
@@ -107,6 +108,7 @@ void puxaBuffer(){
             if (bast1.peek().bastao != 1) movimentos++;
             bast1.peek().bastao = 1;
             coloca_buffer = true;
+            podePegarAnterior = true;
             salvaConfiguracao();
             return;
         }
@@ -116,10 +118,11 @@ void puxaBuffer(){
                 bast2.push(buf.pop());
                 if (bast2.peek().bastao != 2){
                     bast2.peek().bastao = 2;
+                    podePegarAnterior = true;
+                    salvaConfiguracao();
                     movimentos++;
                 }
                 coloca_buffer = true;
-                salvaConfiguracao();
                 return;
             }
         }else{
@@ -127,20 +130,21 @@ void puxaBuffer(){
             if (bast2.peek().bastao != 2) movimentos++;
             bast2.peek().bastao = 2;
             coloca_buffer = true;
+            podePegarAnterior = true;
             salvaConfiguracao();
             return;
         }
     }else{
-                
         if (bast3.size() != 0){
             if (buf.peek().comprimento < bast3.peek().comprimento){
                 bast3.push(buf.pop());
                 if (bast3.peek().bastao != 3){
                     bast3.peek().bastao = 3;
+                    podePegarAnterior = true;
+                    salvaConfiguracao();
                     movimentos++;
                 }
                 coloca_buffer = true;
-                salvaConfiguracao();
                 return;
             }
         }else{
@@ -148,6 +152,7 @@ void puxaBuffer(){
             if (bast3.peek().bastao != 3) movimentos++;
             bast3.peek().bastao = 3;
             coloca_buffer = true;
+            podePegarAnterior = true;
             salvaConfiguracao();
             return;
         }
@@ -165,17 +170,29 @@ void mousePressed(){
 }
 
 void salvaConfiguracao(){
-    for (int i =0;i<3;i++)
+    print("----------\n");
+    for (int i =0;i<3;i++){
         configuracao[0][i] = configuracao[1][i];
+    }
     configuracao[1][0] = copiaDiscos(bast1);
     configuracao[1][1] = copiaDiscos(bast2);
     configuracao[1][2] = copiaDiscos(bast3);
 }
 
 void salvaTodasConfiguracoes(){
-  salvaConfiguracao();
-  salvaConfiguracao();
-  podePegarAnterior = false;
+    for (int i =0;i<3;i++){
+      configuracao[0][i] = configuracao[1][i];
+    }
+    configuracao[1][0] = copiaDiscos(bast1);
+    configuracao[1][1] = copiaDiscos(bast2);
+    configuracao[1][2] = copiaDiscos(bast3);
+    for (int i =0;i<3;i++){
+      configuracao[0][i] = configuracao[1][i];
+    }
+    configuracao[1][0] = copiaDiscos(bast1);
+    configuracao[1][1] = copiaDiscos(bast2);
+    configuracao[1][2] = copiaDiscos(bast3);
+    podePegarAnterior = false;
 }
 
 void coletaConfiguracao(){
@@ -185,6 +202,7 @@ void coletaConfiguracao(){
       bast3 = configuracao[0][2];
       coloca_buffer = true;
       podePegarAnterior = false;
+      salvaConfiguracao();
       movimentos--;
     }
 }
