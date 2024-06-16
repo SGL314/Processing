@@ -1,21 +1,23 @@
 import java.util.Stack;
 
-int qtDiscos = 8;
+int qtDiscos = 5;
 int minTamanhoInicial = 40;
 int largura = 20;
 int variacaoTamanho = 20;
 boolean coloca_buffer = true;
+boolean podePegarAnterior = false;
 int movimentos = 0;
 
 Stack<Disco> bast1 = new Stack<Disco>();
 Stack<Disco> bast2 = new Stack<Disco>();
 Stack<Disco> bast3 = new Stack<Disco>();
 Stack<Disco> buf = new Stack<Disco>();
-Stack<Disco>[][] configuracao = new Stack[2][4];
+Stack<Disco>[][] configuracao = new Stack[2][3];
 
 void setup(){
     size(1000,800);
     criaDiscos();
+    salvaTodasConfiguracoes();
 }
 
 void criaDiscos(){
@@ -87,6 +89,7 @@ void colocaBuffer(){
 }
 
 void puxaBuffer(){
+    podePegarAnterior = true;
     if (mouseX < width/4+width/8){
         if (bast1.size() != 0){
             if (buf.peek().comprimento < bast1.peek().comprimento){
@@ -162,35 +165,45 @@ void mousePressed(){
 }
 
 void salvaConfiguracao(){
-    for (int i =0;i<4;i++)
+    for (int i =0;i<3;i++)
         configuracao[0][i] = configuracao[1][i];
     configuracao[1][0] = copiaDiscos(bast1);
     configuracao[1][1] = copiaDiscos(bast2);
     configuracao[1][2] = copiaDiscos(bast3);
-    configuracao[1][3] = copiaDiscos(buf);
+}
+
+void salvaTodasConfiguracoes(){
+  salvaConfiguracao();
+  salvaConfiguracao();
+  podePegarAnterior = false;
 }
 
 void coletaConfiguracao(){
-    bast1 = configuracao[0][0];
-    bast2 = configuracao[0][1];
-    bast3 = configuracao[0][2];
-    buf = configuracao[0][3];
-    coloca_buffer = true;
-    movimentos--;
+    if (podePegarAnterior){
+      bast1 = configuracao[0][0];
+      bast2 = configuracao[0][1];
+      bast3 = configuracao[0][2];
+      coloca_buffer = true;
+      podePegarAnterior = false;
+      movimentos--;
+    }
 }
 
 void verificaSeVenceu(){
     if (bast3.size() == qtDiscos){
         fill(#000000);
         textFont(createFont("arial",50));
-        text("Você Venceu",width/2-100,height/2-50);
+        if (pow(2,qtDiscos)-1 == movimentos)
+          text("Você Venceu",width/2-100,height/2-50);
+        else
+          text("Você Venceu\nMas da pra melhorar",width/2-100,height/2-50);
     }
 }
 
 void escreveQuantidadeMovimentos(){
     fill(#000000);
     textFont(createFont("arial",25));
-    text("Pontuação: "+movimentos,width-200,25);
+    text("Movimentos: "+movimentos,width-200,25);
 }
 
 void keyPressed(){
@@ -199,6 +212,7 @@ void keyPressed(){
     bast2 = new Stack<Disco>();
     bast3 =new Stack<Disco>();
     buf = new Stack<Disco>();
+    movimentos = 0;
     criaDiscos();
   }else if (key == 'a'){
     coletaConfiguracao();
