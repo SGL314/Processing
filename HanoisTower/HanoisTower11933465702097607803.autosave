@@ -1,0 +1,142 @@
+import java.util.Stack;
+
+int qtDiscos = 5;
+int tamanhoInicial = 120;
+int largura = 20;  
+int variacaoTamanho = 20;
+boolean coloca_buffer = true;
+
+Stack<Disco> bast1 = new Stack<Disco>();
+Stack<Disco> bast2 = new Stack<Disco>();
+Stack<Disco> bast3 = new Stack<Disco>();
+Stack<Disco> buf = new Stack<Disco>();
+
+void setup(){
+    size(800,800);
+    criaDiscos();
+}
+
+void criaDiscos(){
+    int n = 1;
+    while (n<=qtDiscos){
+        bast1.push(new Disco( tamanhoInicial-variacaoTamanho*(n-1), largura));
+        n++;
+    }
+}
+
+void draw(){
+    background(#FFFFFF);
+    desenhaBastoes();
+    desenhaDiscos();
+    verificaSeVenceu();
+}
+
+void desenhaBastoes(){
+    float dist = width/4;
+    int larg = 20;
+    int bastao = 1;
+    while (bastao < 4){
+        fill(#716E6E);
+        rect(bastao*dist-larg/2,height/3,larg,height*2/3);
+        bastao++;
+    }
+    rect(0,height-30,width,30);
+}
+
+void desenhaDiscos(){
+    int i =1;
+    for (Disco d : bast1){
+        d.desenha(i);
+        i++;
+    }
+    i=1;
+    for (Disco d : bast2){
+        d.desenha(i);
+        i++;
+    }
+    i=1;
+    for (Disco d : bast3){
+        d.desenha(i);
+        i++;
+    }
+    i=1;
+    for (Disco d : buf){
+        d.desenha(i,true);
+        i++;
+    }
+    print((int) random(10)+""+coloca_buffer+"\n");
+}
+
+void mousePressed(){
+    if (mouseButton == LEFT){
+        if (coloca_buffer && buf.size() <= 1){
+            
+            if (mouseX < width/4+width/8 && bast1.size() != 0){
+                buf.push(bast1.pop());
+                coloca_buffer = false;
+                return;
+            }else if (mouseX < width/4*2+width/8 && bast2.size() != 0){
+                buf.push(bast2.pop());
+                coloca_buffer = false;
+                return;
+            }else if (bast3.size() != 0){
+                buf.push(bast3.pop());
+                coloca_buffer = false;
+                return;
+            }
+        }else if (!(coloca_buffer) && buf.size() == 1){
+            if (mouseX < width/4+width/8){
+                if (bast1.size() != 0){
+                    if (buf.peek().comprimento < bast1.peek().comprimento){
+                        bast1.push(buf.pop());
+                        bast1.peek().bastao = 1;
+                        coloca_buffer = true;
+                        return;
+                    }
+                }else{
+                    bast1.push(buf.pop());
+                    bast1.peek().bastao = 1;
+                    coloca_buffer = true;
+                    return;
+                }
+            }else if (mouseX < width/4*2+width/8){
+                if (bast2.size() != 0){
+                    if (buf.peek().comprimento < bast2.peek().comprimento){
+                        bast2.push(buf.pop());
+                        bast2.peek().bastao = 2;
+                        coloca_buffer = true;
+                        return;
+                    }
+                }else{
+                    bast2.push(buf.pop());
+                    bast2.peek().bastao = 2;
+                    coloca_buffer = true;
+                    return;
+                }
+            }else{
+                        
+                if (bast3.size() != 0){
+                    if (buf.peek().comprimento < bast3.peek().comprimento){
+                        bast3.push(buf.pop());
+                        bast3.peek().bastao = 3;
+                        coloca_buffer = true;
+                        return;
+                    }
+                }else{
+                    bast3.push(buf.pop());
+                    bast3.peek().bastao = 3;
+                    coloca_buffer = true;
+                    return;
+                }
+            }
+        }
+    }
+}
+
+void verificaSeVenceu(){
+    if (bast3.size() == qtDiscos){
+        fill(#000000);
+        textFont(createFont("arial",50));
+        text("Você Venceu",width/2-100,height/2-50);
+    }
+}
