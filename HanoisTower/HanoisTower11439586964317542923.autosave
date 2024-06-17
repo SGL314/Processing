@@ -4,7 +4,7 @@ int qtDiscos = 6;
 int minTamanhoInicial = 40;
 int largura = 20;
 int variacaoTamanho = 20;
-boolean colocaBuffer = true;
+boolean coloca_buffer = true;
 boolean podePegarAnterior = false;
 int movimentos = 0;
 
@@ -76,15 +76,15 @@ void colocaBuffer(){
     podePegarAnterior = false;
     if (mouseX < width/4+width/8 && bast1.size() != 0){
         buf.push(bast1.pop());
-        colocaBuffer = false;
+        coloca_buffer = false;
         return;
     }else if (mouseX < width/4*2+width/8 && bast2.size() != 0){
         buf.push(bast2.pop());
-        colocaBuffer = false;
+        coloca_buffer = false;
         return;
     }else if (bast3.size() != 0){
         buf.push(bast3.pop());
-        colocaBuffer = false;
+        coloca_buffer = false;
         return;
     }
 }
@@ -100,14 +100,14 @@ void puxaBuffer(){
                     salvaConfiguracao();
                     movimentos++;
                 }
-                colocaBuffer = true;
+                coloca_buffer = true;
                 return;
             }
         }else{
             bast1.push(buf.pop());
             if (bast1.peek().bastao != 1) movimentos++;
             bast1.peek().bastao = 1;
-            colocaBuffer = true;
+            coloca_buffer = true;
             podePegarAnterior = true;
             salvaConfiguracao();
             return;
@@ -122,14 +122,14 @@ void puxaBuffer(){
                     salvaConfiguracao();
                     movimentos++;
                 }
-                colocaBuffer = true;
+                coloca_buffer = true;
                 return;
             }
         }else{
             bast2.push(buf.pop());
             if (bast2.peek().bastao != 2) movimentos++;
             bast2.peek().bastao = 2;
-            colocaBuffer = true;
+            coloca_buffer = true;
             podePegarAnterior = true;
             salvaConfiguracao();
             return;
@@ -144,14 +144,14 @@ void puxaBuffer(){
                     salvaConfiguracao();
                     movimentos++;
                 }
-                colocaBuffer = true;
+                coloca_buffer = true;
                 return;
             }
         }else{
             bast3.push(buf.pop());
             if (bast3.peek().bastao != 3) movimentos++;
             bast3.peek().bastao = 3;
-            colocaBuffer = true;
+            coloca_buffer = true;
             podePegarAnterior = true;
             salvaConfiguracao();
             return;
@@ -161,9 +161,9 @@ void puxaBuffer(){
 
 void mousePressed(){
     if (mouseButton == LEFT){
-        if (colocaBuffer && buf.size() <= 1){
+        if (coloca_buffer && buf.size() <= 1){
             colocaBuffer();
-        }else if (!(colocaBuffer) && buf.size() == 1){
+        }else if (!(coloca_buffer) && buf.size() == 1){
             puxaBuffer();
         }
     }
@@ -189,7 +189,7 @@ void coletaConfiguracao(){
       bast1 = configuracao[0][0];
       bast2 = configuracao[0][1];
       bast3 = configuracao[0][2];
-      colocaBuffer = true;
+      coloca_buffer = true;
       podePegarAnterior = false;
       salvaConfiguracao();
       movimentos--;
@@ -217,7 +217,7 @@ void keyPressed(){
   if (key == 'r'){
     bast1 = new Stack<Disco>();
     bast2 = new Stack<Disco>();
-    bast3 =new Stack<Disco>();
+    bast3 = new Stack<Disco>();
     buf = new Stack<Disco>();
     movimentos = 0;
     criaDiscos();
@@ -240,5 +240,5 @@ Stack<Disco> copiaDiscos(Stack<Disco> stack){
         copia.push(new Disco(dado[0],dado[1]));
         copia.peek().bastao = dado[2];
     }
-
-
+    return copia;
+}

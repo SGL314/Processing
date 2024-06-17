@@ -240,5 +240,5 @@ Stack<Disco> copiaDiscos(Stack<Disco> stack){
         copia.push(new Disco(dado[0],dado[1]));
         copia.peek().bastao = dado[2];
     }
-
-
+    return copia;
+}
