@@ -1,6 +1,6 @@
 import java.util.Stack;
 
-int qtDiscos = 6;
+int qtDiscos = 10;
 int minTamanhoInicial = 40;
 int largura = 20;
 int variacaoTamanho = 20;
@@ -210,7 +210,7 @@ void verificaSeVenceu(){
 void escreveQuantidadeMovimentos(){
     fill(#000000);
     textFont(createFont("arial",25));
-    text("Movimentos: "+movimentos,width-200,25);
+    text("Movimentos: "+movimentos,width-textWidth("Movimentos: "+movimentos),25);
 }
 
 void keyPressed(){
@@ -240,5 +240,5 @@ Stack<Disco> copiaDiscos(Stack<Disco> stack){
         copia.push(new Disco(dado[0],dado[1]));
         copia.peek().bastao = dado[2];
     }
-
-
+    return copia;
+}
