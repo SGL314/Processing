@@ -1,6 +1,6 @@
 public class Node{
     Node father;
-    int x,y,raw;
+    public int x,y,raw;
     color cor;
     public Node (Node father,int x,int y,int raw,color cor){
         this.father = father;
