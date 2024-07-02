@@ -1,5 +1,6 @@
 ArrayList<Node> Nodes = new ArrayList<Node>();
 Node nodeCatched = null;
+Node nodeSelected = null;
 int somaX = 0;
 
 void setup(){
@@ -14,17 +15,20 @@ void draw(){
 
 void createNodes(){
     int qtChilds = 0;
-    int altura = 10;
+    int altura = 3;
     int maxQtChilds = 2;
-    int minQtChilds = 1;
+    int minQtChilds = 2;
     int raw = 20;
     int x,y;
 
     Nodes = new ArrayList<Node>();
     x = (int) random(width-raw*2)+ raw;
     y = (int) random(height-raw*2)+ raw;
+    x = 50;
+    y = 50;
     color cor = color(0,0,255);
-    Node root = new Node(null,x,y,raw,cor);
+    Node root = new Node(new ArrayList<Node>(),x,y,raw,cor);
+    root.num = 1;
     Node father = null;
     Nodes.add(root);
     father = root;
@@ -52,7 +56,9 @@ ArrayList<Node> getChildren(int nivel,int altura, Node father, int maxQtChilds,i
         x = (int) i*20+20;
         somaX += 20;
         y = (int) nivel*50+raw;
-        NodesNow.add(new Node(father,x,y,raw,cor));
+        Node added = new Node(father,x,y,raw,cor);
+        NodesNow.add(added);
+        father.connected.add(added);
     }
     if (nivel <= altura){
         ArrayList<Node> NodesAdd = new ArrayList<Node>();
@@ -73,10 +79,28 @@ ArrayList<Node> getChildren(int nivel,int altura, Node father, int maxQtChilds,i
 
 void drawAll(){
     background(#FFFFFF);
+    int num = 1;
+    ArrayList<Draw> after = new ArrayList<Draw>();
     for(Node node : Nodes){
-        node.drawNode();
+        after.add(node.drawNode());
+        after.add(node.write(num));
+        num++;
     }
-    
+
+    for (Draw draw : after){
+        draw.drawIt();
+    }
+
+    markNodeSelected();
+}
+
+void markNodeSelected(){
+    if (nodeSelected != null){
+        fill(#FF0000);
+        // stroke(#FF0000);
+        circle(nodeSelected.x,nodeSelected.y,nodeSelected.raw);
+        // stroke(1);
+    }
 }
 
 void correcao(){
@@ -102,23 +126,88 @@ float dist(Node a,Node b){
     return d;
 }
 
+// algoritmos
+void preOrdem(){
+    delay(2000);
+    nodeSelected = Nodes.get(0);
+    println(nodeSelected.num+": "+nodeSelected.connected.get(0).num+" | "+nodeSelected.connected.get(1).num);
+    delay(500);
+    nodeSelected = visL(nodeSelected.connected.get(1),nodeSelected);
+    println(nodeSelected.num+": "+nodeSelected.connected.get(0).num+" | "+nodeSelected.connected.get(1).num);
+    delay(500);
+    nodeSelected = visL(nodeSelected.connected.get(0),nodeSelected);
+    delay(500);
+}
+Node visL(Node node,Node after){
+    if (node != null){
+        nodeSelected = node;
+        println(nodeSelected.num);
+        if (nodeSelected.connected.size() >= 2){
+            delay(500);
+            nodeSelected = visL(nodeSelected.connected.get(1),nodeSelected);
+            delay(500);
+            nodeSelected = visL(nodeSelected.connected.get(0),nodeSelected);
+        }else if (nodeSelected.connected.size() >= 1){
+            delay(500);
+            nodeSelected = visL(nodeSelected.connected.get(0),nodeSelected);
+        }
+        delay(500);
+        return after;
+    }
+    return after;
+}
+
 // connections
 void mouseDragged(){
     if (nodeCatched != null){
         nodeCatched.x = mouseX;
         nodeCatched.y = mouseY;
+    }else{
+        translate(1,0);
     }
 }
 void mousePressed(){
     nodeCatched = null;
     for (Node node : Nodes){
         if (node.x-node.raw <= mouseX && mouseX <= node.x+node.raw && node.y-node.raw <= mouseY && mouseY <= node.y+node.raw){
-            nodeCatched = node;
+            if (mouseButton == LEFT) nodeCatched = node;
+            else if (mouseButton == RIGHT){
+                if (nodeSelected == null){
+                    nodeSelected = node;
+                }else{
+                    if (nodeSelected != node){
+                        boolean exists = false;
+                        for (Node nodeVer : nodeSelected.connected){
+                            if (nodeVer == node) exists = true;
+                        }
+                        if (exists == false) nodeSelected.connected.add(node);
+                    }
+                    nodeSelected = null;
+                }
+            }
         }
     }
 }
 void keyPressed(){
     if(key == 'r'){
         createNodes();
+    }else if (key == 'd'){
+        if (nodeSelected != null){
+            for (Node node : Nodes){
+                if (node.connected != null){
+                    ArrayList<Node> nova = new ArrayList<Node>();
+                    for (Node nodeFil : node.connected){
+                        if (nodeFil != nodeSelected){
+                            nova.add(nodeFil);
+                        }
+                    }
+                    node.connected = nova;
+                }
+                if (node == nodeSelected) node = null;
+            }
+        }
+        nodeSelected = null;
+    }else if (key == 'a'){
+        thread("preOrdem");
     }
 }
