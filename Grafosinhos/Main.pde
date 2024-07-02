@@ -1,5 +1,5 @@
-
 ArrayList<Node> Nodes = new ArrayList<Node>();
+Node nodeCatched = null;
 int somaX = 0;
 
 void setup(){
@@ -17,8 +17,9 @@ void createNodes(){
     int altura = 10;
     int maxQtChilds = 2;
     int minQtChilds = 1;
-    int raw = 10;
+    int raw = 20;
     int x,y;
+
     Nodes = new ArrayList<Node>();
     x = (int) random(width-raw*2)+ raw;
     y = (int) random(height-raw*2)+ raw;
@@ -101,6 +102,21 @@ float dist(Node a,Node b){
     return d;
 }
 
+// connections
+void mouseDragged(){
+    if (nodeCatched != null){
+        nodeCatched.x = mouseX;
+        nodeCatched.y = mouseY;
+    }
+}
+void mousePressed(){
+    nodeCatched = null;
+    for (Node node : Nodes){
+        if (node.x-node.raw <= mouseX && mouseX <= node.x+node.raw && node.y-node.raw <= mouseY && mouseY <= node.y+node.raw){
+            nodeCatched = node;
+        }
+    }
+}
 void keyPressed(){
     if(key == 'r'){
         createNodes();
