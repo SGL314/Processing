@@ -1,6 +1,7 @@
 public class Node{
     ArrayList<Node> connected = new ArrayList<Node>();
-    public int x,y,raw,num;
+    public int x,y,raw;
+    public String id = "";
     color cor;
     public Node (ArrayList<Node> connected,int x,int y,int raw,color cor){
         this.connected = connected;
@@ -30,10 +31,10 @@ public class Node{
       return new Draw(this.cor,this.x,this.y,this.raw,"node");
     }
 
-    Draw write(int num){
-      this.num = num;
+    Draw write(String id){
+      if (!(id.equals(" "))) this.id = id;
       fill(#000000);
-      String texto = ""+num+"";
+      String texto = ""+this.id+"";
       // if (this.connected.size() >= 2){
       //   texto += " "+this.connected.get(0).num+" | "+this.connected.get(1).num;
       // }

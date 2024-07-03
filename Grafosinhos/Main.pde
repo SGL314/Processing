@@ -2,9 +2,10 @@ ArrayList<Node> Nodes = new ArrayList<Node>();
 Node nodeCatched = null;
 Node nodeSelected = null;
 int somaX = 0;
+boolean writeNode = false;
 
 void setup(){
-    size(1800,600);
+    size(600,600);
     createNodes();
 }
 
@@ -28,7 +29,7 @@ void createNodes(){
     y = 50;
     color cor = color(0,0,255);
     Node root = new Node(new ArrayList<Node>(),x,y,raw,cor);
-    root.num = 1;
+    root.id = "0";
     Node father = null;
     Nodes.add(root);
     father = root;
@@ -41,6 +42,13 @@ void createNodes(){
 
     for (Node node : add){
         Nodes.add(node);
+    }
+
+    // coloca os ids
+    int num = 1;
+    for(Node node : Nodes){
+        node.write(""+num);
+        num++;
     }
     
 }
@@ -83,7 +91,7 @@ void drawAll(){
     ArrayList<Draw> after = new ArrayList<Draw>();
     for(Node node : Nodes){
         after.add(node.drawNode());
-        after.add(node.write(num));
+        after.add(node.write(" "));
         num++;
     }
 
@@ -96,7 +104,8 @@ void drawAll(){
 
 void markNodeSelected(){
     if (nodeSelected != null){
-        fill(#FF0000);
+        if (writeNode) fill(#00FF00);
+        else fill(#FF0000);
         // stroke(#FF0000);
         circle(nodeSelected.x,nodeSelected.y,nodeSelected.raw);
         // stroke(1);
@@ -127,29 +136,134 @@ float dist(Node a,Node b){
 }
 
 // algoritmos
-void preOrdem(){
-    delay(2000);
-    nodeSelected = Nodes.get(0);
-    println(nodeSelected.num+": "+nodeSelected.connected.get(0).num+" | "+nodeSelected.connected.get(1).num);
-    delay(500);
-    nodeSelected = visL(nodeSelected.connected.get(1),nodeSelected);
-    println(nodeSelected.num+": "+nodeSelected.connected.get(0).num+" | "+nodeSelected.connected.get(1).num);
-    delay(500);
-    nodeSelected = visL(nodeSelected.connected.get(0),nodeSelected);
-    delay(500);
+void algorithim(){
+    excluir();
+    rename();
+    preOrdem();
+    delay(250);
+    emOrdem();
+    delay(250);
+    posOrdem();
+    delay(250);
 }
-Node visL(Node node,Node after){
+
+void excluir(){
+    ArrayList<Node> nova = new ArrayList<Node>();
+    String[] ids = {"15","14","5","4","9","8","7","6"};
+    for (Node node : Nodes){
+        boolean add = true;
+        for (String str : ids){
+            if (node.id.equals(str)){
+                nodeSelected = node;
+                ArrayList<Node> newNodes = new ArrayList<Node>();
+                for (Node node2 : Nodes){
+                    if (node2.connected != null){
+                        ArrayList<Node> nova2 = new ArrayList<Node>();
+                        for (Node nodeFil : node2.connected){
+                            if (nodeFil != nodeSelected){
+                                nova2.add(nodeFil);
+                            }
+                        }
+                        node2.connected = nova2;
+                    }
+                    if (node2 != nodeSelected) newNodes.add(node2);
+                }
+                Nodes = newNodes;
+                add = false;
+            }
+            nodeSelected = null;
+        }
+        if (add) nova.add(node);
+    }
+    Nodes = nova;
+}
+void rename(){
+    String[] names = {"a","c","b","e","d","g","f"};
+    int i = 0;
+    for (Node node : Nodes){
+        node.id = names[i];
+        i++;
+    }
+}
+
+void preOrdem(){
+    nodeSelected = Nodes.get(0);
+    delay(500);
+    nodeSelected = visPreOrdem(Nodes.get(0),null);
+    delay(500);
+    nodeSelected = null;
+    println("");
+}
+Node visPreOrdem(Node node,Node after){
     if (node != null){
         nodeSelected = node;
-        println(nodeSelected.num);
+        print(nodeSelected.id+" ");
         if (nodeSelected.connected.size() >= 2){
             delay(500);
-            nodeSelected = visL(nodeSelected.connected.get(1),nodeSelected);
+            nodeSelected = visPreOrdem(nodeSelected.connected.get(1),nodeSelected);
             delay(500);
-            nodeSelected = visL(nodeSelected.connected.get(0),nodeSelected);
+            nodeSelected = visPreOrdem(nodeSelected.connected.get(0),nodeSelected);
         }else if (nodeSelected.connected.size() >= 1){
             delay(500);
-            nodeSelected = visL(nodeSelected.connected.get(0),nodeSelected);
+            nodeSelected = visPreOrdem(nodeSelected.connected.get(0),nodeSelected);
+        }
+        delay(500);
+        return after;
+    }
+    return after;
+}
+
+void emOrdem(){
+    nodeSelected = Nodes.get(0);
+    delay(500);
+    nodeSelected = visEmOrdem(Nodes.get(0),null);
+    delay(500);
+    nodeSelected = null;
+    println("");
+}
+Node visEmOrdem(Node node,Node after){
+    if (node != null){
+        nodeSelected = node;
+        if (nodeSelected.connected.size() >= 2){
+            delay(500);
+            nodeSelected = visEmOrdem(nodeSelected.connected.get(1),nodeSelected);
+            print(nodeSelected.id+" ");
+            delay(500);
+            nodeSelected = visEmOrdem(nodeSelected.connected.get(0),nodeSelected);
+        }else if (nodeSelected.connected.size() >= 1){
+            delay(500);
+            nodeSelected = visEmOrdem(nodeSelected.connected.get(0),nodeSelected);
+        }else if (nodeSelected.connected.size() == 0){
+            print(nodeSelected.id+" ");
+        }
+        delay(500);
+        return after;
+    }
+    return after;
+}
+
+void posOrdem(){
+    nodeSelected = Nodes.get(0);
+    delay(500);
+    nodeSelected = visPosOrdem(Nodes.get(0),null);
+    delay(500);
+    nodeSelected = null;
+    println("");
+}
+Node visPosOrdem(Node node,Node after){
+    if (node != null){
+        nodeSelected = node;
+        if (nodeSelected.connected.size() >= 2){
+            delay(500);
+            nodeSelected = visPosOrdem(nodeSelected.connected.get(1),nodeSelected);
+            delay(500);
+            nodeSelected = visPosOrdem(nodeSelected.connected.get(0),nodeSelected);
+            print(nodeSelected.id+" ");
+        }else if (nodeSelected.connected.size() >= 1){
+            delay(500);
+            nodeSelected = visPosOrdem(nodeSelected.connected.get(0),nodeSelected);
+        }else if (nodeSelected.connected.size() == 0){
+            print(nodeSelected.id+" ");
         }
         delay(500);
         return after;
@@ -189,25 +303,42 @@ void mousePressed(){
     }
 }
 void keyPressed(){
-    if(key == 'r'){
-        createNodes();
-    }else if (key == 'd'){
-        if (nodeSelected != null){
-            for (Node node : Nodes){
-                if (node.connected != null){
-                    ArrayList<Node> nova = new ArrayList<Node>();
-                    for (Node nodeFil : node.connected){
-                        if (nodeFil != nodeSelected){
-                            nova.add(nodeFil);
-                        }
-                    }
-                    node.connected = nova;
-                }
-                if (node == nodeSelected) node = null;
+    if (nodeSelected == null) writeNode = false;
+    if (writeNode){
+        for (char c : "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray()){
+            if (key == c){
+                nodeSelected.id += c;
             }
         }
-        nodeSelected = null;
-    }else if (key == 'a'){
-        thread("preOrdem");
+        if (key == '\n'){
+            writeNode = false;
+            nodeSelected = null;
+        }else if (keyCode == 8) nodeSelected.id = "";
+    }else{
+        if(key == 'r'){
+            createNodes();
+        }else if (key == 'd'){
+            if (nodeSelected != null){
+                ArrayList<Node> newNodes = new ArrayList<Node>();
+                for (Node node : Nodes){
+                    if (node.connected != null){
+                        ArrayList<Node> nova = new ArrayList<Node>();
+                        for (Node nodeFil : node.connected){
+                            if (nodeFil != nodeSelected){
+                                nova.add(nodeFil);
+                            }
+                        }
+                        node.connected = nova;
+                    }
+                    if (node != nodeSelected) newNodes.add(node);
+                }
+                Nodes = newNodes;
+            }
+            nodeSelected = null;
+        }else if (key == 'a'){
+            thread("algorithim");
+        }else if (key == 'w'){
+            if (nodeSelected != null) writeNode = true;
+        }
     }
 }
