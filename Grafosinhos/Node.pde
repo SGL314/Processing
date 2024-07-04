@@ -1,11 +1,11 @@
 import java.io.Serializable;
 
-public class Node implements Serializable{
-    private static final long serialVersionUID = 1L;
+class Node{
     
     ArrayList<Node> connected = new ArrayList<Node>(),minorisWay;
     public int x,y,raw;
     public String id = "";
+    private String identificator ;
     color cor;
     public Node (ArrayList<Node> connected,int x,int y,int raw,color cor){
         this.connected = connected;
@@ -13,6 +13,7 @@ public class Node implements Serializable{
         this.y = y;
         this.raw = raw;
         this.cor = cor;
+        this.identificator = getIdentificator();
     }
     public Node (Node node,int x,int y,int raw,color cor){
         // if (node != null) connected.add(node);
@@ -20,6 +21,7 @@ public class Node implements Serializable{
         this.y = y;
         this.raw = raw;
         this.cor = cor;
+        this.identificator = getIdentificator();
     }
 
     Draw drawNode(){
@@ -46,6 +48,25 @@ public class Node implements Serializable{
       return new Draw(this.cor,this.x,this.y,this.raw,"node");
     }
 
+    String getIdentificator(){
+      String identificatorHere = aleatr();
+      while (true){
+        boolean pass = true;
+        for (Node node : Nodes){
+          if (node.identificator == identificatorHere){
+            identificatorHere = aleatr();
+            pass = false;
+            break;
+          }
+        }
+        if (pass) break;
+      }
+      return identificatorHere;
+    }
+    String aleatr(){
+      return ""+(((int) random(90))+10)+"_"+(((int) random(90))+10)+"_"+(((int) random(90))+10);
+    }
+
     float distLin(Node a,Node b){
       return pow(pow(a.x-b.x,2)+pow(a.y-b.y,2),0.5f);
     }
@@ -70,6 +91,30 @@ public class Node implements Serializable{
 
     @Override
     public String toString(){
-      return "Node{x='"+x+"', y='"+y+"', raw='"+raw+"', id='"+id+"', cor='"+cor+"', connected='"+connected+"', minorisWay='"+minorisWay+"}";
+      String t_connected = "";
+      int i = 0,tam;
+      if (connected != null){
+        tam = connected.size();
+        for (Node node : connected){
+          t_connected += node.identificator;
+          i++;
+          if (i != tam){
+            t_connected += " ";
+          }
+        }
+      }
+      String t_minorisWay = "";
+      i = 0;
+      if (minorisWay != null){
+        tam = minorisWay.size();
+        for (Node node : minorisWay){
+          t_minorisWay += node.identificator;
+          i++;
+          if (i != tam){
+            t_minorisWay += " ";
+          }
+        }
+      }
+      return "Node{identificator='"+identificator+"', x='"+x+"', y='"+y+"', raw='"+raw+"', id='"+id+"', cor='"+cor+"', connected='"+t_connected+"', minorisWay='"+t_minorisWay+"'}";
     }
 }

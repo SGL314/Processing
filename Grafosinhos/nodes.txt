@@ -1,0 +1,5 @@
+Node{identificator='47_18_93', x='205', y='344', raw='20', id='10000', cor='-12933774', connected='63_21_76 33_97_71', minorisWay=''}
+Node{identificator='27_35_99', x='181', y='68', raw='20', id='587.7943', cor='-355283', connected='47_18_93', minorisWay='47_18_93 63_21_76'}
+Node{identificator='63_21_76', x='451', y='181', raw='20', id='295.10168', cor='-10962548', connected='27_35_99', minorisWay='47_18_93'}
+Node{identificator='33_97_71', x='272', y='206', raw='20', id='153.4047', cor='-8385686', connected='', minorisWay='47_18_93'}
+Node{identificator='19_82_99', x='412', y='468', raw='20', id='10000', cor='-5755340', connected='', minorisWay=''}

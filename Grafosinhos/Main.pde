@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Serializable;
+
 
 ArrayList<Node> Nodes = new ArrayList<Node>();
 Node nodeCatched = null;
@@ -16,6 +18,7 @@ Node nodeSelected = null;
 int somaX = 0;
 // config
 int basicRaw = 20;
+Connection con = new Connection("nodes.txt");
 // variables
 int lastMousePressed = 0;
 boolean breakThread = false;
@@ -24,7 +27,7 @@ boolean writeNode = false;
 void setup(){
     size(600,600);
     // createNodes();
-    getSaved();
+    con.getIt();
 }
 
 void draw(){
@@ -482,7 +485,7 @@ void keyPressed(){
         }else if (key == 'c'){
             nodeCatched = (nodeCatched==null) ? nodeSelected : null;
         }else if (key == 's'){
-            saveIt();
+            con.setIt();
             exit();
         }
     }
@@ -502,69 +505,33 @@ void minorisWay(){
 }
 
 void drawCrown(Node node) {
-  float outerRadius = node.raw*1.2;
-  float innerRadius = node.raw*1;
-  int numSegments = 50; // Número de segmentos da coroa
+float outerRadius = node.raw*1.2;
+float innerRadius = node.raw*1;
+int numSegments = 50; // Número de segmentos da coroa
 
-  float angleStep = TWO_PI / numSegments;
+float angleStep = TWO_PI / numSegments;
 
-  fill(255, 0, 0); // cor vermelha
-  noStroke();
+fill(255, 0, 0); // cor vermelha
+noStroke();
 
-  beginShape();
-  for (int i = 0; i <= numSegments; i++) {
+beginShape();
+for (int i = 0; i <= numSegments; i++) {
     float angle = i * angleStep;
     float xOuter = node.x + cos(angle) * outerRadius;
     float yOuter = node.y + sin(angle) * outerRadius;
     vertex(xOuter, yOuter);
-  }
-  for (int i = numSegments; i >= 0; i--) {
+}
+for (int i = numSegments; i >= 0; i--) {
     float angle = i * angleStep;
     float xInner = node.x + cos(angle) * innerRadius;
     float yInner = node.y + sin(angle) * innerRadius;
     vertex(xInner, yInner);
-  }
-  endShape(CLOSE);
-  stroke(1);
+}
+endShape(CLOSE);
+stroke(1);
 }
 
 // calculus
 float distLin(Node a,Node b){
     return pow(pow(a.x-b.x,2)+pow(a.y-b.y,2),0.5f);
-}
-// save
-void saveIt(){
-    Sla save = new Sla();
-    save.saveIt();
-    String filename = "nodes.txt";
-    Node node = Nodes.get(0);
-    try {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-        writer.write("vasco");
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-void getSaved(){
-    // String filename = "nodes.txt";
-    // try {
-    //     FileInputStream fileIn = new FileInputStream(dataPath(filename));
-    //     ObjectInputStream in = new ObjectInputStream(fileIn);
-        
-    //     while (true) {
-    //         try {
-    //             Node node = (Node) in.readObject();
-                
-    //             in.close();
-    //             fileIn.close();
-    //             Nodes.add(node);
-    //             break;
-                
-    //         } catch (ClassNotFoundException e) {
-    //             e.printStackTrace();
-    //         }
-    //     }
-    // } catch (IOException e) {
-    //     e.printStackTrace();
-    // }
 }
