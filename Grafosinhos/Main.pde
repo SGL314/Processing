@@ -534,6 +534,8 @@ float distLin(Node a,Node b){
 }
 // save
 void saveIt(){
+    Sla save = new Sla();
+    save.saveIt();
     String filename = "nodes.txt";
     Node node = Nodes.get(0);
     try {
