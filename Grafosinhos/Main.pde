@@ -155,9 +155,7 @@ float dist(Node a,Node b){
 }
 
 void teste(){
-    // fill(#8800FF);
-    // // arc(x,y,largura,altura,start,end);
-    // arc(width/2,width/2,10,40,PI/2,3*PI/2);
+    // if (nodeCatched != null) println(nodeCatched.id);
 }
 
 // algoritmos
@@ -219,17 +217,22 @@ void rename(){
 }
 
 void distances(){
+    println("BEGIN");
     int initDist = 10000;
     for (Node node : Nodes){
         node.id = ""+initDist;
     }
-
-    nodeSelected = vis(Nodes.get(0),null,0,new ArrayList<Node>());
-    Nodes.get(0).minorisWay = null;
+    if (nodeCatched != null){
+        Node after = nodeCatched;
+        nodeCatched = null;
+        nodeSelected = vis(after,null,0,new ArrayList<Node>());
+        after.minorisWay = null;
+    }
+    println("END");
 }
 
 Node vis(Node node,Node after,float somaB,ArrayList<Node> way){
-    int time = 100;
+    int time = 1;
     if (breakThread) return null;
     if (node != null){
         nodeSelected = node;
