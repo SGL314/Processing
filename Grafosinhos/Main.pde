@@ -2,6 +2,11 @@ ArrayList<Node> Nodes = new ArrayList<Node>();
 Node nodeCatched = null;
 Node nodeSelected = null;
 int somaX = 0;
+// config
+int basicRaw = 20;
+// variables
+int lastMousePressed = 0;
+boolean breakThread = false;
 boolean writeNode = false;
 
 void setup(){
@@ -12,6 +17,8 @@ void setup(){
 void draw(){
     drawAll();
     correcao();
+    mouseAutomatic();
+    teste();
 }
 
 void createNodes(){
@@ -19,7 +26,7 @@ void createNodes(){
     int altura = 3;
     int maxQtChilds = 2;
     int minQtChilds = 2;
-    int raw = 20;
+    int raw = basicRaw;
     int x,y;
 
     Nodes = new ArrayList<Node>();
@@ -27,7 +34,7 @@ void createNodes(){
     y = (int) random(height-raw*2)+ raw;
     x = 50;
     y = 50;
-    color cor = color(0,0,255);
+    color cor = color(0,0,128);
     Node root = new Node(new ArrayList<Node>(),x,y,raw,cor);
     root.id = "0";
     Node father = null;
@@ -100,6 +107,7 @@ void drawAll(){
     }
 
     markNodeSelected();
+    minorisWay();
 }
 
 void markNodeSelected(){
@@ -109,6 +117,17 @@ void markNodeSelected(){
         // stroke(#FF0000);
         circle(nodeSelected.x,nodeSelected.y,nodeSelected.raw);
         // stroke(1);
+        // show minorisWay
+        Node node = nodeSelected;
+        if (node.minorisWay != null){
+            for (Node node2 : node.minorisWay){
+                fill(#0000FF);
+                circle(node2.x,node2.y,basicRaw);
+            }
+            fill(#00F0F0);
+            circle(node.x,node.y,basicRaw);
+        }
+        
     }
 }
 
@@ -135,15 +154,23 @@ float dist(Node a,Node b){
     return d;
 }
 
+void teste(){
+    // fill(#8800FF);
+    // // arc(x,y,largura,altura,start,end);
+    // arc(width/2,width/2,10,40,PI/2,3*PI/2);
+}
+
 // algoritmos
 void algorithim(){
     excluir();
     rename();
-    preOrdem();
-    delay(250);
-    emOrdem();
-    delay(250);
-    posOrdem();
+    // preOrdem();
+    // delay(250);
+    // emOrdem();
+    // delay(250);
+    // posOrdem();
+    // delay(250);
+    distances();
     delay(250);
 }
 
@@ -179,11 +206,70 @@ void excluir(){
 }
 void rename(){
     String[] names = {"a","c","b","e","d","g","f"};
+    int tam=0;
+    for (String c : names) tam++;
     int i = 0;
     for (Node node : Nodes){
         node.id = names[i];
         i++;
+        if (tam == i){
+            break;
+        }
     }
+}
+
+void distances(){
+    int initDist = 10000;
+    for (Node node : Nodes){
+        node.id = ""+initDist;
+    }
+
+    nodeSelected = vis(Nodes.get(0),null,0,new ArrayList<Node>());
+    Nodes.get(0).minorisWay = null;
+}
+
+Node vis(Node node,Node after,float somaB,ArrayList<Node> way){
+    int time = 100;
+    if (breakThread) return null;
+    if (node != null){
+        nodeSelected = node;
+        way.add(nodeSelected);
+        // print(nodeSelected.id+" ");
+        if (nodeSelected.connected.size() >= 1){
+            int tam = nodeSelected.connected.size(),i=0;
+            float soma=0;
+            while (true){
+                if (i == tam) break;
+                // para-loops
+                boolean continueIt = false;
+                for (Node nodeWay : way){
+                    if (nodeWay == nodeSelected.connected.get(i)){
+                        i++;
+                        continueIt = true;
+                        break;
+                    }
+                }
+                if (continueIt) continue;
+                //
+                soma = somaB+distLin(nodeSelected,nodeSelected.connected.get(i));
+                delay(time);
+                if (Float.parseFloat(nodeSelected.connected.get(i).id) > soma){
+                    nodeSelected.connected.get(i).id = ""+soma;
+                    nodeSelected.connected.get(i).minorisWay = new ArrayList<Node>();
+                    for (Node nodeWay : way) nodeSelected.connected.get(i).minorisWay.add(nodeWay);
+                }
+                ArrayList<Node> put = new ArrayList<Node>();
+                for (Node nodePut : way) put.add(nodePut);
+                
+                nodeSelected = vis(nodeSelected.connected.get(i),nodeSelected,soma,put);
+                i++;
+                
+            }
+        }
+        delay(time);
+        return after;
+    }
+    return after;
 }
 
 void preOrdem(){
@@ -272,33 +358,62 @@ Node visPosOrdem(Node node,Node after){
 }
 
 // connections
-void mouseDragged(){
+void mouseAutomatic(){
+    // if (nodeSelected == null) nodeCatched = null;
     if (nodeCatched != null){
         nodeCatched.x = mouseX;
         nodeCatched.y = mouseY;
-    }else{
-        translate(1,0);
     }
 }
 void mousePressed(){
     nodeCatched = null;
     for (Node node : Nodes){
         if (node.x-node.raw <= mouseX && mouseX <= node.x+node.raw && node.y-node.raw <= mouseY && mouseY <= node.y+node.raw){
-            if (mouseButton == LEFT) nodeCatched = node;
-            else if (mouseButton == RIGHT){
+            if (mouseButton == LEFT){
                 if (nodeSelected == null){
                     nodeSelected = node;
                 }else{
-                    if (nodeSelected != node){
-                        boolean exists = false;
-                        for (Node nodeVer : nodeSelected.connected){
-                            if (nodeVer == node) exists = true;
+                    if (lastMousePressed == LEFT){
+                        if (nodeSelected != node){
+                            boolean exists = false;
+                            for (Node nodeVer : nodeSelected.connected){
+                                if (nodeVer == node){ // retira o node
+                                    nodeSelected.connected.remove(nodeVer);
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (exists == false) nodeSelected.connected.add(node);
                         }
-                        if (exists == false) nodeSelected.connected.add(node);
-                    }
-                    nodeSelected = null;
+                        nodeSelected = null;
+                    }else nodeSelected = null;
                 }
+            }else if (mouseButton == RIGHT){
+                if (nodeSelected == null){
+                    nodeSelected = node;
+                }else{
+                    if (lastMousePressed == RIGHT){
+                        if (nodeSelected != node){
+                            boolean exists = false;
+                            for (Node nodeVer : nodeSelected.connected){
+                                if (nodeVer == node){ // retira o node
+                                    nodeSelected.connected.remove(nodeVer);
+                                    nodeVer.connected.remove(nodeSelected);
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (exists == false){
+                                nodeSelected.connected.add(node);
+                                node.connected.add(nodeSelected);
+                            }
+                        }
+                        nodeSelected = null;
+                    }else nodeSelected = null;
+                }
+                
             }
+            lastMousePressed = mouseButton;
         }
     }
 }
@@ -317,6 +432,11 @@ void keyPressed(){
     }else{
         if(key == 'r'){
             createNodes();
+        }else if (key == 'l'){
+            Nodes = new ArrayList<Node>();
+            Nodes.add(new Node(new ArrayList<Node>(),mouseX,mouseY,basicRaw,color((int) random(256),(int) random(256),(int) random(256))));
+            nodeSelected = null;
+            nodeCatched = null;
         }else if (key == 'd'){
             if (nodeSelected != null){
                 ArrayList<Node> newNodes = new ArrayList<Node>();
@@ -339,6 +459,57 @@ void keyPressed(){
             thread("algorithim");
         }else if (key == 'w'){
             if (nodeSelected != null) writeNode = true;
+        }else if (key == 'n'){
+            Nodes.add(new Node(new ArrayList<Node>(),mouseX,mouseY,basicRaw,color((int) random(256),(int) random(256),(int) random(256))));  
+        }else if (key == 'b'){
+            breakThread = (breakThread) ? false : true;
+        }else if (key == 'c'){
+            nodeCatched = (nodeCatched==null) ? nodeSelected : null;
         }
     }
+}
+void minorisWay(){
+    for (Node node : Nodes){
+        if (node.x-node.raw <= mouseX && mouseX <= node.x+node.raw && node.y-node.raw <= mouseY && mouseY <= node.y+node.raw){
+            if (node.minorisWay != null){
+                for (Node node2 : node.minorisWay){
+                    drawCrown(node2);
+                }
+                fill(#00F0F0);
+                circle(node.x,node.y,basicRaw);
+            }
+        }
+    }
+}
+
+void drawCrown(Node node) {
+  float outerRadius = node.raw*1.2;
+  float innerRadius = node.raw*1;
+  int numSegments = 50; // Número de segmentos da coroa
+
+  float angleStep = TWO_PI / numSegments;
+
+  fill(255, 0, 0); // cor vermelha
+  noStroke();
+
+  beginShape();
+  for (int i = 0; i <= numSegments; i++) {
+    float angle = i * angleStep;
+    float xOuter = node.x + cos(angle) * outerRadius;
+    float yOuter = node.y + sin(angle) * outerRadius;
+    vertex(xOuter, yOuter);
+  }
+  for (int i = numSegments; i >= 0; i--) {
+    float angle = i * angleStep;
+    float xInner = node.x + cos(angle) * innerRadius;
+    float yInner = node.y + sin(angle) * innerRadius;
+    vertex(xInner, yInner);
+  }
+  endShape(CLOSE);
+  stroke(1);
+}
+
+// calculus
+float distLin(Node a,Node b){
+    return pow(pow(a.x-b.x,2)+pow(a.y-b.y,2),0.5f);
 }
