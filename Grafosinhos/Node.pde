@@ -1,4 +1,8 @@
-public class Node{
+import java.io.Serializable;
+
+public class Node implements Serializable{
+    private static final long serialVersionUID = 1L;
+    
     ArrayList<Node> connected = new ArrayList<Node>(),minorisWay;
     public int x,y,raw;
     public String id = "";
@@ -62,5 +66,10 @@ public class Node{
       //   texto += " "+this.connected.get(0).num+" | "+this.connected.get(1).num;
       // }
       return new Draw(#000000,(int) (this.x-(textAscent()+textDescent())/2),(int) (this.y+textWidth(texto)/2),texto,"text");
+    }
+
+    @Override
+    public String toString(){
+      return "Node{x='"+x+"', y='"+y+"', raw='"+raw+"', id='"+id+"', cor='"+cor+"', connected='"+connected+"', minorisWay='"+minorisWay+"}";
     }
 }

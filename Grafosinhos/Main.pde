@@ -1,3 +1,15 @@
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 ArrayList<Node> Nodes = new ArrayList<Node>();
 Node nodeCatched = null;
 Node nodeSelected = null;
@@ -11,7 +23,8 @@ boolean writeNode = false;
 
 void setup(){
     size(600,600);
-    createNodes();
+    // createNodes();
+    getSaved();
 }
 
 void draw(){
@@ -23,7 +36,7 @@ void draw(){
 
 void createNodes(){
     int qtChilds = 0;
-    int altura = 3;
+    int altura = 7;
     int maxQtChilds = 2;
     int minQtChilds = 2;
     int raw = basicRaw;
@@ -160,7 +173,7 @@ void teste(){
 
 // algoritmos
 void algorithim(){
-    excluir();
+    // excluir();
     rename();
     // preOrdem();
     // delay(250);
@@ -468,6 +481,9 @@ void keyPressed(){
             breakThread = (breakThread) ? false : true;
         }else if (key == 'c'){
             nodeCatched = (nodeCatched==null) ? nodeSelected : null;
+        }else if (key == 's'){
+            saveIt();
+            exit();
         }
     }
 }
@@ -515,4 +531,38 @@ void drawCrown(Node node) {
 // calculus
 float distLin(Node a,Node b){
     return pow(pow(a.x-b.x,2)+pow(a.y-b.y,2),0.5f);
+}
+// save
+void saveIt(){
+    String filename = "nodes.txt";
+    Node node = Nodes.get(0);
+    try {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+        writer.write("vasco");
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+void getSaved(){
+    // String filename = "nodes.txt";
+    // try {
+    //     FileInputStream fileIn = new FileInputStream(dataPath(filename));
+    //     ObjectInputStream in = new ObjectInputStream(fileIn);
+        
+    //     while (true) {
+    //         try {
+    //             Node node = (Node) in.readObject();
+                
+    //             in.close();
+    //             fileIn.close();
+    //             Nodes.add(node);
+    //             break;
+                
+    //         } catch (ClassNotFoundException e) {
+    //             e.printStackTrace();
+    //         }
+    //     }
+    // } catch (IOException e) {
+    //     e.printStackTrace();
+    // }
 }
