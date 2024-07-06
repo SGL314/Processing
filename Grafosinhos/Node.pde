@@ -2,7 +2,7 @@ import java.io.Serializable;
 
 class Node{
     
-    ArrayList<Node> connected = new ArrayList<Node>(),minorisWay;
+    ArrayList<Node> connected = new ArrayList<Node>(),minorisWay = new ArrayList<Node>();
     public int x,y,raw;
     public String id = "";
     private String identificator ;
@@ -86,7 +86,7 @@ class Node{
       // if (this.connected.size() >= 2){
       //   texto += " "+this.connected.get(0).num+" | "+this.connected.get(1).num;
       // }
-      return new Draw(#000000,(int) (this.x-(textAscent()+textDescent())/2),(int) (this.y+textWidth(texto)/2),texto,"text");
+      return new Draw(#000000,(int) (this.x-textWidth(texto)/2),(int) (this.y+this.raw),texto,"text");
     }
 
     @Override

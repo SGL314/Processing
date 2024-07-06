@@ -75,6 +75,26 @@ class Connection{
             }
             mins.add(minorisWays);
         }
-        // exit();
+        int i = 0;
+        for (Node nodeA : Nodes){
+            for (String id : cons.get(i)){
+                for (Node nodeB : Nodes){
+                    if (nodeB.identificator.equals(id)){
+                        println("C:> "+id);
+                        nodeA.connected.add(nodeB);
+                    }
+                    
+                }
+            }
+            for (String id : mins.get(i)){
+                for (Node nodeB : Nodes){
+                    if (nodeB.identificator.equals(id)){
+                        nodeA.minorisWay.add(nodeB);
+                        println("M:> "+id);
+                    }
+                }
+            }
+            i++;
+        }
     }
 }

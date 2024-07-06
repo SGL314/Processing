@@ -11,18 +11,22 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Serializable;
 
-
 ArrayList<Node> Nodes = new ArrayList<Node>();
 Node nodeCatched = null;
 Node nodeSelected = null;
+Node nodePassing = null;
 int somaX = 0;
 // config
 int basicRaw = 20;
 Connection con = new Connection("nodes.txt");
+Algoris Alg = new Algoris();
 // variables
 int lastMousePressed = 0;
+int typeSelected = 0;
 boolean breakThread = false;
 boolean writeNode = false;
+int dragX = 0,dragY = 0;
+float zoom = 1,lastZoom = 1;
 
 void setup(){
     size(600,600);
@@ -31,9 +35,18 @@ void setup(){
 }
 
 void draw(){
+    background(#FFFFFF);
+    scale(zoom);
+    translate(dragX/zoom,dragY/zoom);
+    position();
+    ecrivent();
+
     drawAll();
     correcao();
+
     mouseAutomatic();
+    markNodeSelected();
+
     teste();
 }
 
@@ -76,8 +89,6 @@ void createNodes(){
     
 }
 
-// int[] cores = 
-
 ArrayList<Node> getChildren(int nivel,int altura, Node father, int maxQtChilds,int minQtChilds, int raw){
     ArrayList<Node> NodesNow = new ArrayList<Node>();
     int qtChilds = (int) (random(maxQtChilds-minQtChilds+1)+minQtChilds);
@@ -109,8 +120,8 @@ ArrayList<Node> getChildren(int nivel,int altura, Node father, int maxQtChilds,i
 }
 
 void drawAll(){
-    background(#FFFFFF);
     int num = 1;
+    // translate(dragX,dragY);
     ArrayList<Draw> after = new ArrayList<Draw>();
     for(Node node : Nodes){
         after.add(node.drawNode());
@@ -121,29 +132,20 @@ void drawAll(){
     for (Draw draw : after){
         draw.drawIt();
     }
-
-    markNodeSelected();
-    minorisWay();
+    translate(-dragX,-dragY);
 }
 
 void markNodeSelected(){
+    // selected
     if (nodeSelected != null){
-        if (writeNode) fill(#00FF00);
-        else fill(#FF0000);
-        // stroke(#FF0000);
-        circle(nodeSelected.x,nodeSelected.y,nodeSelected.raw);
-        // stroke(1);
-        // show minorisWay
-        Node node = nodeSelected;
-        if (node.minorisWay != null){
-            for (Node node2 : node.minorisWay){
-                fill(#0000FF);
-                circle(node2.x,node2.y,basicRaw);
-            }
-            fill(#00F0F0);
-            circle(node.x,node.y,basicRaw);
-        }
-        
+        if (writeNode) drawCrown(nodeSelected,#00FF00);
+        else if (typeSelected == RIGHT) drawCrown(nodeSelected,#FF0000);
+        else drawCrown(nodeSelected,#FFFF00);
+        // if (nodeSelected == nodePassing) nodePassing = null;
+    }
+    // passing
+    if (nodePassing != null && nodeSelected != nodePassing && nodePassing.minorisWay.size() == 0){
+        drawCrown(nodePassing,#00F0F0);
     }
 }
 
@@ -165,229 +167,103 @@ void correcao(){
     }
 }
 
-float dist(Node a,Node b){
-    float d = pow(pow(a.x-b.x,2f)+pow(a.y-b.y,2f),0.5f);
-    return d;
+// Auxiliares
+void teste(){
+    // stroke(#FF0000);
+    // // translate(zoom/dragX,zoom/dragY);
+    // // line(width/2+dragX,0+dragY,width/2+dragX,width+dragY);
+    // // line(0+dragX,width/2+dragY,width+dragX,width/2+dragY);
+    // // translate(dragX/zoom,dragY/zoom);
+    // stroke(1);
 }
 
-void teste(){
-    // if (nodeCatched != null) println(nodeCatched.id);
+void position(){
+    fill(#FF00A0);
+    String texto = "("+mouseX+", "+mouseY+")";
+    text(texto,(mouseX-dragX)/zoom,(mouseY-dragY)/zoom); // Segue o mouse
+}
+
+void ecrivent(){
+    fill(#000000);
+    String texto = dragX+" : "+dragY;
+    textSize(25/zoom);
+    text(texto,(10-dragX)/zoom,(width-2-dragY)/zoom);
+    textSize(12);
 }
 
 // algoritmos
 void algorithim(){
-    // excluir();
-    rename();
-    // preOrdem();
-    // delay(250);
-    // emOrdem();
-    // delay(250);
-    // posOrdem();
-    // delay(250);
-    distances();
+    Alg.rename();
+    Alg.distances();
     delay(250);
 }
 
-void excluir(){
-    ArrayList<Node> nova = new ArrayList<Node>();
-    String[] ids = {"15","14","5","4","9","8","7","6"};
-    for (Node node : Nodes){
-        boolean add = true;
-        for (String str : ids){
-            if (node.id.equals(str)){
-                nodeSelected = node;
-                ArrayList<Node> newNodes = new ArrayList<Node>();
-                for (Node node2 : Nodes){
-                    if (node2.connected != null){
-                        ArrayList<Node> nova2 = new ArrayList<Node>();
-                        for (Node nodeFil : node2.connected){
-                            if (nodeFil != nodeSelected){
-                                nova2.add(nodeFil);
-                            }
-                        }
-                        node2.connected = nova2;
-                    }
-                    if (node2 != nodeSelected) newNodes.add(node2);
-                }
-                Nodes = newNodes;
-                add = false;
-            }
-            nodeSelected = null;
-        }
-        if (add) nova.add(node);
-    }
-    Nodes = nova;
-}
-void rename(){
-    String[] names = {"a","c","b","e","d","g","f"};
-    int tam=0;
-    for (String c : names) tam++;
-    int i = 0;
-    for (Node node : Nodes){
-        node.id = names[i];
-        i++;
-        if (tam == i){
-            break;
-        }
-    }
-}
-
-void distances(){
-    println("BEGIN");
-    int initDist = 10000;
-    for (Node node : Nodes){
-        node.id = ""+initDist;
-    }
-    if (nodeCatched != null){
-        Node after = nodeCatched;
-        nodeCatched = null;
-        nodeSelected = vis(after,null,0,new ArrayList<Node>());
-        after.minorisWay = null;
-    }
-    println("END");
-}
-
-Node vis(Node node,Node after,float somaB,ArrayList<Node> way){
-    int time = 1;
-    if (breakThread) return null;
-    if (node != null){
-        nodeSelected = node;
-        way.add(nodeSelected);
-        // print(nodeSelected.id+" ");
-        if (nodeSelected.connected.size() >= 1){
-            int tam = nodeSelected.connected.size(),i=0;
-            float soma=0;
-            while (true){
-                if (i == tam) break;
-                // para-loops
-                boolean continueIt = false;
-                for (Node nodeWay : way){
-                    if (nodeWay == nodeSelected.connected.get(i)){
-                        i++;
-                        continueIt = true;
-                        break;
-                    }
-                }
-                if (continueIt) continue;
-                //
-                soma = somaB+distLin(nodeSelected,nodeSelected.connected.get(i));
-                delay(time);
-                if (Float.parseFloat(nodeSelected.connected.get(i).id) > soma){
-                    nodeSelected.connected.get(i).id = ""+soma;
-                    nodeSelected.connected.get(i).minorisWay = new ArrayList<Node>();
-                    for (Node nodeWay : way) nodeSelected.connected.get(i).minorisWay.add(nodeWay);
-                }
-                ArrayList<Node> put = new ArrayList<Node>();
-                for (Node nodePut : way) put.add(nodePut);
-                
-                nodeSelected = vis(nodeSelected.connected.get(i),nodeSelected,soma,put);
-                i++;
-                
-            }
-        }
-        delay(time);
-        return after;
-    }
-    return after;
-}
-
-void preOrdem(){
-    nodeSelected = Nodes.get(0);
-    delay(500);
-    nodeSelected = visPreOrdem(Nodes.get(0),null);
-    delay(500);
-    nodeSelected = null;
-    println("");
-}
-Node visPreOrdem(Node node,Node after){
-    if (node != null){
-        nodeSelected = node;
-        print(nodeSelected.id+" ");
-        if (nodeSelected.connected.size() >= 2){
-            delay(500);
-            nodeSelected = visPreOrdem(nodeSelected.connected.get(1),nodeSelected);
-            delay(500);
-            nodeSelected = visPreOrdem(nodeSelected.connected.get(0),nodeSelected);
-        }else if (nodeSelected.connected.size() >= 1){
-            delay(500);
-            nodeSelected = visPreOrdem(nodeSelected.connected.get(0),nodeSelected);
-        }
-        delay(500);
-        return after;
-    }
-    return after;
-}
-
-void emOrdem(){
-    nodeSelected = Nodes.get(0);
-    delay(500);
-    nodeSelected = visEmOrdem(Nodes.get(0),null);
-    delay(500);
-    nodeSelected = null;
-    println("");
-}
-Node visEmOrdem(Node node,Node after){
-    if (node != null){
-        nodeSelected = node;
-        if (nodeSelected.connected.size() >= 2){
-            delay(500);
-            nodeSelected = visEmOrdem(nodeSelected.connected.get(1),nodeSelected);
-            print(nodeSelected.id+" ");
-            delay(500);
-            nodeSelected = visEmOrdem(nodeSelected.connected.get(0),nodeSelected);
-        }else if (nodeSelected.connected.size() >= 1){
-            delay(500);
-            nodeSelected = visEmOrdem(nodeSelected.connected.get(0),nodeSelected);
-        }else if (nodeSelected.connected.size() == 0){
-            print(nodeSelected.id+" ");
-        }
-        delay(500);
-        return after;
-    }
-    return after;
-}
-
-void posOrdem(){
-    nodeSelected = Nodes.get(0);
-    delay(500);
-    nodeSelected = visPosOrdem(Nodes.get(0),null);
-    delay(500);
-    nodeSelected = null;
-    println("");
-}
-Node visPosOrdem(Node node,Node after){
-    if (node != null){
-        nodeSelected = node;
-        if (nodeSelected.connected.size() >= 2){
-            delay(500);
-            nodeSelected = visPosOrdem(nodeSelected.connected.get(1),nodeSelected);
-            delay(500);
-            nodeSelected = visPosOrdem(nodeSelected.connected.get(0),nodeSelected);
-            print(nodeSelected.id+" ");
-        }else if (nodeSelected.connected.size() >= 1){
-            delay(500);
-            nodeSelected = visPosOrdem(nodeSelected.connected.get(0),nodeSelected);
-        }else if (nodeSelected.connected.size() == 0){
-            print(nodeSelected.id+" ");
-        }
-        delay(500);
-        return after;
-    }
-    return after;
-}
-
 // connections
+void mouseWheel(MouseEvent event){
+    // translate(dragX*zoom,dragY*zoom);
+    int x = mouseX;
+    int y = mouseY;
+    int drx = dragX;
+    int dry = dragY;
+
+    lastZoom = zoom;
+
+        
+    if (pow(2,event.getCount()*(-1)) > 1){
+        dragX += (width/2-mouseX);
+        dragY += (height/2-mouseY);
+        dragX += -x+drx;
+        dragY += -y+dry;
+    }else{
+        // dragX += (width/2-mouseX);
+        // dragY += (height/2-mouseY);
+        println((-dragX+drx)+" : "+(-dragY+dry));
+        // dragX += x;
+        // dragY += y;
+    }
+
+    lastZoom *= pow(2,event.getCount()*(-1));
+
+    zoom = lastZoom;
+
+
+    println(mouseX + " : "+mouseY + " | "+lastZoom);
+
+    
+
+    
+}
 void mouseAutomatic(){
     // if (nodeSelected == null) nodeCatched = null;
     if (nodeCatched != null){
-        nodeCatched.x = mouseX;
-        nodeCatched.y = mouseY;
+        nodeCatched.x = mouseX-dragX;
+        nodeCatched.y = mouseY-dragY;
+    }
+    nodePassing = null;
+    for (Node node : Nodes){
+        if (node.x-node.raw+dragX <= mouseX && mouseX <= node.x+node.raw+dragX && node.y-node.raw+dragY <= mouseY && mouseY <= node.y+node.raw+dragY){
+            nodePassing = node;
+            break;
+        }
+    }
+    // minorisWay
+    if (nodePassing != null && nodeSelected == null)
+    if (nodePassing.x-nodePassing.raw+dragX <= mouseX && mouseX <= nodePassing.x+nodePassing.raw+dragX && nodePassing.y-nodePassing.raw+dragY <= mouseY && mouseY <= nodePassing.y+nodePassing.raw+dragY){
+        // if (nodePassing.minorisWay != null)
+        if (nodePassing.minorisWay != null && nodePassing.minorisWay.size() >= 1){
+            for (Node node2 : nodePassing.minorisWay){
+                if (nodePassing.minorisWay.get(0) == node2) drawCrown(node2,#FF00FF);
+                else drawCrown(node2,#FF0000);
+            }
+            drawCrown(nodePassing,#0000FF);
+        }
     }
 }
 void mousePressed(){
     nodeCatched = null;
     for (Node node : Nodes){
-        if (node.x-node.raw <= mouseX && mouseX <= node.x+node.raw && node.y-node.raw <= mouseY && mouseY <= node.y+node.raw){
+        if (node.x-node.raw+dragX <= mouseX && mouseX <= node.x+node.raw+dragX && node.y-node.raw+dragY <= mouseY && mouseY <= node.y+node.raw+dragY){
+            typeSelected = mouseButton;
             if (mouseButton == LEFT){
                 if (nodeSelected == null){
                     nodeSelected = node;
@@ -436,6 +312,13 @@ void mousePressed(){
         }
     }
 }
+void mouseDragged() {
+    // translate(mouseX-pmouseX,);
+    dragX += mouseX-pmouseX;
+    dragY += mouseY-pmouseY;
+    println("---------\n"+mouseX+"\n"+pmouseX+"\n"+mouseY+"\n"+pmouseY);
+    println("---------");
+}
 void keyPressed(){
     if (nodeSelected == null) writeNode = false;
     if (writeNode){
@@ -449,89 +332,114 @@ void keyPressed(){
             nodeSelected = null;
         }else if (keyCode == 8) nodeSelected.id = "";
     }else{
-        if(key == 'r'){
+        if (key == 'r'){ // Creates nodes
             createNodes();
-        }else if (key == 'l'){
+        }else if (key == 'l'){ // Clear the map
             Nodes = new ArrayList<Node>();
-            Nodes.add(new Node(new ArrayList<Node>(),mouseX,mouseY,basicRaw,color((int) random(256),(int) random(256),(int) random(256))));
+            Nodes.add(new Node(new ArrayList<Node>(),mouseX-dragX,mouseY-dragY,basicRaw,color((int) random(256),(int) random(256),(int) random(256))));
             nodeSelected = null;
             nodeCatched = null;
-        }else if (key == 'd'){
-            if (nodeSelected != null){
+        }else if (key == 'd'){ // Delete node
+            if (nodePassing != null){
                 ArrayList<Node> newNodes = new ArrayList<Node>();
                 for (Node node : Nodes){
                     if (node.connected != null){
                         ArrayList<Node> nova = new ArrayList<Node>();
                         for (Node nodeFil : node.connected){
-                            if (nodeFil != nodeSelected){
+                            if (nodeFil != nodePassing){
                                 nova.add(nodeFil);
                             }
                         }
                         node.connected = nova;
                     }
-                    if (node != nodeSelected) newNodes.add(node);
+                    if (node != nodePassing) newNodes.add(node);
                 }
                 Nodes = newNodes;
+                if (nodePassing == nodeSelected){
+                    newNodes = new ArrayList<Node>();
+                    for (Node node : Nodes){
+                        if (node.connected != null){
+                            ArrayList<Node> nova = new ArrayList<Node>();
+                            for (Node nodeFil : node.connected){
+                                if (nodeFil != nodeSelected){
+                                    nova.add(nodeFil);
+                                }
+                            }
+                            node.connected = nova;
+                        }
+                        if (node != nodeSelected) newNodes.add(node);
+                    }
+                    Nodes = newNodes;
+                }
+                if (nodePassing == nodeSelected) nodeSelected = null;
+                nodePassing = null;
             }
-            nodeSelected = null;
-        }else if (key == 'a'){
+        }else if (key == 'a'){ // Algorithim
             thread("algorithim");
-        }else if (key == 'w'){
+        }else if (key == 'w'){ // Write on the node
             if (nodeSelected != null) writeNode = true;
-        }else if (key == 'n'){
-            Nodes.add(new Node(new ArrayList<Node>(),mouseX,mouseY,basicRaw,color((int) random(256),(int) random(256),(int) random(256))));  
-        }else if (key == 'b'){
+        }else if (key == 'n'){ // Add new node
+            Nodes.add(new Node(new ArrayList<Node>(),(int) ((mouseX-dragX)/zoom),(int) ((mouseY-dragY)/zoom),basicRaw,color((int) random(256),(int) random(256),(int) random(256))));  
+        }else if (key == 'b'){ // Break Thread
             breakThread = (breakThread) ? false : true;
-        }else if (key == 'c'){
-            nodeCatched = (nodeCatched==null) ? nodeSelected : null;
-        }else if (key == 's'){
+        }else if (key == 'c'){ // Catch node
+            nodeCatched = (nodeCatched==null) ? nodePassing : null;
+        }else if (key == 's'){ // Skip
             con.setIt();
             exit();
+        }else if (key == 'm'){ // MinorisWay will be clear
+            for (Node node : Nodes) node.minorisWay = new ArrayList<Node>();
+        }else if (key == 'z'){ // Turn into zero the drags
+            dragX=0;dragY=0;
+        }else if (key == 't'){ // Tester
+            // if (zoom < lastZoom){
+            //     dragX += -mouseX*zoom;
+            //     dragY += -mouseY*zoom;
+            //     println("Minoris");
+            // }else if (zoom != lastZoom){
+            //     dragX += mouseX*lastZoom;
+            //     dragY += mouseY*lastZoom;
+            //     println("Majoris");
+            // }
+            zoom = lastZoom;
+            println(dragX + " : "+dragY+ " | "+lastZoom);
+        }else if (key == 'p'){
+            println(mouseX + " : "+mouseY + " | "+lastZoom);
         }
     }
-}
-void minorisWay(){
-    for (Node node : Nodes){
-        if (node.x-node.raw <= mouseX && mouseX <= node.x+node.raw && node.y-node.raw <= mouseY && mouseY <= node.y+node.raw){
-            if (node.minorisWay != null){
-                for (Node node2 : node.minorisWay){
-                    drawCrown(node2);
-                }
-                fill(#00F0F0);
-                circle(node.x,node.y,basicRaw);
-            }
-        }
-    }
-}
-
-void drawCrown(Node node) {
-float outerRadius = node.raw*1.2;
-float innerRadius = node.raw*1;
-int numSegments = 50; // Número de segmentos da coroa
-
-float angleStep = TWO_PI / numSegments;
-
-fill(255, 0, 0); // cor vermelha
-noStroke();
-
-beginShape();
-for (int i = 0; i <= numSegments; i++) {
-    float angle = i * angleStep;
-    float xOuter = node.x + cos(angle) * outerRadius;
-    float yOuter = node.y + sin(angle) * outerRadius;
-    vertex(xOuter, yOuter);
-}
-for (int i = numSegments; i >= 0; i--) {
-    float angle = i * angleStep;
-    float xInner = node.x + cos(angle) * innerRadius;
-    float yInner = node.y + sin(angle) * innerRadius;
-    vertex(xInner, yInner);
-}
-endShape(CLOSE);
-stroke(1);
 }
 
 // calculus
 float distLin(Node a,Node b){
     return pow(pow(a.x-b.x,2)+pow(a.y-b.y,2),0.5f);
+}
+float dist(Node a,Node b){
+    float d = pow(pow(a.x-b.x,2f)+pow(a.y-b.y,2f),0.5f);
+    return d;
+}
+void drawCrown(Node node,color cor) {
+    float outerRadius = node.raw*1.2;
+    float innerRadius = node.raw*1;
+    int numSegments = 50; // Número de segmentos da coroa
+
+    float angleStep = TWO_PI / numSegments;
+
+    fill(cor); // cor vermelha
+    noStroke();
+
+    beginShape();
+    for (int i = 0; i <= numSegments; i++) {
+    float angle = i * angleStep;
+    float xOuter = node.x+dragX + cos(angle) * outerRadius;
+    float yOuter = node.y+dragY + sin(angle) * outerRadius;
+    vertex(xOuter, yOuter);
+    }
+    for (int i = numSegments; i >= 0; i--) {
+    float angle = i * angleStep;
+    float xInner = node.x+dragX + cos(angle) * innerRadius;
+    float yInner = node.y+dragY + sin(angle) * innerRadius;
+    vertex(xInner, yInner);
+    }
+    endShape(CLOSE);
+    stroke(1);
 }
