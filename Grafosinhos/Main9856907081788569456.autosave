@@ -404,6 +404,8 @@ void mouseDragged() {
     // translate(mouseX-pmouseX,);
     dragX += mouseX-pmouseX;
     dragY += mouseY-pmouseY;
+    println("---------\n"+mouseX+"\n"+pmouseX+"\n"+mouseY+"\n"+pmouseY);
+    println("---------");
 }
 void keyPressed(){
 

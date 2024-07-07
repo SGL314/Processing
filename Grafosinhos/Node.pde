@@ -31,15 +31,16 @@ class Node{
             fill(#00FF00);
             line(this.x,this.y,node.x,node.y);
             distLine(node);
+            float rawCon = pow(basicRaw,1)/basicRawSaved*10;
             // conexões
             if (abs(this.x-node.x) > abs(this.y-node.y)){
               fill(#000000);
-              if (this.x < node.x) arc((this.x+node.x)/2,(this.y+node.y)/2,10,10,3*PI/2,3*PI/2+PI);
-              else arc((this.x+node.x)/2,(this.y+node.y)/2,10,10,PI/2,3*PI/2);
+              if (this.x < node.x) arc((this.x+node.x)/2,(this.y+node.y)/2,rawCon,rawCon,3*PI/2,3*PI/2+PI);
+              else arc((this.x+node.x)/2,(this.y+node.y)/2,rawCon,rawCon,PI/2,3*PI/2);
             }else{
               fill(#000000);
-              if (this.y < node.y) arc((this.x+node.x)/2,(this.y+node.y)/2,10,10,0,PI);
-              else arc((this.x+node.x)/2,(this.y+node.y)/2,10,10,PI,2*PI);
+              if (this.y < node.y) arc((this.x+node.x)/2,(this.y+node.y)/2,rawCon,rawCon,0,PI);
+              else arc((this.x+node.x)/2,(this.y+node.y)/2,rawCon,rawCon,PI,2*PI);
             }
           }
         }
@@ -75,6 +76,7 @@ class Node{
       fill(#000000);
       // fill(#FF0000);
       String texto = ""+((float) round(distLin(this,node)*10))/10;
+      textSize(2);
       text(texto,(this.x+node.x)/2-textWidth(texto)/2,(this.y+node.y)/2-(textAscent()+textDescent()));
       // circle((this.x+node.x)/2-textWidth(texto)/2,(this.y+node.y)/2-(textAscent()+textDescent()),2);
     }

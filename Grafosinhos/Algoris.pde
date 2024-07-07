@@ -1,4 +1,5 @@
 class Algoris{
+    int time = 0;
     void distances(){
         println("BEGIN");
         int initDist = 10000;
@@ -15,7 +16,6 @@ class Algoris{
     }
 
     Node vis(Node node,Node after,float somaB,ArrayList<Node> way){
-        int time = 1;
         if (breakThread) return null;
         if (node != null){
             nodeSelected = node;

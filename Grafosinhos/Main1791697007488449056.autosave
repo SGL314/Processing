@@ -12,26 +12,21 @@ import java.io.IOException;
 import java.io.Serializable;
 
 ArrayList<Node> Nodes = new ArrayList<Node>();
-Node nodeCatched = null;
-Node nodeSelected = null;
+Node nodeCatched = n
+null;
 Node nodePassing = null;
-Node nodeFlagged = null;
 int somaX = 0;
 // config
 int basicRaw = 20;
-int basicRawSaved = basicRaw;
-String fileNameImg = "trabalho.png";
-Connection con = new Connection("casa2trabalho.txt");
+Connection con = new Connection("escola.txt");
 Algoris Alg = new Algoris();
 PImage img;
 ArrayList<String> nomesImgs = new ArrayList<String>();
 int[][] valoresImgs = {
-    {1228, 739}, // escola
-    {1910, 887} // trabalho
+    {1228, 739} // escola
 };
 // variables
 int lastMousePressed = 0;
-int loop = 0;
 int typeSelected = 0;
 boolean breakThread = false;
 boolean writeNode = false;
@@ -39,12 +34,11 @@ int dragX = 0,dragY = 0;
 float zoom = 1,lastZoom = 1;
 
 void setup(){
-    size(1000,1000);
+    size(600,600);
     // createNodes();
     con.getIt();
     setNomesImgs();
     images();
-    if (Nodes.size() >= 1) basicRaw = Nodes.get(0).raw;
 }
 
 void draw(){
@@ -66,7 +60,7 @@ void draw(){
 
 void images(){
     try {
-        img = loadImage(fileNameImg);
+        img = loadImage(con.filename.replace(".txt",".png"));
     } catch (Exception e){
 
     }
@@ -143,7 +137,6 @@ ArrayList<Node> getChildren(int nivel,int altura, Node father, int maxQtChilds,i
 
 void drawAll(){
     int num = 1;
-    loop++;
     // translate(dragX,dragY);
     ArrayList<Draw> after = new ArrayList<Draw>();
     for(Node node : Nodes){
@@ -156,8 +149,6 @@ void drawAll(){
         draw.drawIt();
     }
     translate(-dragX,-dragY);
-    if (nodeFlagged != null) println(nodeFlagged.id+" : "+loop);
-
 }
 
 void markNodeSelected(){
@@ -192,7 +183,7 @@ void correcao(){
     }
 }
 
-// auxiliares
+// Auxiliares
 void teste(){
     // stroke(#FF0000);
     // // translate(zoom/dragX,zoom/dragY);
@@ -219,7 +210,7 @@ int getPropImg(char eixo){
     if (eixo == 'x'){
         int i = 0;
         for (String nome : nomesImgs){
-            if (fileNameImg.equals(nome)){
+            if (nome.equals(con.filename.replace(".txt",""))){
                 exists = true;
                 break;
             }
@@ -229,7 +220,7 @@ int getPropImg(char eixo){
     }else if (eixo == 'y'){
         int i = 0;
         for (String nome : nomesImgs){
-            if (fileNameImg.equals(nome)){
+            if (nome.equals(con.filename.replace(".txt",""))){
                 exists = true;
                 break;
             }
@@ -240,8 +231,7 @@ int getPropImg(char eixo){
     return valor;
 }
 void setNomesImgs(){
-    nomesImgs.add("escola.png");
-    nomesImgs.add("trabalho.png");
+    nomesImgs.add("escola");
 }
 
 // algoritmos
@@ -273,16 +263,17 @@ void mouseWheel(MouseEvent event){
     lastZoom *= pow(2,event.getCount()*(-1));
 
     zoom = lastZoom;
-    
+    dragX += (width/2-mouseX);
+    dragY += (height/2-mouseY);
     if (pow(2,event.getCount()*(-1)) > 1){
-        dragX += (width/2-mouseX);
-        dragY += (height/2-mouseY);
         dragX += -x+drx;
         dragY += -y+dry;
     }else{
-        dragX = x-(-(drx+width/2)/2+width/2);
-        dragY = y-(-(dry+height/2)/2+height/2);
+        dragX += (width/(pow(zoom,-1)*2));
+        dragY += (height/(pow(zoom,-1)*2));
         println((-dragX+drx)+" : "+(-dragY+dry)+" | "+zoom);
+        // dragX += x;
+        // dragY += y;
     }
 
 
@@ -295,62 +286,33 @@ void mouseWheel(MouseEvent event){
 void mouseAutomatic(){
     // if (nodeSelected == null) nodeCatched = null;
     if (nodeCatched != null){
-        nodeCatched.x = (int) ((mouseX-dragX)/zoom);
-        nodeCatched.y = (int) ((mouseY-dragY)/zoom);
+        nodeCatched.x = mouseX-dragX;
+        nodeCatched.y = mouseY-dragY;
     }
     nodePassing = null;
-    float pax,pbx,px,pay,pby,py;
     for (Node node : Nodes){
-        px = (mouseX-dragX)/zoom;
-        py = (mouseY-dragY)/zoom;
-        pax = node.x-node.raw;
-        pbx = node.x+node.raw;
-        pay = node.y-node.raw;
-        pby = node.y+node.raw;
-        if (pax<=px&&px<=pbx&&pay<=py&&py<=pby){
+        if (node.x-node.raw+dragX <= mouseX && mouseX <= node.x+node.raw+dragX && node.y-node.raw+dragY <= mouseY && mouseY <= node.y+node.raw+dragY){
             nodePassing = node;
             break;
         }
     }
     // minorisWay
-    Node nodeMinorisWay = null;
-    boolean showMinorisWay = false;
-    if (nodePassing != null && nodeSelected == null){
-        px = (mouseX-dragX)/zoom;
-        py = (mouseY-dragY)/zoom;
-        pax = nodePassing.x-nodePassing.raw;
-        pbx = nodePassing.x+nodePassing.raw;
-        pay = nodePassing.y-nodePassing.raw;
-        pby = nodePassing.y+nodePassing.raw;
-        if (pax<=px&&px<=pbx&&pay<=py&&py<=pby){
-            nodeMinorisWay = nodePassing;
-            showMinorisWay = true;
-        }
-    }else if (nodeFlagged != null){
-        nodeMinorisWay = nodeFlagged;
-        showMinorisWay = true;
-    }
-    if (showMinorisWay){
-        if (nodeMinorisWay.minorisWay != null && nodeMinorisWay.minorisWay.size() >= 1){
-            for (Node node2 : nodeMinorisWay.minorisWay){
-                if (nodeMinorisWay.minorisWay.get(0) == node2) drawCrown(node2,#FF00FF);
+    if (nodePassing != null && nodeSelected == null)
+    if ((nodePassing.x-nodePassing.raw)*zoom <= (mouseX-dragX)/zoom && (mouseX-dragX)/zoom <= (nodePassing.x+nodePassing.raw)*zoom && (nodePassing.y-nodePassing.raw)*zoom <= (mouseY-dragY)/zoom && (mouseY-dragY)/zoom <= (nodePassing.y+nodePassing.raw)*zoom){
+        // if (nodePassing.minorisWay != null)
+        if (nodePassing.minorisWay != null && nodePassing.minorisWay.size() >= 1){
+            for (Node node2 : nodePassing.minorisWay){
+                if (nodePassing.minorisWay.get(0) == node2) drawCrown(node2,#FF00FF);
                 else drawCrown(node2,#FF0000);
             }
-            drawCrown(nodeMinorisWay,#0000FF);
+            drawCrown(nodePassing,#0000FF);
         }
     }
 }
 void mousePressed(){
     nodeCatched = null;
     for (Node node : Nodes){
-        float pax,pbx,px,pay,pby,py;
-        px = (mouseX-dragX)/zoom;
-        py = (mouseY-dragY)/zoom;
-        pax = node.x-node.raw;
-        pbx = node.x+node.raw;
-        pay = node.y-node.raw;
-        pby = node.y+node.raw;
-        if (pax<=px&&px<=pbx&&pay<=py&&py<=pby){
+        if (node.x-node.raw+dragX <= mouseX && mouseX <= node.x+node.raw+dragX && node.y-node.raw+dragY <= mouseY && mouseY <= node.y+node.raw+dragY){
             typeSelected = mouseButton;
             if (mouseButton == LEFT){
                 if (nodeSelected == null){
@@ -404,9 +366,10 @@ void mouseDragged() {
     // translate(mouseX-pmouseX,);
     dragX += mouseX-pmouseX;
     dragY += mouseY-pmouseY;
+    println("---------\n"+mouseX+"\n"+pmouseX+"\n"+mouseY+"\n"+pmouseY);
+    println("---------");
 }
 void keyPressed(){
-
     if (nodeSelected == null) writeNode = false;
     if (writeNode){
         for (char c : "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray()){
@@ -423,7 +386,7 @@ void keyPressed(){
             createNodes();
         }else if (key == 'l'){ // Clear the map
             Nodes = new ArrayList<Node>();
-            Nodes.add(new Node(new ArrayList<Node>(),(int) ((mouseX-dragX)/zoom),(int) ((mouseY-dragY)/zoom),basicRaw,color((int) random(256),(int) random(256),(int) random(256)))); 
+            Nodes.add(new Node(new ArrayList<Node>(),mouseX-dragX,mouseY-dragY,basicRaw,color((int) random(256),(int) random(256),(int) random(256))));
             nodeSelected = null;
             nodeCatched = null;
         }else if (key == 'd'){ // Delete node
@@ -492,25 +455,8 @@ void keyPressed(){
             println(dragX + " : "+dragY+ " | "+lastZoom);
         }else if (key == 'p'){
             println(mouseX + " : "+mouseY + " | "+lastZoom);
-        }else if (keyCode == UP){
-            for (Node node : Nodes) node.raw += (node.raw>=100) ? 0 : 1;
-            basicRaw = Nodes.get(0).raw; 
-        }else if (keyCode == DOWN){
-            for (Node node : Nodes) node.raw -= (node.raw<=1) ? 0 : 1;
-            basicRaw = Nodes.get(0).raw; 
-        }else if (key == 'f'){
-            nodeFlagged = (nodeFlagged==null || nodePassing!=nodeFlagged) ? nodePassing : null;
-        } 
-    }
-    
-}
-Node putInNodeFlagged(Node nodeA){
-    for (Node node  : Nodes){
-        if (nodeA == node){
-            return node;
         }
     }
-    return null;
 }
 
 // calculus

@@ -25,6 +25,7 @@ class Draw{
                 break;
             case "text":
                 fill(this.cor);
+                // textSize(1.2f);
                 text(this.text,this.x,this.y);
                 break;
             default:
