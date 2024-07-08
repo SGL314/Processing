@@ -20,23 +20,14 @@ int somaX = 0;
 // config
 int basicRaw = 20;
 int basicRawSaved = basicRaw;
-// String fileNameImg = "escola.png";
-// String fileNameImg = "onibusIgreja.png";
-String fileNameImg = "igreja.png";
-// String fileNameImg = "trabalho.png";
-// Connection con = new Connection("escola.txt");
-// Connection con = new Connection("escola2.txt");
-// Connection con = new Connection("onibusIgreja_go.txt");
-Connection con = new Connection("igreja_go.txt");
-// Connection con = new Connection("casa2trabalho.txt");
+String fileNameImg = "escola.png";
+Connection con = new Connection("escola.txt");
 Algoris Alg = new Algoris();
 PImage img;
 ArrayList<String> nomesImgs = new ArrayList<String>();
 int[][] valoresImgs = {
     {1228, 739}, // escola
-    {1910, 887}, // trabalho
-    {1920, 1080}, // onibusIgreja
-    {1920, 1080} // igreja
+    {1910, 887} // trabalho
 };
 // variables
 int lastMousePressed = 0;
@@ -54,7 +45,6 @@ void setup(){
     setNomesImgs();
     images();
     if (Nodes.size() >= 1) basicRaw = Nodes.get(0).raw;
-    fullScreen();
 }
 
 void draw(){
@@ -252,9 +242,6 @@ int getPropImg(char eixo){
 void setNomesImgs(){
     nomesImgs.add("escola.png");
     nomesImgs.add("trabalho.png");
-    nomesImgs.add("onibusIgreja.png");
-    nomesImgs.add("igreja.png");
-    // nomesImgs.add("onibusIgreja.png");
 }
 
 // algoritmos
