@@ -27,7 +27,7 @@ int basicRawSaved = basicRaw;
 // Connection con = new Connection("escola.txt");
 // Connection con = new Connection("escola2.txt");
 // Connection con = new Connection("onibusIgreja_go.txt");
-//Connection con = new Connection("igreja_go.txt");
+f
  Connection con = new Connection("casa2trabalho.txt");
 Algoris Alg = new Algoris();
 PImage img;
@@ -105,7 +105,7 @@ void createNodes(){
     somaX = 0;
 
     qtChilds = (int) (random(maxQtChilds-minQtChilds+1)+minQtChilds);
-    // println(qtChilds);
+    println(qtChilds);
     ArrayList<Node> add = getChildren(nivel+1,altura ,father,maxQtChilds,minQtChilds,raw);
 
     for (Node node : add){
@@ -166,7 +166,7 @@ void drawAll(){
         draw.drawIt();
     }
     translate(-dragX,-dragY);
-    // if (nodeFlagged != null) println(nodeFlagged.id+" : "+loop);
+    if (nodeFlagged != null) println(nodeFlagged.id+" : "+loop);
 
 }
 
@@ -282,7 +282,7 @@ void mouseWheel(MouseEvent event){
     int dry = dragY;
 
     lastZoom = zoom;
-    // println(mouseX + " : "+mouseY + " | "+lastZoom);
+    println(mouseX + " : "+mouseY + " | "+lastZoom);
     // if (pow(2,event.getCount()*(-1)) > 1){
     //     dragX += (width/2-mouseX);
     //     dragY += (height/2-mouseY);
@@ -304,7 +304,7 @@ void mouseWheel(MouseEvent event){
     }else{
         dragX = x-(-(drx+width/2)/2+width/2);
         dragY = y-(-(dry+height/2)/2+height/2);
-        // println((-dragX+drx)+" : "+(-dragY+dry)+" | "+zoom);
+        println((-dragX+drx)+" : "+(-dragY+dry)+" | "+zoom);
     }
 
 
@@ -511,7 +511,7 @@ void keyPressed(){
             //     println("Majoris");
             // }
             zoom = lastZoom;
-            // println(dragX + " : "+dragY+ " | "+lastZoom);
+            println(dragX + " : "+dragY+ " | "+lastZoom);
         }else if (key == 'p'){
             println(mouseX + " : "+mouseY + " | "+lastZoom);
         }else if (keyCode == UP){
