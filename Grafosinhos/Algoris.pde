@@ -33,7 +33,7 @@ class Algoris{
                             i++;
                             continueIt = true;
                             break;
-                        }
+                        } 
                     }
                     if (continueIt) continue;
                     //

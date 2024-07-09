@@ -20,23 +20,14 @@ int somaX = 0;
 // config
 int basicRaw = 20;
 int basicRawSaved = basicRaw;
-// String fileNameImg = "escola.png";
-// String fileNameImg = "onibusIgreja.png";
-//String fileNameImg = "igreja.png";
- String fileNameImg = "trabalho.png";
-// Connection con = new Connection("escola.txt");
-// Connection con = new Connection("escola2.txt");
-// Connection con = new Connection("onibusIgreja_go.txt");
-//Connection con = new Connection("igreja_go.txt");
- Connection con = new Connection("casa2trabalho.txt");
+String fileNameImg = "escola.png";
+Connection con = new Connection("escola.txt");
 Algoris Alg = new Algoris();
 PImage img;
 ArrayList<String> nomesImgs = new ArrayList<String>();
 int[][] valoresImgs = {
     {1228, 739}, // escola
-    {1910, 887}, // trabalho
-    {1920, 1080}, // onibusIgreja
-    {1920, 1080} // igreja
+    {1910, 887} // trabalho
 };
 // variables
 int lastMousePressed = 0;
@@ -48,13 +39,12 @@ int dragX = 0,dragY = 0;
 float zoom = 1,lastZoom = 1;
 
 void setup(){
-    size(1980,1020);
+    size(1000,1000);
     // createNodes();
     con.getIt();
     setNomesImgs();
     images();
     if (Nodes.size() >= 1) basicRaw = Nodes.get(0).raw;
-    // fullScreen();
 }
 
 void draw(){
@@ -105,7 +95,7 @@ void createNodes(){
     somaX = 0;
 
     qtChilds = (int) (random(maxQtChilds-minQtChilds+1)+minQtChilds);
-    // println(qtChilds);
+    println(qtChilds);
     ArrayList<Node> add = getChildren(nivel+1,altura ,father,maxQtChilds,minQtChilds,raw);
 
     for (Node node : add){
@@ -166,7 +156,7 @@ void drawAll(){
         draw.drawIt();
     }
     translate(-dragX,-dragY);
-    // if (nodeFlagged != null) println(nodeFlagged.id+" : "+loop);
+    if (nodeFlagged != null) println(nodeFlagged.id+" : "+loop);
 
 }
 
@@ -217,19 +207,10 @@ void position(){
     text(texto,(mouseX-dragX)/zoom,(mouseY-dragY)/zoom); // Segue o mouse
 }
 void ecrivent(){
-    // drags
     fill(#000000);
     String texto = dragX+" : "+dragY;
     textSize(25/zoom);
-    text(texto,(10-dragX)/zoom,(height-10-dragY)/zoom);
-    // text(texto,100,200);
-    // qt nodes
-    fill(#000000);
-    int qt = 0;
-    for (Node node : Nodes) qt++;
-    texto = ""+qt;
-    textSize(25/zoom);
-    text(texto,(10-dragX)/zoom,(30-dragY)/zoom);
+    text(texto,(10-dragX)/zoom,(width-2-dragY)/zoom);
     textSize(12);
 }
 int getPropImg(char eixo){
@@ -261,9 +242,6 @@ int getPropImg(char eixo){
 void setNomesImgs(){
     nomesImgs.add("escola.png");
     nomesImgs.add("trabalho.png");
-    nomesImgs.add("onibusIgreja.png");
-    nomesImgs.add("igreja.png");
-    // nomesImgs.add("onibusIgreja.png");
 }
 
 // algoritmos
@@ -282,7 +260,7 @@ void mouseWheel(MouseEvent event){
     int dry = dragY;
 
     lastZoom = zoom;
-    // println(mouseX + " : "+mouseY + " | "+lastZoom);
+    println(mouseX + " : "+mouseY + " | "+lastZoom);
     // if (pow(2,event.getCount()*(-1)) > 1){
     //     dragX += (width/2-mouseX);
     //     dragY += (height/2-mouseY);
@@ -304,7 +282,7 @@ void mouseWheel(MouseEvent event){
     }else{
         dragX = x-(-(drx+width/2)/2+width/2);
         dragY = y-(-(dry+height/2)/2+height/2);
-        // println((-dragX+drx)+" : "+(-dragY+dry)+" | "+zoom);
+        println((-dragX+drx)+" : "+(-dragY+dry)+" | "+zoom);
     }
 
 
@@ -511,7 +489,7 @@ void keyPressed(){
             //     println("Majoris");
             // }
             zoom = lastZoom;
-            // println(dragX + " : "+dragY+ " | "+lastZoom);
+            println(dragX + " : "+dragY+ " | "+lastZoom);
         }else if (key == 'p'){
             println(mouseX + " : "+mouseY + " | "+lastZoom);
         }else if (keyCode == UP){
