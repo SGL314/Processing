@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 ArrayList<Node> Nodes = new ArrayList<Node>();
+ArrayList<PImage> imgs = new ArrayList<PImage>();
 Node nodeCatched = null;
 Node nodeSelected = null;
 Node nodePassing = null;
@@ -20,15 +21,17 @@ int somaX = 0;
 // config
 int basicRaw = 20;
 int basicRawSaved = basicRaw;
-// String fileNameImg = "escola.png";
+String pack = "unsv";
+String fileNameImg = "escola.png";
 // String fileNameImg = "onibusIgreja.png";
 //String fileNameImg = "igreja.png";
-String fileNameImg = "trabalho.png";
+// String fileNameImg = "trabalho.png";
 // Connection con = new Connection("escola.txt");
 // Connection con = new Connection("escola2.txt");
 // Connection con = new Connection("onibusIgreja_go.txt");
 //Connection con = new Connection("igreja_go.txt");
-Connection con = new Connection("casa2trabalho.txt");
+// Connection con = new Connection("casa2trabalho.txt");
+Connection con = new Connection("unsv.txt");
 Algoris Alg = new Algoris();
 PImage img;
 ArrayList<String> nomesImgs = new ArrayList<String>();
@@ -51,6 +54,7 @@ void setup(){
     size(1980,1020);
     // createNodes();
     con.getIt();
+    getPack();
     setNomesImgs();
     images();
     if (Nodes.size() >= 1) basicRaw = Nodes.get(0).raw;
@@ -59,7 +63,7 @@ void setup(){
 
 void draw(){
     background(#FFFFFF);
-    if (img != null) image(img,dragX,dragY,getPropImg('x')*zoom,getPropImg('y')*zoom);
+    drawImages();
     scale(zoom);
     translate(dragX/zoom,dragY/zoom);
     position();
@@ -74,6 +78,20 @@ void draw(){
     teste();
 }
 
+// images
+void drawImages(){
+    if (imgs.size() >= 1){
+        int i =0;
+        for (PImage image : imgs){
+            image(image,dragX,dragY,getPropImg('x')*zoom+i*1980,getPropImg('y')*zoom);
+            i++;
+        }
+    }else{
+        if (img != null) image(img,dragX,dragY,getPropImg('x')*zoom,getPropImg('y')*zoom);
+    
+    }
+}
+
 void images(){
     try {
         img = loadImage(fileNameImg);
@@ -81,6 +99,14 @@ void images(){
 
     }
 }
+
+void getPack(){
+    switch (pack) {
+        case "unsv":
+            imgs.add(loadImage("horto.png"));
+    }
+}
+//
 
 void createNodes(){
     int qtChilds = 0;
@@ -120,7 +146,7 @@ void createNodes(){
     }
     
 }
-
+// casa2trabalho
 ArrayList<Node> getChildren(int nivel,int altura, Node father, int maxQtChilds,int minQtChilds, int raw){
     ArrayList<Node> NodesNow = new ArrayList<Node>();
     int qtChilds = (int) (random(maxQtChilds-minQtChilds+1)+minQtChilds);
@@ -495,7 +521,7 @@ void keyPressed(){
             nodeCatched = (nodeCatched==null) ? nodePassing : null;
         }else if (key == 's'){ // Skip
             con.setIt();
-            exit();
+            
         }else if (key == 'm'){ // MinorisWay will be clear
             for (Node node : Nodes) node.minorisWay = new ArrayList<Node>();
         }else if (key == 'z'){ // Turn into zero the drags
@@ -522,7 +548,9 @@ void keyPressed(){
             basicRaw = Nodes.get(0).raw; 
         }else if (key == 'f'){
             nodeFlagged = (nodeFlagged==null || nodePassing!=nodeFlagged) ? nodePassing : null;
-        } 
+        }else if (key == ESC){
+            exit();
+        }
     }
     
 }

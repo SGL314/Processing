@@ -16,7 +16,6 @@ class Connection{
         writer.close();
 
         println("Texto salvo com sucesso!");
-        exit(); // Fecha o sketch após salvar o arquivo
     }
     public void getIt(){
         String[] lines = loadStrings(sketchPath(filename));
