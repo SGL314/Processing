@@ -54,7 +54,7 @@ void setup(){
     setNomesImgs();
     images();
     if (Nodes.size() >= 1) basicRaw = Nodes.get(0).raw;
-    // fullScreen();
+    fullScreen();
 }
 
 void draw(){
