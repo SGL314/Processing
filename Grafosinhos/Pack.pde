@@ -55,16 +55,15 @@ class Pack{
         ArrayList<String> Limages_names = new ArrayList<String>();
         ArrayList<int[]> Limages_proportions = new ArrayList<int[]>();
         ArrayList<int[]> Limages_positions = new ArrayList<int[]>();
-        int posV = pos+dir;
-        if (posV<0) return; 
+        if (pos-dir<0 || pos-dir>=this.len()) return; 
         if (dir == -1){
             for (int i =0;i<this.len();i++){
-                if (i<posV || i>posV){
+                if (i<pos || i>pos){
                     Limages.add(this.getImage(i));
                     Limages_names.add(this.getName(i));
                     Limages_proportions.add(this.getProportion(i));
                     Limages_positions.add(this.getPosition(i));
-                }else if (i == posV && i+1 < this.len()){
+                }else if (i == pos && i+1 < this.len()){
                     i++;
                     Limages.add(this.getImage(i));
                     Limages_names.add(this.getName(i));
@@ -80,12 +79,12 @@ class Pack{
             }
         }else if (dir == 1){
             for (int i =0;i<this.len();i++){
-                if (i<posV-1 || i>posV-1){
+                if (i<pos-1 || i>pos-1){
                     Limages.add(this.getImage(i));
                     Limages_names.add(this.getName(i));
                     Limages_proportions.add(this.getProportion(i));
                     Limages_positions.add(this.getPosition(i));
-                }else if (i == posV-1 && i-1 > 0){
+                }else if (i == pos-1){
                     i++;
                     Limages.add(this.getImage(i));
                     Limages_names.add(this.getName(i));

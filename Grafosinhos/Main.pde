@@ -48,9 +48,12 @@ int loop = 0;
 int typeSelected = 0;
 boolean breakThread = false;
 boolean writeNode = false;
+boolean changePositionImage = false;
+boolean alreadyChangedPositionImage = false;
 int dragX = 0,dragY = 0;
 float zoom = 1,lastZoom = 1;
 int[] infoImage = {0,0,0};
+int variationImage = 10;
 
 void setup(){
     size(1980/2,1020);
@@ -66,20 +69,25 @@ void setup(){
 
 void draw(){
     background(#FFFFFF);
-    drawImages();
+
+    mouseAutomatic();
+
     scale(zoom);
+
+    drawImages();
+
     translate(dragX/zoom,dragY/zoom);
+
     position();
     ecrivent();
-
     drawAll();
     correcao();
 
-    mouseAutomatic();
+    
     markNodeSelected();
 
     teste();
-    moveImages();
+    if (changePositionImage) moveImages();
 }
 
 // images
@@ -88,7 +96,9 @@ void drawImages(){
         for (Pack pack : Packs){
             if (pack.name.equals(namePack)){
                 for (int i=0;i<pack.len();i++){
+                    if (infoImage[0] == i && changePositionImage) rect((pack.getPosX(infoImage[0])-5)*zoom+dragX,(pack.getPosY(infoImage[0])-5)*zoom+dragY,(pack.getPropX(infoImage[0])+10)*zoom,(pack.getPropY(infoImage[0])+10)*zoom);
                     image(pack.getImage(i),(int) ((pack.getPosX(i)*zoom+dragX)),(int) ((pack.getPosY(i)*zoom+dragY)),pack.getPropX(i)*zoom,pack.getPropY(i)*zoom);
+                    
                 }
             }
         }
@@ -105,20 +115,29 @@ void images(){
 
     }
 }
-
 void setPacks(){
     Pack add = new Pack("unsv");
-    add.add("Pack_UNSV/horto.png",1980,1020,0,0);
-    add.add("Pack_UNSV/cachoeirinha.png",1980,1020,100,0);
+
+    // ctpm
+    add.add("Pack_UNSV/horto.png", 1980, 1020, 0, -2048);
+    add.add("Pack_UNSV/cachoeirinha_uniao.png", 1980, 1020, 2331, -2205);
+    add.add("Pack_UNSV/cachoeirinha.png", 1980, 1020, 2835, 0);
+    add.add("Pack_UNSV/carlosprates.png", 1980, 1020, 3024, 1449);
+    add.add("Pack_UNSV/lourdes.png", 1980, 1020, 0, 1890);
+    add.add("Pack_UNSV/parquemunicipal.png", 1980, 1020, -2268, 1953);
+    add.add("Pack_UNSV/prado_barropreto.png", 1980, 1020, -2457, 0);
+    add.add("Pack_UNSV/santacruz.png", 1980, 1020, -2646, -1764);
+
+
     Packs.add(add);
 
 }
-
 void moveImages(){
     for (Pack pack : Packs){
         if (pack.name.equals(namePack)){
             pack.setPosX(infoImage[0],infoImage[1]);
             pack.setPosY(infoImage[0],infoImage[2]);
+            
         }
     }
 }
@@ -470,7 +489,7 @@ void mouseDragged() {
     dragY += mouseY-pmouseY;
 }
 void keyPressed(){
-    int variation = 10;
+    int variation = variationImage;
     if (nodeSelected == null) writeNode = false;
     if (writeNode){
         for (char c : "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray()){
@@ -557,22 +576,26 @@ void keyPressed(){
         }else if (key == 'p'){
             println(mouseX + " : "+mouseY + " | "+lastZoom);
         }else if (keyCode == UP){
-            for (Node node : Nodes) node.raw += (node.raw>=100) ? 0 : 1;
-            basicRaw = Nodes.get(0).raw;
-            infoImage[2]-=variation; 
+            if (changePositionImage) infoImage[2]-=variation;
+            else{
+                for (Node node : Nodes) node.raw += (node.raw>=100) ? 0 : 1;
+                basicRaw = Nodes.get(0).raw;
+            }
         }else if (keyCode == DOWN){
-            for (Node node : Nodes) node.raw -= (node.raw<=1) ? 0 : 1;
-            basicRaw = Nodes.get(0).raw;
-            infoImage[2]+=variation;
+            if (changePositionImage) infoImage[2]+=variation;
+            else{
+                for (Node node : Nodes) node.raw -= (node.raw<=1) ? 0 : 1;
+                basicRaw = Nodes.get(0).raw;
+            }
         }else if (key == 'f'){
             nodeFlagged = (nodeFlagged==null || nodePassing!=nodeFlagged) ? nodePassing : null;
         }else if (key == ESC){
-            exit();
+            exitManually();
         }else if (keyCode == LEFT){
-            infoImage[1]-=variation;
+            if (changePositionImage) infoImage[1]-=variation;
         }else if (keyCode == RIGHT){
-            infoImage[1]+=variation;
-        }else if (key == '<'){
+            if (changePositionImage) infoImage[1]+=variation;
+        }else if (key == ','){
             infoImage[0]--;
             int len=0;
             for (Pack pack : Packs) if (pack.name.equals(namePack)) len=pack.len();
@@ -581,32 +604,16 @@ void keyPressed(){
                 infoImage[1] = pack.getPosX(infoImage[0]);
                 infoImage[2] = pack.getPosY(infoImage[0]);
             }
-        }else if (key == '>'){
+        }else if (key == '.'){
             infoImage[0]++;
             int len=0;
             for (Pack pack : Packs) if (pack.name.equals(namePack)) len=pack.len();
-            if (infoImage[0]>len) infoImage[0]-=len;
+            if (infoImage[0]>=len) infoImage[0]-=len;
             for (Pack pack : Packs) if (pack.name.equals(namePack)){
                 infoImage[1] = pack.getPosX(infoImage[0]);
                 infoImage[2] = pack.getPosY(infoImage[0]);
             }
-        }else if(key == '['){
-            for(Pack pack : Packs){
-                if (pack.name.equals(namePack)){
-                    pack.passTo(infoImage[0],1);
-                }
-            }
-            infoImage[0]--;
-            if (infoImage[0]<0) infoImage[0]=0;
-            for (Pack pack : Packs){
-                if (pack.name.equals(namePack)){
-                    pack.setPosX(infoImage[0],infoImage[1]);
-                    pack.setPosY(infoImage[0],infoImage[2]);
-                }
-            }
-            
-
-        }else if (key == ']'){
+        }else if (key == '['){
             for(Pack pack : Packs){
                 if (pack.name.equals(namePack)){
                     pack.passTo(infoImage[0],-1);
@@ -618,10 +625,37 @@ void keyPressed(){
             if (infoImage[0]>=len) infoImage[0]=len-1;
             for (Pack pack : Packs){
                 if (pack.name.equals(namePack)){
-                    pack.setPosX(infoImage[0],infoImage[1]);
-                    pack.setPosY(infoImage[0],infoImage[2]);
+                    infoImage[1] = pack.getPosX(infoImage[0]);
+                    infoImage[2] = pack.getPosY(infoImage[0]);
                 }
             }
+        }else if (key == ']'){
+            for(Pack pack : Packs){
+                if (pack.name.equals(namePack)){
+                    pack.passTo(infoImage[0],1);
+                }
+            }
+            infoImage[0]--;
+            int len=0;
+            for (Pack pack : Packs) if (pack.name.equals(namePack)) len=pack.len();
+            if (infoImage[0]<0) infoImage[0]=0;
+            for (Pack pack : Packs){
+                if (pack.name.equals(namePack)){
+                    infoImage[1] = pack.getPosX(infoImage[0]);
+                    infoImage[2] = pack.getPosY(infoImage[0]);
+                }
+            }
+        }else if (keyCode == CONTROL){
+            variationImage += (variationImage<=1) ? 0 : -1;
+        }else if (keyCode == SHIFT){
+            variationImage += (variationImage>=1000) ? 0 : 1;
+        }else if(key == 'i'){
+            for (Pack pack : Packs) if (pack.name.equals(namePack)){
+                infoImage[1] = pack.getPosX(infoImage[0]);
+                infoImage[2] = pack.getPosY(infoImage[0]);
+            }
+            changePositionImage = (changePositionImage) ? false : true;
+            alreadyChangedPositionImage = true;
         }
     }
     
@@ -633,6 +667,18 @@ Node putInNodeFlagged(Node nodeA){
         }
     }
     return null;
+}
+void exitManually(){
+    if (alreadyChangedPositionImage){
+        for (Pack pack : Packs){
+            if (namePack.equals(pack.name)){
+                for (int i=0;i<pack.len();i++) println("add.add(\""+pack.getName(i)+"\", "+pack.getPropX(i)+", "+pack.getPropY(i)+", "+pack.getPosX(i)+", "+pack.getPosY(i)+");");
+                break;
+            }
+        }
+    
+    }
+    exit();
 }
 
 // calculus
