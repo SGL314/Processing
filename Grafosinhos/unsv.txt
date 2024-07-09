@@ -1,0 +1,1 @@
+Node{identificator='65_31_72', x='662', y='321', raw='20', id='', cor='-7682927', connected='', minorisWay=''}

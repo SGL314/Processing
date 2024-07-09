@@ -21,7 +21,7 @@ int somaX = 0;
 // config
 int basicRaw = 20;
 int basicRawSaved = basicRaw;
-String pack = "unsv";
+String namePack = "unsv";
 String fileNameImg = "escola.png";
 // String fileNameImg = "onibusIgreja.png";
 //String fileNameImg = "igreja.png";
@@ -41,6 +41,7 @@ int[][] valoresImgs = {
     {1920, 1080}, // onibusIgreja
     {1920, 1080} // igreja
 };
+ArrayList<Pack> Packs = new ArrayList<Pack>();
 // variables
 int lastMousePressed = 0;
 int loop = 0;
@@ -49,16 +50,18 @@ boolean breakThread = false;
 boolean writeNode = false;
 int dragX = 0,dragY = 0;
 float zoom = 1,lastZoom = 1;
+int[] infoImage = {0,0,0};
 
 void setup(){
-    size(1980,1020);
+    size(1980/2,1020);
     // createNodes();
     con.getIt();
-    getPack();
+    setPacks();
     setNomesImgs();
     images();
     if (Nodes.size() >= 1) basicRaw = Nodes.get(0).raw;
-    fullScreen();
+    // fullScreen();
+    
 }
 
 void draw(){
@@ -76,15 +79,18 @@ void draw(){
     markNodeSelected();
 
     teste();
+    moveImages();
 }
 
 // images
 void drawImages(){
-    if (imgs.size() >= 1){
-        int i =0;
-        for (PImage image : imgs){
-            image(image,dragX,dragY,getPropImg('x')*zoom+i*1980,getPropImg('y')*zoom);
-            i++;
+    if (Packs.size() >= 1){
+        for (Pack pack : Packs){
+            if (pack.name.equals(namePack)){
+                for (int i=0;i<pack.len();i++){
+                    image(pack.getImage(i),(int) ((pack.getPosX(i)*zoom+dragX)),(int) ((pack.getPosY(i)*zoom+dragY)),pack.getPropX(i)*zoom,pack.getPropY(i)*zoom);
+                }
+            }
         }
     }else{
         if (img != null) image(img,dragX,dragY,getPropImg('x')*zoom,getPropImg('y')*zoom);
@@ -100,10 +106,20 @@ void images(){
     }
 }
 
-void getPack(){
-    switch (pack) {
-        case "unsv":
-            imgs.add(loadImage("horto.png"));
+void setPacks(){
+    Pack add = new Pack("unsv");
+    add.add("Pack_UNSV/horto.png",1980,1020,0,0);
+    add.add("Pack_UNSV/cachoeirinha.png",1980,1020,100,0);
+    Packs.add(add);
+
+}
+
+void moveImages(){
+    for (Pack pack : Packs){
+        if (pack.name.equals(namePack)){
+            pack.setPosX(infoImage[0],infoImage[1]);
+            pack.setPosY(infoImage[0],infoImage[2]);
+        }
     }
 }
 //
@@ -454,7 +470,7 @@ void mouseDragged() {
     dragY += mouseY-pmouseY;
 }
 void keyPressed(){
-
+    int variation = 10;
     if (nodeSelected == null) writeNode = false;
     if (writeNode){
         for (char c : "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray()){
@@ -542,14 +558,70 @@ void keyPressed(){
             println(mouseX + " : "+mouseY + " | "+lastZoom);
         }else if (keyCode == UP){
             for (Node node : Nodes) node.raw += (node.raw>=100) ? 0 : 1;
-            basicRaw = Nodes.get(0).raw; 
+            basicRaw = Nodes.get(0).raw;
+            infoImage[2]-=variation; 
         }else if (keyCode == DOWN){
             for (Node node : Nodes) node.raw -= (node.raw<=1) ? 0 : 1;
-            basicRaw = Nodes.get(0).raw; 
+            basicRaw = Nodes.get(0).raw;
+            infoImage[2]+=variation;
         }else if (key == 'f'){
             nodeFlagged = (nodeFlagged==null || nodePassing!=nodeFlagged) ? nodePassing : null;
         }else if (key == ESC){
             exit();
+        }else if (keyCode == LEFT){
+            infoImage[1]-=variation;
+        }else if (keyCode == RIGHT){
+            infoImage[1]+=variation;
+        }else if (key == '<'){
+            infoImage[0]--;
+            int len=0;
+            for (Pack pack : Packs) if (pack.name.equals(namePack)) len=pack.len();
+            if (infoImage[0]<0) infoImage[0]+=len;
+            for (Pack pack : Packs) if (pack.name.equals(namePack)){
+                infoImage[1] = pack.getPosX(infoImage[0]);
+                infoImage[2] = pack.getPosY(infoImage[0]);
+            }
+        }else if (key == '>'){
+            infoImage[0]++;
+            int len=0;
+            for (Pack pack : Packs) if (pack.name.equals(namePack)) len=pack.len();
+            if (infoImage[0]>len) infoImage[0]-=len;
+            for (Pack pack : Packs) if (pack.name.equals(namePack)){
+                infoImage[1] = pack.getPosX(infoImage[0]);
+                infoImage[2] = pack.getPosY(infoImage[0]);
+            }
+        }else if(key == '['){
+            for(Pack pack : Packs){
+                if (pack.name.equals(namePack)){
+                    pack.passTo(infoImage[0],1);
+                }
+            }
+            infoImage[0]--;
+            if (infoImage[0]<0) infoImage[0]=0;
+            for (Pack pack : Packs){
+                if (pack.name.equals(namePack)){
+                    pack.setPosX(infoImage[0],infoImage[1]);
+                    pack.setPosY(infoImage[0],infoImage[2]);
+                }
+            }
+            
+
+        }else if (key == ']'){
+            for(Pack pack : Packs){
+                if (pack.name.equals(namePack)){
+                    pack.passTo(infoImage[0],-1);
+                }
+            }
+            infoImage[0]++;
+            int len=0;
+            for (Pack pack : Packs) if (pack.name.equals(namePack)) len=pack.len();
+            if (infoImage[0]>=len) infoImage[0]=len-1;
+            for (Pack pack : Packs){
+                if (pack.name.equals(namePack)){
+                    pack.setPosX(infoImage[0],infoImage[1]);
+                    pack.setPosY(infoImage[0],infoImage[2]);
+                }
+            }
         }
     }
     
