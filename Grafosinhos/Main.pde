@@ -293,7 +293,7 @@ void ecrivent(){
     text(texto,(10-dragX)/zoom,(30-dragY)/zoom);
     textSize(12);
 }
-int getPropImg(char eixo){
+int getPropImg(char eixo){ 
     int valor = 0;
     boolean exists = false;
     if (eixo == 'x'){
