@@ -50,10 +50,14 @@ boolean breakThread = false;
 boolean writeNode = false;
 boolean changePositionImage = false;
 boolean alreadyChangedPositionImage = false;
+boolean toDrawImages = true;
 int dragX = 0,dragY = 0;
 float zoom = 1,lastZoom = 1;
 int[] infoImage = {0,0,0};
 int variationImage = 10;
+int tempo = 1;
+int qtNodes = 0;
+String relatorio = "";
 
 void setup(){
     size(1980/2,1020);
@@ -63,49 +67,59 @@ void setup(){
     setNomesImgs();
     images();
     if (Nodes.size() >= 1) basicRaw = Nodes.get(0).raw;
-    // fullScreen();
+    fullScreen();
+    frameRate(100);
     
 }
 
 void draw(){
     background(#FFFFFF);
-
-    mouseAutomatic();
+    if (toDrawImages) drawImages();
+    // relatorio += "\n"+((float) -1000/tempo)+" FPS";
+    // relatorio += "\n"+(tempo-millis())+" drawImages";
 
     scale(zoom);
-
-    drawImages();
-
     translate(dragX/zoom,dragY/zoom);
+    // relatorio += "\n"+(tempo-millis())+" relatives";
 
-    position();
+    // relatorio += "\n"+((float) -1000/tempo)+" FPS";
     ecrivent();
+    position();
+
     drawAll();
+    // println(nodePassing);
+    // relatorio += "\n"+(tempo-millis())+" drawAll";
     correcao();
+    // relatorio += "\n"+(tempo-millis())+" correcao";
 
-    
+    mouseAutomatic();
     markNodeSelected();
-
+    // relatorio += "\n"+(tempo-millis())+" marking";
     teste();
     if (changePositionImage) moveImages();
 }
 
 // images
 void drawImages(){
+    int qtImgs = 0;
     if (Packs.size() >= 1){
         for (Pack pack : Packs){
             if (pack.name.equals(namePack)){
                 for (int i=0;i<pack.len();i++){
-                    if (infoImage[0] == i && changePositionImage) rect((pack.getPosX(infoImage[0])-5)*zoom+dragX,(pack.getPosY(infoImage[0])-5)*zoom+dragY,(pack.getPropX(infoImage[0])+10)*zoom,(pack.getPropY(infoImage[0])+10)*zoom);
-                    image(pack.getImage(i),(int) ((pack.getPosX(i)*zoom+dragX)),(int) ((pack.getPosY(i)*zoom+dragY)),pack.getPropX(i)*zoom,pack.getPropY(i)*zoom);
-                    
+                    if ((pack.getPosX(i)*zoom+dragX)+pack.getPropX(i)*zoom >= 0 && (pack.getPosX(i)*zoom+dragX) <= width && ((pack.getPosY(i)*zoom+dragY)) <= height && ((pack.getPosY(i)*zoom+dragY))+pack.getPropY(i)*zoom >= 0){
+                        if (infoImage[0] == i && changePositionImage) rect((pack.getPosX(infoImage[0])-5)*zoom+dragX,(pack.getPosY(infoImage[0])-5)*zoom+dragY,(pack.getPropX(infoImage[0])+10)*zoom,(pack.getPropY(infoImage[0])+10)*zoom);
+                        image(pack.getImage(i),(int) ((pack.getPosX(i)*zoom+dragX)),(int) ((pack.getPosY(i)*zoom+dragY)),pack.getPropX(i)*zoom,pack.getPropY(i)*zoom);
+                        qtImgs++;
+                    }
                 }
+                break;
             }
         }
     }else{
         if (img != null) image(img,dragX,dragY,getPropImg('x')*zoom,getPropImg('y')*zoom);
     
     }
+    relatorio += "\nimgs: "+qtImgs;
 }
 
 void images(){
@@ -119,14 +133,15 @@ void setPacks(){
     Pack add = new Pack("unsv");
 
     // ctpm
-    add.add("Pack_UNSV/horto.png", 1980, 1020, 0, -2048);
-    add.add("Pack_UNSV/cachoeirinha_uniao.png", 1980, 1020, 2331, -2205);
-    add.add("Pack_UNSV/cachoeirinha.png", 1980, 1020, 2835, 0);
-    add.add("Pack_UNSV/carlosprates.png", 1980, 1020, 3024, 1449);
-    add.add("Pack_UNSV/lourdes.png", 1980, 1020, 0, 1890);
-    add.add("Pack_UNSV/parquemunicipal.png", 1980, 1020, -2268, 1953);
-    add.add("Pack_UNSV/prado_barropreto.png", 1980, 1020, -2457, 0);
-    add.add("Pack_UNSV/santacruz.png", 1980, 1020, -2646, -1764);
+add.add("Pack_UNSV/complement.png", 3085, 1075, -787, 1094);
+add.add("Pack_UNSV/cachoeirinha_uniao.png", 1980, 1020, 521, 485);
+add.add("Pack_UNSV/carlosprates.png", 1980, 1020, -281, 1445);
+add.add("Pack_UNSV/lourdes.png", 1980, 1020, 16, 2409);
+add.add("Pack_UNSV/parquemunicipal.png", 1980, 1020, 466, 1972);
+add.add("Pack_UNSV/prado_barropreto.png", 1980, 1020, -463, 2032);
+add.add("Pack_UNSV/cachoeirinha.png", 1980, 1020, -237, 415);
+add.add("Pack_UNSV/horto.png", 1980, 1020, 738, 1169);
+add.add("Pack_UNSV/santacruz.png", 1980, 1020, 258, -228);
 
 
     Packs.add(add);
@@ -137,7 +152,7 @@ void moveImages(){
         if (pack.name.equals(namePack)){
             pack.setPosX(infoImage[0],infoImage[1]);
             pack.setPosY(infoImage[0],infoImage[2]);
-            
+            break;
         }
     }
 }
@@ -215,12 +230,31 @@ ArrayList<Node> getChildren(int nivel,int altura, Node father, int maxQtChilds,i
 void drawAll(){
     int num = 1;
     loop++;
+    qtNodes = 0;
     // translate(dragX,dragY);
+    float pax,pbx,px,pay,pby,py;
     ArrayList<Draw> after = new ArrayList<Draw>();
+    boolean doPassing = true;
+    nodePassing = null;
     for(Node node : Nodes){
         after.add(node.drawNode());
         after.add(node.write(" "));
+        
+        if (doPassing){
+            px = (mouseX-dragX)/zoom;
+            py = (mouseY-dragY)/zoom;
+            pax = node.x-node.raw;
+            pbx = node.x+node.raw;
+            pay = node.y-node.raw;
+            pby = node.y+node.raw;
+            if (pax<=px&&px<=pbx&&pay<=py&&py<=pby){
+                nodePassing = node;
+                doPassing = false;
+            }
+        }
+        
         num++;
+        qtNodes++;
     }
 
     for (Draw draw : after){
@@ -243,6 +277,7 @@ void markNodeSelected(){
     if (nodePassing != null && nodeSelected != nodePassing && nodePassing.minorisWay.size() == 0){
         drawCrown(nodePassing,#00F0F0);
     }
+    
 }
 
 void correcao(){
@@ -286,12 +321,15 @@ void ecrivent(){
     // text(texto,100,200);
     // qt nodes
     fill(#000000);
-    int qt = 0;
-    for (Node node : Nodes) qt++;
-    texto = ""+qt;
+    tempo -= millis();
+    relatorio += "\n"+((float) -1000/tempo)+" FPS";
+    texto = ""+qtNodes+"    "+relatorio;
+    tempo = millis();
+    relatorio = "";
     textSize(25/zoom);
     text(texto,(10-dragX)/zoom,(30-dragY)/zoom);
     textSize(12);
+    
 }
 int getPropImg(char eixo){ 
     int valor = 0;
@@ -381,20 +419,10 @@ void mouseAutomatic(){
         nodeCatched.x = (int) ((mouseX-dragX)/zoom);
         nodeCatched.y = (int) ((mouseY-dragY)/zoom);
     }
-    nodePassing = null;
+
+    // nodePassing = null;
     float pax,pbx,px,pay,pby,py;
-    for (Node node : Nodes){
-        px = (mouseX-dragX)/zoom;
-        py = (mouseY-dragY)/zoom;
-        pax = node.x-node.raw;
-        pbx = node.x+node.raw;
-        pay = node.y-node.raw;
-        pby = node.y+node.raw;
-        if (pax<=px&&px<=pbx&&pay<=py&&py<=pby){
-            nodePassing = node;
-            break;
-        }
-    }
+
     // minorisWay
     Node nodeMinorisWay = null;
     boolean showMinorisWay = false;
@@ -480,6 +508,7 @@ void mousePressed(){
                 
             }
             lastMousePressed = mouseButton;
+            break;
         }
     }
 }
@@ -548,6 +577,7 @@ void keyPressed(){
             thread("algorithim");
         }else if (key == 'w'){ // Write on the node
             if (nodeSelected != null) writeNode = true;
+            else toDrawImages = (toDrawImages) ? false : true;
         }else if (key == 'n'){ // Add new node
             Nodes.add(new Node(new ArrayList<Node>(),(int) ((mouseX-dragX)/zoom),(int) ((mouseY-dragY)/zoom),basicRaw,color((int) random(256),(int) random(256),(int) random(256))));  
         }else if (key == 'b'){ // Break Thread
@@ -656,17 +686,23 @@ void keyPressed(){
             }
             changePositionImage = (changePositionImage) ? false : true;
             alreadyChangedPositionImage = true;
+        }else if (key == 'o'){
+            ArrayList<ArrayList<Node>> conects = new ArrayList<ArrayList<Node>>();
+            for (Node node : Nodes){
+                conects.add(node.connected);
+                node.connected = new ArrayList<Node>();
+            }
+            int i =0;
+            for (Node node : Nodes){
+                for (Node nodeFather : conects.get(i)){
+                    nodeFather.connected.add(node);
+                }
+                i++;
+            }
+
         }
     }
     
-}
-Node putInNodeFlagged(Node nodeA){
-    for (Node node  : Nodes){
-        if (nodeA == node){
-            return node;
-        }
-    }
-    return null;
 }
 void exitManually(){
     if (alreadyChangedPositionImage){

@@ -58,7 +58,7 @@ class Pack{
         if (pos-dir<0 || pos-dir>=this.len()) return; 
         if (dir == -1){
             for (int i =0;i<this.len();i++){
-                if (i<pos || i>pos){
+                if (i!=pos){
                     Limages.add(this.getImage(i));
                     Limages_names.add(this.getName(i));
                     Limages_proportions.add(this.getProportion(i));
@@ -74,12 +74,12 @@ class Pack{
                     Limages_names.add(this.getName(i));
                     Limages_proportions.add(this.getProportion(i));
                     Limages_positions.add(this.getPosition(i));
-                    i+=2;
+                    i++;
                 }
             }
         }else if (dir == 1){
             for (int i =0;i<this.len();i++){
-                if (i<pos-1 || i>pos-1){
+                if (i!=pos-1){
                     Limages.add(this.getImage(i));
                     Limages_names.add(this.getName(i));
                     Limages_proportions.add(this.getProportion(i));
@@ -95,7 +95,7 @@ class Pack{
                     Limages_names.add(this.getName(i));
                     Limages_proportions.add(this.getProportion(i));
                     Limages_positions.add(this.getPosition(i));
-                    i+=2;
+                    i++;
                 }
             }
         }
