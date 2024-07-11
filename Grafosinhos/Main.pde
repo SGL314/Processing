@@ -21,7 +21,7 @@ int somaX = 0;
 // config
 int basicRaw = 20;
 int basicRawSaved = basicRaw;
-String namePack = "unsv";
+String namePack = "mirinha";
 String fileNameImg = "escola.png";
 // String fileNameImg = "onibusIgreja.png";
 //String fileNameImg = "igreja.png";
@@ -31,7 +31,9 @@ String fileNameImg = "escola.png";
 // Connection con = new Connection("onibusIgreja_go.txt");
 //Connection con = new Connection("igreja_go.txt");
 // Connection con = new Connection("casa2trabalho.txt");
-Connection con = new Connection("unsv.txt");
+// Connection con = new Connection("unsv.txt");
+Connection con = new Connection("mirinha.txt");
+// Connection con = new Connection("sair_escola.txt");
 Algoris Alg = new Algoris();
 PImage img;
 ArrayList<String> nomesImgs = new ArrayList<String>();
@@ -60,14 +62,14 @@ int qtNodes = 0;
 String relatorio = "";
 
 void setup(){
-    size(1980/2,1020);
+    size(1980*3/4,1020);
     // createNodes();
     con.getIt();
     setPacks();
     setNomesImgs();
     images();
     if (Nodes.size() >= 1) basicRaw = Nodes.get(0).raw;
-    fullScreen();
+    // fullScreen();
     frameRate(100);
     
 }
@@ -130,21 +132,41 @@ void images(){
     }
 }
 void setPacks(){
-    Pack add = new Pack("unsv");
+    Pack add;
 
     // ctpm
-add.add("Pack_UNSV/complement.png", 3085, 1075, -787, 1094);
-add.add("Pack_UNSV/cachoeirinha_uniao.png", 1980, 1020, 521, 485);
-add.add("Pack_UNSV/carlosprates.png", 1980, 1020, -281, 1445);
-add.add("Pack_UNSV/lourdes.png", 1980, 1020, 16, 2409);
-add.add("Pack_UNSV/parquemunicipal.png", 1980, 1020, 466, 1972);
-add.add("Pack_UNSV/prado_barropreto.png", 1980, 1020, -463, 2032);
-add.add("Pack_UNSV/cachoeirinha.png", 1980, 1020, -237, 415);
-add.add("Pack_UNSV/horto.png", 1980, 1020, 738, 1169);
-add.add("Pack_UNSV/santacruz.png", 1980, 1020, 258, -228);
+    if (namePack == "unsv"){
+        add = new Pack(namePack);
+        add.add("Pack_UNSV/complement.png", 3085, 1075, -787, 1094);
+        add.add("Pack_UNSV/cachoeirinha_uniao.png", 1980, 1020, 521, 485);
+        add.add("Pack_UNSV/carlosprates.png", 1980, 1020, -281, 1445);
+        add.add("Pack_UNSV/lourdes.png", 1980, 1020, 16, 2409);
+        add.add("Pack_UNSV/parquemunicipal.png", 1980, 1020, 466, 1972);
+        add.add("Pack_UNSV/prado_barropreto.png", 1980, 1020, -463, 2032);
+        add.add("Pack_UNSV/cachoeirinha.png", 1980, 1020, -237, 415);
+        add.add("Pack_UNSV/horto.png", 1980, 1020, 738, 1169);
+        add.add("Pack_UNSV/santacruz.png", 1980, 1020, 258, -228);
+        Packs.add(add);
+    }else if (namePack.equals("mirinha")){
+        add = new Pack(namePack);
+        add.add("Pack_Mirinha/mineras.png", 1687, 780, -714, -35);
+add.add("Pack_Mirinha/alipiodemelo.png", 1668, 780, -1492, 903);
+add.add("Pack_Mirinha/santarosa.png", 1562, 775, 151, -14);
+add.add("Pack_Mirinha/cachoeirinha.png", 1532, 789, 308, 692);
+add.add("Pack_Mirinha/mataufmg.png", 1677, 779, -672, 673);
+add.add("Pack_Mirinha/br.png", 1677, 778, -811, 985);
+add.add("Pack_Mirinha/ouropreto.png", 1547, 801, -875, 272);
+add.add("Pack_Mirinha/castelocima.png", 1666, 791, -1535, 139);
 
 
-    Packs.add(add);
+        // for (int i=0;i<add.len();i++){
+        //     add.setPosX(i,0);
+        //     add.setPosY(i,0);
+        // }
+        Packs.add(add);
+    }
+
+
 
 }
 void moveImages(){
@@ -712,7 +734,6 @@ void exitManually(){
                 break;
             }
         }
-    
     }
     exit();
 }

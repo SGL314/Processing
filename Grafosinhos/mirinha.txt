@@ -1,0 +1,16 @@
+Node{identificator='77_30_59', x='956', y='715', raw='4', id='casa', cor='-15267288', connected='', minorisWay=''}
+Node{identificator='89_16_75', x='-995', y='1191', raw='4', id='', cor='-3712116', connected='', minorisWay=''}
+Node{identificator='77_46_31', x='-987', y='1161', raw='4', id='', cor='-3041356', connected='', minorisWay=''}
+Node{identificator='26_21_77', x='-980', y='1123', raw='4', id='', cor='-8539097', connected='', minorisWay=''}
+Node{identificator='16_18_39', x='-881', y='794', raw='4', id='', cor='-14592921', connected='', minorisWay=''}
+Node{identificator='31_72_59', x='-900', y='780', raw='4', id='', cor='-13410049', connected='', minorisWay=''}
+Node{identificator='54_74_45', x='-911', y='771', raw='4', id='', cor='-732545', connected='', minorisWay=''}
+Node{identificator='56_37_16', x='-925', y='779', raw='4', id='', cor='-15288411', connected='', minorisWay=''}
+Node{identificator='67_21_51', x='-936', y='806', raw='4', id='', cor='-7536815', connected='', minorisWay=''}
+Node{identificator='86_62_78', x='-938', y='831', raw='4', id='', cor='-3605198', connected='', minorisWay=''}
+Node{identificator='57_89_73', x='-939', y='855', raw='4', id='', cor='-2698417', connected='', minorisWay=''}
+Node{identificator='30_57_71', x='-940', y='879', raw='4', id='', cor='-1696833', connected='', minorisWay=''}
+Node{identificator='20_83_73', x='-941', y='934', raw='4', id='', cor='-9471273', connected='', minorisWay=''}
+Node{identificator='80_91_40', x='-943', y='948', raw='4', id='', cor='-1933013', connected='', minorisWay=''}
+Node{identificator='54_75_94', x='-955', y='1004', raw='4', id='', cor='-76172', connected='', minorisWay=''}
+Node{identificator='28_97_42', x='-967', y='1068', raw='4', id='', cor='-9104228', connected='', minorisWay=''}
