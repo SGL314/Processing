@@ -28,24 +28,23 @@ class Node{
       if (this.connected != null){
         for (Node node : connected){
           if (node != null){
-            fill(#00FF00);
+            stroke(#000000);
             line(this.x,this.y,node.x,node.y);
             distLine(node);
             float rawCon = pow(basicRaw,1)/basicRawSaved*10;
             // conexões
+            stroke(0);
+            fill(#000000);
             if (abs(this.x-node.x) > abs(this.y-node.y)){
-              fill(#000000);
               if (this.x < node.x) arc((this.x+node.x)/2,(this.y+node.y)/2,rawCon,rawCon,3*PI/2,3*PI/2+PI);
               else arc((this.x+node.x)/2,(this.y+node.y)/2,rawCon,rawCon,PI/2,3*PI/2);
             }else{
-              fill(#000000);
               if (this.y < node.y) arc((this.x+node.x)/2,(this.y+node.y)/2,rawCon,rawCon,0,PI);
               else arc((this.x+node.x)/2,(this.y+node.y)/2,rawCon,rawCon,PI,2*PI);
             }
           }
         }
       }
-
       return new Draw(this.cor,this.x,this.y,this.raw,"node");
     }
 
@@ -73,7 +72,7 @@ class Node{
     }
 
     void distLine(Node node){
-      fill(#000000);
+      fill(#888888);
       // fill(#FF0000);
       String texto = ""+((float) round(distLin(this,node)*10))/10;
       textSize(2);
@@ -83,12 +82,9 @@ class Node{
 
     Draw write(String id){
       if (!(id.equals(" "))) this.id = id;
-      fill(#000000);
+      int corTexto = #888888;
       String texto = ""+this.id+"";
-      // if (this.connected.size() >= 2){
-      //   texto += " "+this.connected.get(0).num+" | "+this.connected.get(1).num;
-      // }
-      return new Draw(#000000,(int) (this.x-textWidth(texto)/2),(int) (this.y+this.raw),texto,"text");
+      return new Draw(corTexto,(int) (this.x-textWidth(texto)/2),(int) (this.y+this.raw),texto,"text");
     }
 
     @Override

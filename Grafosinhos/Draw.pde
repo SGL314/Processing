@@ -20,8 +20,10 @@ class Draw{
     void drawIt(){
         switch (this.tipo){
             case "node":
+                noStroke();
                 fill(this.cor);
                 circle(this.x,this.y,this.raw);
+                stroke(0);
                 break;
             case "text":
                 fill(this.cor);

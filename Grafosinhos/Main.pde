@@ -86,7 +86,7 @@ void draw(){
 
     // relatorio += "\n"+((float) -1000/tempo)+" FPS";
     ecrivent();
-    position();
+    // position();
 
     drawAll();
     // println(nodePassing);
@@ -155,8 +155,9 @@ add.add("Pack_Mirinha/santarosa.png", 1562, 775, 151, -14);
 add.add("Pack_Mirinha/cachoeirinha.png", 1532, 789, 308, 692);
 add.add("Pack_Mirinha/mataufmg.png", 1677, 779, -672, 673);
 add.add("Pack_Mirinha/br.png", 1677, 778, -811, 985);
-add.add("Pack_Mirinha/ouropreto.png", 1547, 801, -875, 272);
+add.add("Pack_Mirinha/ouropreto.png", 1547, 801, -875, 271);
 add.add("Pack_Mirinha/castelocima.png", 1666, 791, -1535, 139);
+
 
 
         // for (int i=0;i<add.len();i++){
