@@ -1,0 +1,49 @@
+int qt_persons = 10;
+int profTerreno = 200;
+
+ArrayList<Person> Persons = new ArrayList<Person>();
+
+void setup(){
+    size(800,800);
+    createPersons();
+    thread("downPersons");
+}
+
+void createPersons(){
+    int i = 1;
+    while (i<= qt_persons){
+        Persons.add(new Person("aleatr"));
+        i++;
+    }
+}
+
+void draw(){
+    ambiente();
+    movimentos();
+}
+
+void ambiente(){
+    background(#7CC1D3);
+    fill(#522E0B);
+    rect(0,0,width,profTerreno);
+}
+
+void movimentos(){
+    for (Person person : Persons){
+        person.move();
+        person.show();
+    }
+}
+
+void downPersons(){
+    while (true){
+        for (Person person : Persons){
+            if (person.py > height-profTerreno){
+                person.py -= 1;
+            }
+            if (person.py < height-profTerreno){
+                person.py += 1;
+            }
+        }
+    }
+}
