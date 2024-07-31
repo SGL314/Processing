@@ -6,13 +6,11 @@ boolean runningDownPersons = false;
 Person lastDied = null;
 Object objectSelected = null;
 int geration = 1;
-int pop = 100;
-
-Control controle = new Control();
-boolean runThreads = true;
+boolean usingPersons = false;
 
 ArrayList<Person> Persons = new ArrayList<Person>();
 ArrayList<Poco> Pocos = new ArrayList<Poco>();
+ArrayList<Person> Persons2 = new ArrayList<Person>();
 
 void setup(){
     size(1400,800);
@@ -54,7 +52,6 @@ void ambiente(){
 void objects(){
     int dist = 50;
     for (Person person : Persons){
-        if (person.died) continue;
         person.move();
         person.show();
         for (Poco poco : Pocos){
@@ -70,40 +67,18 @@ void objects(){
 }
 
 void logic(){
-    if (pop == 0 || pop == 1){
-        controle.runThreads = false;
-        runThreads = false;
-        print("Strange");
-        while (controle.runningDownPersons || controle.runningLiving){
-           print("");
-        }
-        print("hhhh");
-        ArrayList<Person> add = new ArrayList<Person>();
-        for (Person person : Persons){
-            if (!(person.died)) add.add(person);
-        }
-        Persons = new ArrayList<Person>();
-        for (Person p1 : add){
-            Persons.add(p1);
-        }
+    if (Persons.size() == 0){
         lastDied.life += 3;
         lastDied.water += 3;
         Persons.add(lastDied);
         //add
         int i = 1;
-        if (pop == 0)
         while (i<= qt_persons-1){
-            Persons.add(new Person(lastDied));
-            i++;
-        }
-        else
-        while (i<= qt_persons-2){
             Persons.add(new Person(lastDied));
             i++;
         }
         //embaralha
         for (Person person : Persons){
-            person.died = false;
             person.px = (int) random(width);
             person.py = height-profTerreno;
         }
@@ -114,37 +89,44 @@ void logic(){
         }
         print("\n");
         geration++;
-        pop = qt_persons;
-        controle.runThreads = true;
-        controle.re_runThreads();
-        print("reset");
-        posFuncUsingPersons = 1;
-        // delay(2000);
+    }else if (Persons.size() == 1){
+        lastDied.life += 3;
+        lastDied.water += 3;
+        Persons.add(lastDied);
+        //add
+        int i = 1;
+        while (i<= qt_persons-2){
+            Persons.add(new Person(lastDied));
+            i++;
+        }
+        //embaralha
+        for (Person person : Persons){
+            person.px = (int) random(width);
+            person.py = height-profTerreno;
+        }
+        //print
+        print(":> ");
+        for (float coe : lastDied.coes){
+            print(coe+" ");
+        }
+        print("\n");
+        geration++;
     }
 }
 
 void texts(){
-    String texto = "rt: "+runThreads+"\nRunningAll: "+controle.runningAllThreads()+"\nRunThreads: "+controle.runThreads+"\nRunningAny: "+controle.runningAnyThreads()+"\nGeration "+geration+"\nPop.: ";
-    int  qt = 0;
-    for (Person person : Persons){
-        if (person.died == false) qt++;
-    }
-    pop = qt;
-    texto += ""+pop;
-    
+    String texto = "Geration "+geration+"\nPop.: "+Persons.size();
     textSize(50);
     text(texto,25,40);
     textSize(12.5f);
 }
 
 void downPersons(){
-    controle.runningDownPersons = true;
-    while (controle.runThreads){
+    while (true){
         runningDownPersons = false;
         if (Persons.size() >= 1 && posFuncUsingPersons == 1){
             runningDownPersons = true;
             for (Person person : Persons){
-                if (person.died) continue;
                 if (person.py > height-profTerreno){
                     person.py -= 0.5;
                 }
@@ -158,31 +140,28 @@ void downPersons(){
                     person.px += 1;
                 }
             }
+            
+
         }
         runningDownPersons = false;
         delay(16);
     }
-    println("out_dp");
-    controle.runningDownPersons = false;
-    println(controle.runningDownPersons);
 }
 
 void living(){
-    controle.runningLiving = true;
-    while (controle.runThreads){
+    while (true){
         ArrayList<Person> removePersons = new ArrayList<Person>();
         if (Persons.size() >= 1 && posFuncUsingPersons == 2 && runningDownPersons == false){
             for (Person person : Persons){
                 person.live();
                 if (person.life <= 0){
-                    
                     removePersons.add(person);
                 }
             }
             for (Person p1 : removePersons){
                 for (Person p2 : Persons){
                     if (p1 == p2){
-                        p2.died = true;
+                        Persons.remove(p2);
                         lastDied = p2;
                         break;
                     }
@@ -193,8 +172,6 @@ void living(){
         delay(1000);
         posFuncUsingPersons = 2;
     }
-    println("out_lv");
-    controle.runningLiving = false;
 }
 
 void mousePressed(){
