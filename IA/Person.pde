@@ -1,14 +1,17 @@
 class Person extends Object{
     float altura = 20;
     float largura = 5;
-    float water = 0;
-    float maxWater = 3;
-    float consumWater = 1;
+    float water = 6,
+    maxWater =    6,
+    consumWater = 1,
+    food =        3,
+    maxFood =     3,
+    consumFood =  0.25f;
     float life = 3;
     boolean died = false;
     // thnking
-    float[] coes = {1f,0,1f,0,1f,0};
-    int qt_coes = 6;
+    float[] coes = {0,0,0,0,0,0,0,0,0,0,0,0};
+    int qt_coes = 12;
     Person(String tipo){
         switch (tipo){
             case "aleatr":
@@ -19,37 +22,49 @@ class Person extends Object{
     }
     Person(Person base){
         int pos = (int) random(qt_coes);
-        float vari = (((int) random(2))*2-1)*0.5f;
+        float vari = (((int) random(2))*2-1)*2f;
         this.coes = base.coes;
         this.coes[pos] += vari;
 
     }
 
     void live(){
-        if (this.water>=this.consumWater){
+        if (this.water>=this.consumWater && this.food>=this.consumFood){
             this.water -= this.consumWater;
+            this.food -= this.consumFood;
         }else{
             this.life -= 1;
         }
     }
 
     void think(){
-        float D_nexter=0,go=0,unbind=0;
-        Poco nexter = null;
+        float D_nexterWater=0,D_nexterFood=0,goWater=0,goFood=0;
+        Poco nexterWater = null;
+        Fazenda nexterFood = null;
 
         for (Poco poco : Pocos){
-            if (nexter == null){
-                nexter = poco;
-            }else if (abs(nexter.px-this.px) > abs(poco.px-this.px)){
-                nexter = poco;
+            if (nexterWater == null){
+                nexterWater = poco;
+            }else if (abs(nexterWater.px-this.px) > abs(poco.px-this.px)){
+                nexterWater = poco;
             }
         }
-        if (nexter != null) D_nexter = abs(nexter.px-this.px);
+        for (Fazenda fazenda : Fazendas){
+            if (nexterFood == null){
+                nexterFood = fazenda;
+            }else if (abs(nexterFood.px-this.px) > abs(fazenda.px-this.px)){
+                nexterFood = fazenda;
+            }
+        }
+        if (nexterWater != null) D_nexterWater = abs(nexterWater.px-this.px);
+        if (nexterFood != null) D_nexterFood = abs(nexterFood.px-this.px);
 
-        go += D_nexter*coes[1]+water*coes[3]+consumWater*coes[5];
-        unbind += D_nexter*coes[0]+water*coes[2]+consumWater*coes[4];
-        if (go > unbind){
-            this.px += (this.px > nexter.px) ? -1 : 1;
+        goWater += D_nexterWater*coes[0]+water*coes[1]+consumWater*coes[2]+D_nexterFood*coes[3]+food*coes[4]+consumFood*coes[5];
+        goFood += D_nexterWater*coes[6]+water*coes[7]+consumWater*coes[8]+D_nexterFood*coes[9]+food*coes[10]+consumFood*coes[11];
+        if (goWater > goFood){
+            this.px += (this.px > nexterWater.px) ? -1 : 1;
+        }else{
+            this.px += (this.px > nexterFood.px) ? -1 : 1;
         }
     }
 
@@ -60,7 +75,8 @@ class Person extends Object{
     }
 
     void show(){
-        String texto = this.water+" wa.";
+        int casasDecimais = 3;
+        String texto = round(this.water*pow(10,3))/pow(10,3)+" wa.";
         int espaco = 10;
         int cor = #A56B3C;
         fill(#0000FF);
@@ -71,13 +87,21 @@ class Person extends Object{
         fill(#FF0000);
         text(texto,this.px,this.py+espaco);
 
+        texto = round(this.food*pow(10,3))/pow(10,3)+" fo.";
+        espaco = 10;
+        fill(#E0D783);
+        text(texto,this.px,this.py-this.altura-espaco*2);
+
 
         fill(cor);
         rect(this.px-this.largura/2,this.py-this.altura,this.largura,this.altura);
     }
     /*
-    >D_nexter   | unbind<
-    >water      | 
-    >consumWater| go<
+    >D_nexterWater| goFood<
+    >water        | 
+    >consumWater  | 
+    >D_nexterFood | 
+    >food         | 
+    >consumFood   | goWater<
     */
 }

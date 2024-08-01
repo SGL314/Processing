@@ -223,7 +223,7 @@ void mousePressed(){
         }
     }
     for (Fazenda fazenda : Fazendas){
-        if (fazenda.px-fazenda.larguraCasa/2<= mouseX && mouseX <= fazenda.px+fazenda.larguraCasa/2){
+        if (fazenda.px-fazenda.largura/2<= mouseX && mouseX <= fazenda.px+fazenda.larguraCasa/2){
             if (fazenda!=objectSelected) objectSelected = fazenda;
             else objectSelected = null;
             return;
