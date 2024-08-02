@@ -12,6 +12,8 @@ int pop = 100;
 Control controle = new Control();
 boolean runThreads = true;
 
+int qt_water=0,qt_food=0;
+
 ArrayList<Person> Persons = new ArrayList<Person>();
 ArrayList<Poco> Pocos = new ArrayList<Poco>();
 ArrayList<Fazenda> Fazendas = new ArrayList<Fazenda>();
@@ -27,8 +29,10 @@ void setup(){
 
 void createPersons(){
     int i = 1;
+    Person base = new Person("aleatr");
+    base.px = width/2;
     while (i<= qt_persons){
-        Persons.add(new Person("aleatr"));
+        Persons.add(new Person(base,i));
         i++;
     }
 }
@@ -63,6 +67,8 @@ void ambiente(){
 
 void objects(){
     int dist = 50;
+    qt_water = 0;
+    qt_food=0;
     for (Person person : Persons){
         if (person.died) continue;
         person.move();
@@ -103,19 +109,20 @@ void logic(){
         for (Person p1 : add){
             Persons.add(p1);
         }
-        lastDied.life += 3;
-        lastDied.water += 3;
+        lastDied.life += 4;
+        lastDied.water = 15;
+        lastDied.food = 6;
         Persons.add(lastDied);
         //add
         int i = 1;
         if (pop == 0)
         while (i<= qt_persons-1){
-            Persons.add(new Person(lastDied));
+            Persons.add(new Person(lastDied,i));
             i++;
         }
         else
         while (i<= qt_persons-2){
-            Persons.add(new Person(lastDied));
+            Persons.add(new Person(lastDied,i));
             i++;
         }
         //embaralha
@@ -142,7 +149,7 @@ void logic(){
 
 void texts(){
     fill(#000000);
-    String texto = "Geration "+geration+"\nPop.: ";
+    String texto = qt_food+"fo. "+qt_water+"wa.\nGeration "+geration+"\nPop.: ";
     int  qt = 0;
     for (Person person : Persons){
         if (person.died == false) qt++;

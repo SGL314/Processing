@@ -1,17 +1,18 @@
 class Person extends Object{
     float altura = 20;
     float largura = 5;
-    float water = 6,
+    float water = 12,
     maxWater =    6,
-    consumWater = 1,
+    consumWater = 0.75f,
     food =        3,
     maxFood =     3,
     consumFood =  0.25f;
     float life = 3;
     boolean died = false;
     // thnking
-    float[] coes = {0,0,0,0,0,0,0,0,0,0,0,0};
-    int qt_coes = 12;
+    float[] coes = {-12.0f, 2.0f, 9.0f, -23.0f}; // tested
+    int qt_coes = 4,
+    vari_coes = 1;
     Person(String tipo){
         switch (tipo){
             case "aleatr":
@@ -20,12 +21,41 @@ class Person extends Object{
                 break;
         }
     }
-    Person(Person base){
-        int pos = (int) random(qt_coes);
-        float vari = (((int) random(2))*2-1)*2f;
+    Person(Person base,int pos){
+        //engineAleatr
+        int posCoe = (int) random(qt_coes);
+        float vari = (((int) random(2))*2-1)*vari_coes;
         this.coes = base.coes;
-        this.coes[pos] += vari;
+        this.coes[posCoe] += vari;
 
+        // posCoe = (int) random(qt_coes);
+        // vari = (((int) random(2))*2-1)*vari_coes;
+        // this.coes[posCoe] += vari;
+
+        // posCoe = (int) random(qt_coes);
+        // vari = (((int) random(2))*2-1)*vari_coes;
+        // this.coes[posCoe] += vari;
+        
+        //engineVarius
+        // int posNow = pos;
+        // int posCoe = 0;
+        // float personsPerPosCoe = qt_persons/qt_coes;
+        // float variValueCoe = 2*vari_coes/personsPerPosCoe;
+        // float variation = vari_coes;
+        // this.coes = base.coes;
+        // this.px = base.px;
+        // while (true){
+        //     if (posNow>personsPerPosCoe){
+        //         posCoe++;
+        //         posNow-=personsPerPosCoe;
+        //     }else{
+        //         variation -= variValueCoe*posNow;
+        //         break;
+        //     }
+        // }
+        // print(posCoe+": "+variation+"\n");
+        // if (posCoe>=qt_coes) posCoe -= (posCoe-qt_coes+1);
+        // this.coes[posCoe] += variation;
     }
 
     void live(){
@@ -59,19 +89,21 @@ class Person extends Object{
         if (nexterWater != null) D_nexterWater = abs(nexterWater.px-this.px);
         if (nexterFood != null) D_nexterFood = abs(nexterFood.px-this.px);
 
-        goWater += D_nexterWater*coes[0]+water*coes[1]+consumWater*coes[2]+D_nexterFood*coes[3]+food*coes[4]+consumFood*coes[5];
-        goFood += D_nexterWater*coes[6]+water*coes[7]+consumWater*coes[8]+D_nexterFood*coes[9]+food*coes[10]+consumFood*coes[11];
+        goWater += water*consumWater*coes[0]+food*consumFood*coes[1];
+        goFood += water*consumWater*coes[2]+food*consumFood*coes[3];
         if (goWater > goFood){
             this.px += (this.px > nexterWater.px) ? -1 : 1;
-        }else{
+            qt_water++;
+        }else if (goFood > goWater){
             this.px += (this.px > nexterFood.px) ? -1 : 1;
+            qt_food++;
         }
     }
 
     void move(){
         think();
         int dir = ((int) random(2))*2-1;
-        this.px += dir;
+        this.px += dir*0;
     }
 
     void show(){
