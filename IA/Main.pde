@@ -73,14 +73,15 @@ void objects(){
         if (person.died) continue;
         person.move();
         person.show();
+        float velEat = 16,velDrink = 24;
         for (Poco poco : Pocos){
             if (person.px > poco.px-dist && person.px < poco.px+dist){
-                person.water += 1/frameRate;
+                person.water += person.consumWater/frameRate*velEat;
             }
         }
         for (Fazenda fazenda : Fazendas){
             if (person.px > fazenda.px-fazenda.larguraCasa/2-fazenda.larguraTerreno && person.px < fazenda.px+fazenda.larguraCasa/2+fazenda.larguraTerreno){
-                person.food += 1/frameRate;
+                person.food += person.consumFood/frameRate*velDrink;
             }
         }
     }
@@ -109,9 +110,9 @@ void logic(){
         for (Person p1 : add){
             Persons.add(p1);
         }
-        lastDied.life += 4;
-        lastDied.water = 15;
-        lastDied.food = 6;
+        lastDied.life = 3;
+        lastDied.water = lastDied.initWater;
+        lastDied.food = lastDied.initFood;
         Persons.add(lastDied);
         //add
         int i = 1;
@@ -126,10 +127,11 @@ void logic(){
             i++;
         }
         //embaralha
+        float npx = (int) random(width), npy = height-profTerreno;
         for (Person person : Persons){
             person.died = false;
-            person.px = (int) random(width);
-            person.py = height-profTerreno;
+            person.px = npx;
+            person.py = npy;
         }
         //print
         print(":> ");

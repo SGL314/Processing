@@ -1,10 +1,12 @@
 class Person extends Object{
     float altura = 20;
     float largura = 5;
-    float water = 12,
+    float initWater = 20,
+    initFood = 9;
+    float water = initWater,
     maxWater =    6,
     consumWater = 0.75f,
-    food =        3,
+    food =        initFood,
     maxFood =     3,
     consumFood =  0.25f;
     float life = 3;
@@ -27,35 +29,6 @@ class Person extends Object{
         float vari = (((int) random(2))*2-1)*vari_coes;
         this.coes = base.coes;
         this.coes[posCoe] += vari;
-
-        // posCoe = (int) random(qt_coes);
-        // vari = (((int) random(2))*2-1)*vari_coes;
-        // this.coes[posCoe] += vari;
-
-        // posCoe = (int) random(qt_coes);
-        // vari = (((int) random(2))*2-1)*vari_coes;
-        // this.coes[posCoe] += vari;
-        
-        //engineVarius
-        // int posNow = pos;
-        // int posCoe = 0;
-        // float personsPerPosCoe = qt_persons/qt_coes;
-        // float variValueCoe = 2*vari_coes/personsPerPosCoe;
-        // float variation = vari_coes;
-        // this.coes = base.coes;
-        // this.px = base.px;
-        // while (true){
-        //     if (posNow>personsPerPosCoe){
-        //         posCoe++;
-        //         posNow-=personsPerPosCoe;
-        //     }else{
-        //         variation -= variValueCoe*posNow;
-        //         break;
-        //     }
-        // }
-        // print(posCoe+": "+variation+"\n");
-        // if (posCoe>=qt_coes) posCoe -= (posCoe-qt_coes+1);
-        // this.coes[posCoe] += variation;
     }
 
     void live(){
@@ -86,8 +59,6 @@ class Person extends Object{
                 nexterFood = fazenda;
             }
         }
-        if (nexterWater != null) D_nexterWater = abs(nexterWater.px-this.px);
-        if (nexterFood != null) D_nexterFood = abs(nexterFood.px-this.px);
 
         goWater += water*consumWater*coes[0]+food*consumFood*coes[1];
         goFood += water*consumWater*coes[2]+food*consumFood*coes[3];
@@ -103,7 +74,7 @@ class Person extends Object{
     void move(){
         think();
         int dir = ((int) random(2))*2-1;
-        this.px += dir*0;
+        this.px += dir*1;
     }
 
     void show(){
