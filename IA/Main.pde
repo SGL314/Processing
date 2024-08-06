@@ -1,4 +1,4 @@
-int qt_persons = 100;
+int qt_persons = 300;
 int qt_pocos = 3;
 int qt_fazendas = 1;
 int profTerreno = 200;
@@ -250,5 +250,17 @@ void mousePressed(){
 void mouse(){
     if (objectSelected != null){
         objectSelected.px = mouseX;
+    }
+}
+
+void keyPressed() {
+    if (key == 'o'){
+        for (Person p : Persons) p.water++;
+    }else if (key == 'l'){
+        for (Person p : Persons) p.water--;
+    }else if (key == 'i'){
+        for (Person p : Persons) p.food++;
+    }else if (key == 'k'){
+        for (Person p : Persons) p.food--;
     }
 }

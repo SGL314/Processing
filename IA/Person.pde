@@ -4,15 +4,15 @@ class Person extends Object{
     float initWater = 20,
     initFood = 9;
     float water = initWater,
-    maxWater =    6,
+    maxWater =    20,
     consumWater = 0.75f,
     food =        initFood,
-    maxFood =     3,
+    maxFood =     10,
     consumFood =  0.25f;
     float life = 3;
     boolean died = false;
     // thnking
-    float[] coes = {-12.0f, 2.0f, 9.0f, -23.0f}; // tested
+    float[] coes = {3.0f, -18.0f, -2.0f, 6.0f}; // tested {-12.0f, 2.0f, 9.0f, -23.0f};
     int qt_coes = 4,
     vari_coes = 1;
     Person(String tipo){
@@ -25,10 +25,12 @@ class Person extends Object{
     }
     Person(Person base,int pos){
         //engineAleatr
-        int posCoe = (int) random(qt_coes);
-        float vari = (((int) random(2))*2-1)*vari_coes;
-        this.coes = base.coes;
-        this.coes[posCoe] += vari;
+        for (int i = 0; i<qt_coes;i++){
+            int posCoe = (int) random(qt_coes);
+            float vari = (((int) random(2))*2-1)*vari_coes;
+            this.coes = base.coes;
+            this.coes[posCoe] += vari;
+        }
     }
 
     void live(){
@@ -38,6 +40,8 @@ class Person extends Object{
         }else{
             this.life -= 1;
         }
+        if (this.food > this.maxFood) this.food = this.maxFood;
+        if (this.water > this.maxWater) this.water = this.maxWater;
     }
 
     void think(){
@@ -59,9 +63,13 @@ class Person extends Object{
                 nexterFood = fazenda;
             }
         }
+        if (nexterWater != null && nexterFood != null) {
+            D_nexterFood = abs(nexterFood.px-this.px);
+            D_nexterWater = abs(nexterWater.px-this.px);
+        }else return;
 
-        goWater += water*consumWater*coes[0]+food*consumFood*coes[1];
-        goFood += water*consumWater*coes[2]+food*consumFood*coes[3];
+        goWater += (1/water)*consumWater*coes[0]*pow(D_nexterWater,1f)+(1/food)*consumFood*coes[1]*pow(D_nexterFood,1f);
+        goFood += (1/water)*consumWater*coes[2]*pow(D_nexterWater,1f)+(1/food)*consumFood*coes[3]*pow(D_nexterFood,1f);
         if (goWater > goFood){
             this.px += (this.px > nexterWater.px) ? -1 : 1;
             qt_water++;
