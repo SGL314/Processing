@@ -616,7 +616,7 @@ void keyPressed(){
             }
         }else if (key == 'a'){ // Algorithim
             thread("algorithim");
-        }else if (key == 'w'){ // Write on the node
+        }else if (key == 'w'){ // Write on the node or show iamges
             if (nodeSelected != null) writeNode = true;
             else toDrawImages = (toDrawImages) ? false : true;
         }else if (key == 'n'){ // Add new node
@@ -625,9 +625,8 @@ void keyPressed(){
             breakThread = (breakThread) ? false : true;
         }else if (key == 'c'){ // Catch node
             nodeCatched = (nodeCatched==null) ? nodePassing : null;
-        }else if (key == 's'){ // Skip
+        }else if (key == 's'){ // Save
             con.setIt();
-            
         }else if (key == 'm'){ // MinorisWay will be clear
             for (Node node : Nodes) node.minorisWay = new ArrayList<Node>();
         }else if (key == 'z'){ // Turn into zero the drags
@@ -644,7 +643,7 @@ void keyPressed(){
             // }
             zoom = lastZoom;
             // println(dragX + " : "+dragY+ " | "+lastZoom);
-        }else if (key == 'p'){
+        }else if (key == 'p'){ // show position
             println(mouseX + " : "+mouseY + " | "+lastZoom);
         }else if (keyCode == UP){
             if (changePositionImage) infoImage[2]-=variation;
@@ -658,7 +657,7 @@ void keyPressed(){
                 for (Node node : Nodes) node.raw -= (node.raw<=1) ? 0 : 1;
                 basicRaw = Nodes.get(0).raw;
             }
-        }else if (key == 'f'){
+        }else if (key == 'f'){ // Flag on the point
             nodeFlagged = (nodeFlagged==null || nodePassing!=nodeFlagged) ? nodePassing : null;
         }else if (key == ESC){
             exitManually();
