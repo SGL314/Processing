@@ -21,7 +21,7 @@ int somaX = 0;
 // config
 int basicRaw = 20;
 int basicRawSaved = basicRaw;
-String namePack = "mirinha";
+String namePack = "bhbus";
 String fileNameImg = "escola.png";
 // String fileNameImg = "onibusIgreja.png";
 //String fileNameImg = "igreja.png";
@@ -32,7 +32,7 @@ String fileNameImg = "escola.png";
 //Connection con = new Connection("igreja_go.txt");
 // Connection con = new Connection("casa2trabalho.txt");
 // Connection con = new Connection("unsv.txt");
-Connection con = new Connection("mirinha.txt");
+Connection con = new Connection("bhbus.txt");
 // Connection con = new Connection("sair_escola.txt");
 Algoris Alg = new Algoris();
 PImage img;
@@ -97,7 +97,7 @@ void draw(){
     mouseAutomatic();
     markNodeSelected();
     // relatorio += "\n"+(tempo-millis())+" marking";
-    teste();
+    //teste();
     if (changePositionImage) moveImages();
 }
 
@@ -150,13 +150,31 @@ void setPacks(){
     }else if (namePack.equals("mirinha")){
         add = new Pack(namePack);
         add.add("Pack_Mirinha/mineras.png", 1687, 780, -714, -35);
-add.add("Pack_Mirinha/alipiodemelo.png", 1668, 780, -1492, 903);
-add.add("Pack_Mirinha/santarosa.png", 1562, 775, 151, -14);
-add.add("Pack_Mirinha/cachoeirinha.png", 1532, 789, 308, 692);
-add.add("Pack_Mirinha/mataufmg.png", 1677, 779, -672, 673);
-add.add("Pack_Mirinha/br.png", 1677, 778, -811, 985);
-add.add("Pack_Mirinha/ouropreto.png", 1547, 801, -875, 271);
-add.add("Pack_Mirinha/castelocima.png", 1666, 791, -1535, 139);
+        add.add("Pack_Mirinha/alipiodemelo.png", 1668, 780, -1492, 903);
+        add.add("Pack_Mirinha/santarosa.png", 1562, 775, 151, -14);
+        add.add("Pack_Mirinha/cachoeirinha.png", 1532, 789, 308, 692);
+        add.add("Pack_Mirinha/mataufmg.png", 1677, 779, -672, 673);
+        add.add("Pack_Mirinha/br.png", 1677, 778, -811, 985);
+        add.add("Pack_Mirinha/ouropreto.png", 1547, 801, -875, 271);
+        add.add("Pack_Mirinha/castelocima.png", 1666, 791, -1535, 139);
+
+
+
+        // for (int i=0;i<add.len();i++){
+        //     add.setPosX(i,0);
+        //     add.setPosY(i,0);
+        // }
+        Packs.add(add);
+    }else if (namePack.equals("bhbus")){
+         add = new Pack(namePack);
+        add.add("Pack_bhbus/mineras.png", 1687, 780, -714, -35);
+        add.add("Pack_bhbus/alipiodemelo.png", 1668, 780, -1492, 903);
+        add.add("Pack_bhbus/santarosa.png", 1562, 775, 151, -14);
+        add.add("Pack_bhbus/cachoeirinha.png", 1532, 789, 308, 692);
+        add.add("Pack_bhbus/mataufmg.png", 1677, 779, -672, 673);
+        add.add("Pack_bhbus/br.png", 1677, 778, -811, 985);
+        add.add("Pack_bhbus/ouropreto.png", 1547, 801, -875, 271);
+        add.add("Pack_bhbus/castelocima.png", 1666, 791, -1535, 139);
 
 
 
