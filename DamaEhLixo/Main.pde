@@ -3,18 +3,22 @@ int[][] tabuleiro = new int[8][8];
 String[] letras = {"a","b","c","d","e","f","g","h"};
 int[] numeros = {1,2,3,4,5,6,7,8};
 int me = 0;
-int turn = 1; // 0 branco 1 preto
+int turn = 0; // 0 branco 1 preto
 int tamPeca = 70;
 int border = 50;
+int cpx = 0, cpy = 0;
+boolean selectPiece = true,selectLocal = false;
+int[][] positions = {{-1,-1},{-1,-1}};
 
 void setup(){
     // Altere
     int _me = 1; // 1 branco, 2 preto
     int put = 1; // 0  branco 1 preto
+    int teto = 3; // linhas
     // Não altere
     size(800,800);
     me = _me;
-    tabuleiro = setTab(_me,3,put);
+    tabuleiro = setTab(_me,teto,put);
 }
 
 int[][] setTab(int me,int teto,int put){
@@ -29,7 +33,7 @@ int[][] setTab(int me,int teto,int put){
                 if ((j+i%2)%2 == put){
                     n_tab[i][j] = you;
                 }
-            }else if (i+1>=8-teto){
+            }else if (i+1>8-teto){
                 if ((j+i%2)%2 == put){
                     n_tab[i][j] = me;
                 }
@@ -72,14 +76,26 @@ void show(){
         }
     }
     // Letras e Numeros
-    for(int i=0;i<8;i++){
+    if (me==1){
+        for(int i=0;i<8;i++){
+            fill(#000000);
+            int size=25;
+            textSize(size);
+            text(letras[i],border+i*(width-2*border)/8+(width-2*border)/16,border-10);
+            text(letras[i],border+i*(width-2*border)/8+(width-2*border)/16,height-border+size);
+            text(""+numeros[7-i],border-size,i*(width-2*border)/8+border+(height-2*border)/16+size/2);
+            text(""+numeros[7-i],height-border+size/2,i*(width-2*border)/8+border+(height-2*border)/16+size/2);
+        }
+    }else{
+        for(int i=7;i>=0;i--){
         fill(#000000);
         int size=25;
         textSize(size);
-        text(letras[i],border+i*(width-2*border)/8+(width-2*border)/16,border-10);
-        text(letras[i],border+i*(width-2*border)/8+(width-2*border)/16,height-border+size);
-        text(""+numeros[7-i],border-size,i*(width-2*border)/8+border+(height-2*border)/16+size/2);
-        text(""+numeros[7-i],height-border+size/2,i*(width-2*border)/8+border+(height-2*border)/16+size/2);
+        text(letras[i],border+(7-i)*(width-2*border)/8+(width-2*border)/16,border-10);
+        text(letras[i],border+(7-i)*(width-2*border)/8+(width-2*border)/16,height-border+size);
+        text(""+numeros[(i)],border-size,i*(width-2*border)/8+border+(height-2*border)/16+size/2);
+        text(""+numeros[(i)],height-border+size/2,i*(width-2*border)/8+border+(height-2*border)/16+size/2);
+    }
     }
     // Turno
     int hTurn = 25,wTurn = 25,borderTurn = 5,borderTurnSelect=5;
@@ -126,23 +142,36 @@ void mousePressed(){
     int px = mouseX,py = mouseY;
     for(int i=0;i<8;i++){
         for(int j=0;j<8;j++){
-            if (tabuleiro[i][j] != 0){
-                if (dist(j*(width-2*border)/8+(width-2*border)/16,i*(width-2*border)/8+(width-2*border)/16,px,py) <= tamPeca){
-                    println(numeros[i]+":"+letras[j]);
+            
+            if (j*(width-2*border)/8 +border<= px && px <= (j+1)*(width-2*border)/8+border && i*(width-2*border)/8 +border<= py && py <= (i+1)*(width-2*border)/8+border){
+                if (tabuleiro[i][j] != 0 && selectPiece){
+                    selectPiece = false;
+                    selectLocal = true;
+                    positions[0][0] = j;
+                    positions[0][1] = i;
+                }else if (selectLocal && tabuleiro[i][j] == 0){
+                    selectLocal = false;
+                    selectPiece = true;
+                    positions[1][0] = j;
+                    positions[1][1] = i;
                 }
+                cpx = j*(width-2*border)/8+(width-2*border)/16+border;
+                cpy = i*(width-2*border)/8+(width-2*border)/16+border;
             }
         }
     }
+    println("");
 }
-
-// float dist(float a ,float b,float c,float d){
-//     float dx = pow(a-c,2);
-//     float dy = pow(b-d,2);
-//     float d = pow(dx+dy,0.5f);
-//     return d;
-// }
 
 void draw(){
     background(#FFFFFF);
     show();
+
+    //
+    if (positions[0][0] != -1 && positions[1][0] != -1){
+        fill(#FF0000);
+        circle(positions[0][0]*(width-2*border)/8+(width-2*border)/16+border,positions[0][1]*(width-2*border)/8+(width-2*border)/16+border,10);
+        fill(#00FF00);
+        circle(positions[1][0]*(width-2*border)/8+(width-2*border)/16+border,positions[1][1]*(width-2*border)/8+(width-2*border)/16+border,10);
+    }
 }
