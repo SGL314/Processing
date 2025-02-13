@@ -6,7 +6,6 @@ tamCadeira,espacoAteMeridianoCentral = 1.5,
 espacoEntreFileiras=25,espacoEntreCadeiras=3,
 distBlocosLaterais = 3.5,
 aberturaCorredor = 3.5;
-
 /*
 Centrais:
 6 : 8b
