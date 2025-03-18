@@ -2,7 +2,7 @@ class Algoris{
     int time = 0;
     void distances(){
         println("BEGIN");
-        int initDist = 10000;
+        int initDist = 1000000;
         for (Node node : Nodes){
             node.id = ""+initDist;
         }

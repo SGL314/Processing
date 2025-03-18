@@ -22,7 +22,6 @@ class Connection{
         ArrayList<String> ids = new ArrayList<String>();
         ArrayList<ArrayList<String>> cons = new ArrayList<ArrayList<String>>(), mins = new ArrayList<ArrayList<String>>();;
         for (String line : lines){
-            // println(line);
             boolean get = false;
             String cache = "";
             ArrayList<String> caches = new ArrayList<String>();
@@ -39,14 +38,7 @@ class Connection{
                 }
                 
             }
-            // mostra
-            // for (String str : caches){
-            //     print(str+" ");
-            // }
-            // println("");
-            // pre setting
-            int
-            identificator = 0,
+            int identificator = 0,
             x = 1,
             y = 2,
             raw = 3,
@@ -60,7 +52,7 @@ class Connection{
             Nodes.add(adding);
             // println(adding.toString());
             // arrays
-            println(caches.get(connected));
+            // println(caches.get(connected));
             ids.add(caches.get(identificator));
             ArrayList<String> connecteds = new ArrayList<String>();
             for (String put : caches.get(connected).split(" ")){
@@ -79,7 +71,7 @@ class Connection{
             for (String id : cons.get(i)){
                 for (Node nodeB : Nodes){
                     if (nodeB.identificator.equals(id)){
-                        println("C:> "+id);
+                        // println("C:> "+id);
                         nodeA.connected.add(nodeB);
                     }
                     
@@ -89,7 +81,7 @@ class Connection{
                 for (Node nodeB : Nodes){
                     if (nodeB.identificator.equals(id)){
                         nodeA.minorisWay.add(nodeB);
-                        println("M:> "+id);
+                        // println("M:> "+id);
                     }
                 }
             }
