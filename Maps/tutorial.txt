@@ -1,0 +1,21 @@
+KEYBOARD:
+    w : remove imagens or escreve em cima do node selecionado
+    l : limpa o mapa e coloca um node
+    a : roda o algoritmo
+    r : remove todos os nodes
+    d : deleta o node selecionado ou que tá passando por cima
+    n : novo node
+    b : para a thread do algoritmo
+    c : pega o node que passa por cima
+    s : salva tudo
+    m : limpa o menor caminho achado
+    z : volta pro meio
+    p : mostra a posição
+    UP , DOWN : movimenta a imagem pra cima,baixo ou aumenta ou diminui o raio dos nodes
+    LEFT , RIGHT : movimenta uma imagem para os lados
+    f : marca um node
+    ESC : sai sem salvar
+    , , [ : coloca a imagem selecionada a baixo
+    . , ] : coloca a imagem seleciona a cima
+    o : inverte a direção da conexão dos nodes
+    SHIFT : Continua selecionando o node que clicou
