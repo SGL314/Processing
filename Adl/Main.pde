@@ -20,11 +20,14 @@ Diferença entre fileiras laterais : 0.5 1.5 0.333 0.8 1.5
 */
 
 float[] distBlocosCentrais = {6.0,6.0},
-layoutBlocosCentrais = {6,6,7,7,8,8,9,9},
-layoutBlocosLaterais = {4,6,7,8,8,7}, // default: 4,7,8,9,7,7
-diferencaFileiraLateralDireitaP = {0,1.5,1.5,1.5,1.0,1.0,1.0},
-diferencaFileiraLateralEsquerdaP = {0,1.0,1.0,1.0,1.0,1.0,1.0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
+layoutBlocosCentrais = {6,6,7,7,8,8,9,9,10,10},
+layoutBlocosLaterais = {4,6,7,8,8,8,8,7,6}, // default: 4,7,8,9,7,7
+diferencaFileiraLateralDireitaP =  {0,1.5,1.5,1.5,1.0,1.0,1.0,1.0,1.0},
+diferencaFileiraLateralEsquerdaP = {0,1.0,1.0,1.0,1.0,1.5,1.0,1.5,1.0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
 
+// Apresentation
+int addingDownLat = 170;
+int addingDownCen = 50*2;
 /*
 {0,1.5,0.5,0.5,0.5,0.5}
 Ld: p: 0,1.5,0.5,2.5,1.5,0.5 -> 0,1.5,0.5,2.5,0.5,0.5
@@ -108,7 +111,7 @@ void linhasImaginarias(){
     size = 20;
     texto = "Meio do Nobre";
     px = 510;
-    py = 605;
+    py = 605+addingDownCen;
     noStroke();
     textSize(size);
     rect(px,py-size+3,textWidth(texto),size);
@@ -133,7 +136,7 @@ void linhasImaginarias(){
     size = 20;
     texto = "Lateral Direita";
     px = 760;
-    py = 605;
+    py = 605+addingDownCen;
     noStroke();
     rect(px,py-size+3,textWidth(texto),size);
     fill(#AC21CB);
@@ -146,7 +149,7 @@ void linhasImaginarias(){
     size = 20;
     texto = "Lateral Esquerda";
     px = 260;
-    py = 605;
+    py = 605+addingDownCen;
     noStroke();
     rect(px,py-size+3,textWidth(texto),size);
     fill(#AC21CB);
@@ -270,7 +273,8 @@ void dados(){
     textSize(20);
     String texto = qtCadeiras+" Cadeiras";
     text(texto,width/2-textWidth(texto)/2,espessuraPulpito-textAscent()/2);
-
+    // Laterais
+    // Esquerdo
     fill(#ffffff);
     float size = 20;
     texto = "";
@@ -287,13 +291,13 @@ void dados(){
         i++;
     }
     float px = 45;
-    float py = 490-tamCadeira-espacoEntreFileiras;
+    float py = 490+addingDownLat-tamCadeira-espacoEntreFileiras;
     noStroke();
     textSize(size);
     rect(px,py-size+3,textWidth(texto),size);
     fill(#00a000);
     text(texto,px,py);
-
+    // Direito
     fill(#ffffff);
     size = 20;
     texto = "";
@@ -306,14 +310,14 @@ void dados(){
         i++;
     }
     px = width-45-textWidth(texto);
-    py = 490-tamCadeira-espacoEntreFileiras;
+    py = 490+addingDownLat-tamCadeira-espacoEntreFileiras;
     noStroke();
     textSize(size);
     rect(px,py-size+3,textWidth(texto),size);
     fill(#00a000);
     text(texto,px,py);
-
-
+    // Centrias
+    // Esquerdo
     fill(#ffffff);
     size = 20;
     texto = "";
@@ -329,14 +333,14 @@ void dados(){
         }
         i++;
     }
-    px = 310;
-    py = 575-tamCadeira-espacoEntreFileiras;
+    px = 260;
+    py = 575+addingDownCen-tamCadeira-espacoEntreFileiras;
     noStroke();
     textSize(size);
     rect(px,py-size+3,textWidth(texto),size);
     fill(#00a000);
     text(texto,px,py);
-
+    // Direito
     fill(#ffffff);
     size = 20;
     texto = "";
@@ -348,8 +352,8 @@ void dados(){
         }
         i++;
     }
-    px = 560;
-    py = 575-tamCadeira-espacoEntreFileiras;
+    px = 510;
+    py = 575+addingDownCen-tamCadeira-espacoEntreFileiras;
     noStroke();
     textSize(size);
     rect(px,py-size+3,textWidth(texto),size);
