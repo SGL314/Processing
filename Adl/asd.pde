@@ -1,4 +1,4 @@
-class Mini_Miriam{
+class asd{
     int longitude = 30,
     distLadoEsquerdoAltar = 8, distLadoDireitoAltar = 7,
     altura = 39, alturaAltar = 2, // em y: do altar e do altar até a faixa perto da mesa de som
@@ -14,15 +14,16 @@ class Mini_Miriam{
     distBlocosLaterais = 3.5,
     aberturaCorredor = 3.5,
     fileiraDireita_inline_Pilastra = 5,
-    espessuraFaixa,coeCmToPx;
+    espessuraFaixa,coeCmToPx,
+    fileirasLateraisAcima = 2;
 
     float[] distBlocosCentrais = {10.0,10.0},
-    layoutBlocosCentrais =       {6,6,7,8,8,9,9},
-    layoutBlocoLateralDireito =  {6,7,8,7,6,5,4},
-    layoutBlocoLateralEsquerdo = {6,7,8,9,8,7,7},
-    diferencaFileiraLateralDireitaP =  {0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-    diferencaFileiraLateralEsquerdaP = {0,1.0,1.0,2.0,1.0,1.0,1.0,1.0,1.0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
-
+    layoutBlocosCentrais =       {8,8,8,8,8,8,8},
+    layoutBlocoLateralDireito =  {4,5,6,6,6,6,6},
+    layoutBlocoLateralEsquerdo = {4,5,6,6,6,6,6},
+    diferencaFileiraLateralDireitaP =  {0,-1.0,-1.0,0,0,0,0,0,0},
+    diferencaFileiraLateralEsquerdaP = {0,-1.0,-1.0,0,0,0,0,0,0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
+    
     // Apresentation
     float addingDownLat = 2.5; // ajustado em init
     float addingDownCen = 0.5; // ajustado em init
@@ -33,7 +34,7 @@ class Mini_Miriam{
     corCaixaDeSom = #434343,
     corParedes = #CECECE,
     alphaAll = 192,
-    alphaCorCadeirasBLs = alphaAll, alphaCorCadeirasBCs = alphaAll;
+    alphaCorCadeirasBLs = alphaAll, alphaCorCadeirasBCs = 50;
 
     int qtCadeiras = 0;
     int loop = 0;
@@ -51,7 +52,7 @@ class Mini_Miriam{
         // 1cm = 0.4166666px
         float a = tamCadeira, c = espacoEntreCadeiras, e = 3*tamQuadrado;
         float l = -2*e, k = (2*pow((c+a),2)-pow(e,2));
-        espacoEntreFileirasLaterais = c +  pow(2,.5) * (-l-pow((pow(l,2)+4*k),.5))/2;
+        espacoEntreFileirasLaterais = espacoEntreFileiras;
 
         addingDownCen = addingDownCen*3*tamQuadrado + tamQuadrado*1;
         addingDownLat = addingDownLat*3*tamQuadrado;
@@ -77,13 +78,13 @@ class Mini_Miriam{
         qtCadeiras = 0;
         ground();
         things();
-        linhasImaginarias();
-        linhasAuxiliares();
+        // linhasImaginarias();
+        // linhasAuxiliares();
         blocosLaterais();
         blocosCentrais();
         altar();
         pilastras();
-        dados();
+        // dados();
         paredes();
 
         translate(-paddingX,-paddingY);
@@ -495,8 +496,10 @@ class Mini_Miriam{
         stroke(#000000);
         int linha = 0,variCadeiras=0,qtInitCadeiras =0;
         float ang = 45,difLateral=0; // descobrindo a reta da função : f(0) = distBlocosLaterais; f(meridiano que tange o bloco) = distsBlocosCentrais[1]; [negativo para horário]
-        aberturaCorredor = ((longitude/2-1)*tamQuadrado-espacoAteMeridianoCentral*tamQuadrado-layoutBlocosCentrais[0]*tamCadeira-(layoutBlocosCentrais[0]-1)*espacoEntreCadeiras)/tamQuadrado;
-        // println(aberturaCorredor);
+        float correcaoLinearLateral = 2*(tamCadeira+espacoEntreCadeiras);
+        aberturaCorredor = (-tamCadeira/10*2+(longitude/2-1)*tamQuadrado-espacoAteMeridianoCentral*tamQuadrado-6*tamCadeira-(6-1)*espacoEntreCadeiras)/tamQuadrado;
+        
+        println("abertura do corredor: "+aberturaCorredor);
         translate(width/2-espacoAteMeridianoCentral*tamQuadrado-layoutBlocosCentrais[0]*tamCadeira-(layoutBlocosCentrais[0]-1)*espacoEntreCadeiras-tamQuadrado*aberturaCorredor,espessuraAltar+distBlocosCentrais[1]*tamQuadrado);
         rotate((float) ang*PI/180);
         fill(corCadeirasBLs,alphaCorCadeirasBLs);
@@ -506,7 +509,7 @@ class Mini_Miriam{
             if (qtInitCadeiras==0) qtInitCadeiras=(int) line;
             difLateral += diferencaFileiraLateralEsquerdaP[linha];
             for (int i = 0 ; i < line;i++){
-                rect((-i)*(tamCadeira+espacoEntreCadeiras)-tamCadeira+difLateral*tamCadeira+linha*espacoEntreCadeiras,linha*(espacoEntreFileirasLaterais+tamCadeira),tamCadeira,tamCadeira);
+                rect(-correcaoLinearLateral+(-i)*(tamCadeira+espacoEntreCadeiras)-difLateral*(tamCadeira+espacoEntreCadeiras)+espacoEntreCadeiras+tamCadeira +1*tamQuadrado - (aberturaCorredor)*tamQuadrado, linha*(espacoEntreFileirasLaterais+tamCadeira)-fileirasLateraisAcima*(tamCadeira+espacoEntreFileiras),tamCadeira,tamCadeira);
                 qtCadeiras++;
                 // break;
             }
@@ -514,6 +517,7 @@ class Mini_Miriam{
             variCadeiras++;
             // break;
         }
+
         // ajusta pra ficar reto
         rotate((float) (-ang*PI/180));
         translate(-2.0*(-espacoAteMeridianoCentral*tamQuadrado-layoutBlocosCentrais[0]*tamCadeira-(layoutBlocosCentrais[0]-1)*espacoEntreCadeiras-tamQuadrado*aberturaCorredor),0);
@@ -521,6 +525,7 @@ class Mini_Miriam{
         // translate(tamQuadrado+espacoEntreCadeiras+,0);
         // reset
         linha = 0;variCadeiras=0;qtInitCadeiras=0;difLateral=0;
+
         // direita
         for (float line : layoutBlocoLateralDireito){
             if (qtInitCadeiras==0) qtInitCadeiras=(int) line;
@@ -529,7 +534,7 @@ class Mini_Miriam{
                 // marca uma especifica
                 //if (i==0 && linha==3) fill(255,0,0);
                 //
-                rect((i)*(tamCadeira+espacoEntreCadeiras)-difLateral*tamCadeira-difLateral*espacoEntreCadeiras , linha*(espacoEntreFileirasLaterais+tamCadeira) ,tamCadeira,tamCadeira);
+                rect(correcaoLinearLateral +(i)*(tamCadeira+espacoEntreCadeiras)+difLateral*(tamCadeira+espacoEntreCadeiras)-espacoEntreCadeiras-tamCadeira-2*tamQuadrado + (aberturaCorredor)*tamQuadrado, linha*(espacoEntreFileirasLaterais+tamCadeira) -fileirasLateraisAcima*(tamCadeira+espacoEntreFileiras),tamCadeira,tamCadeira);
                 qtCadeiras++;
                 // break;
             }
