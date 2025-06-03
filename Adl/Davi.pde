@@ -1,4 +1,4 @@
-class asd{
+class Davi{
     int longitude = 30,
     distLadoEsquerdoAltar = 8, distLadoDireitoAltar = 7,
     altura = 39, alturaAltar = 2, // em y: do altar e do altar até a faixa perto da mesa de som
@@ -15,12 +15,13 @@ class asd{
     aberturaCorredor = 3.5,
     fileiraDireita_inline_Pilastra = 5,
     espessuraFaixa,coeCmToPx,
-    fileirasLateraisAcima = 2;
+    fileirasLateraisAcima = 2,
+    distLateralDireita = 132+22+125, distLateralEsquerda = 269;
 
     float[] distBlocosCentrais = {10.0,10.0},
     layoutBlocosCentrais =       {8,8,8,8,8,8,8},
-    layoutBlocoLateralDireito =  {4,5,6,6,6,6,6},
-    layoutBlocoLateralEsquerdo = {4,5,6,6,6,6,6},
+    layoutBlocoLateralDireito =  {6,7,8,8,8,8},
+    layoutBlocoLateralEsquerdo = {6,7,8,8,8,8},
     diferencaFileiraLateralDireitaP =  {0,-1.0,-1.0,0,0,0,0,0,0},
     diferencaFileiraLateralEsquerdaP = {0,-1.0,-1.0,0,0,0,0,0,0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
     
@@ -34,7 +35,7 @@ class asd{
     corCaixaDeSom = #434343,
     corParedes = #CECECE,
     alphaAll = 192,
-    alphaCorCadeirasBLs = alphaAll, alphaCorCadeirasBCs = 50;
+    alphaCorCadeirasBLs = alphaAll, alphaCorCadeirasBCs = alphaAll;
 
     int qtCadeiras = 0;
     int loop = 0;
@@ -46,13 +47,12 @@ class asd{
         longitudeAltar = longitude * tamQuadrado;
         tamCadeira = 21.6666666666;
         espacoEntreFileiras = 3*tamQuadrado-tamCadeira;
-        espacoEntreFileirasLaterais=espacoEntreFileiras; // -2*tamCadeira + 3*sqrt(2)*tamCadeira + tamCadeira;
+        espacoEntreFileirasLaterais=4*tamQuadrado-tamCadeira; // -2*tamCadeira + 3*sqrt(2)*tamCadeira + tamCadeira;
         espessuraFaixa = 17*coeCmToPx; // 17cm 
         // 1px = 2.4cm
         // 1cm = 0.4166666px
         float a = tamCadeira, c = espacoEntreCadeiras, e = 3*tamQuadrado;
         float l = -2*e, k = (2*pow((c+a),2)-pow(e,2));
-        espacoEntreFileirasLaterais = espacoEntreFileiras;
 
         addingDownCen = addingDownCen*3*tamQuadrado + tamQuadrado*1;
         addingDownLat = addingDownLat*3*tamQuadrado;
@@ -66,11 +66,11 @@ class asd{
         background(#ffffff);
 
         fill(corParedes);
-        rect(-5,0,width,height);
+        rect(-paddingX,0,width,height);
 
         fill(#ffffff);
-        rect(width/2 - (269*coeCmToPx+(longitude/2+distLadoEsquerdoAltar)*tamQuadrado+espessuraFaixa)
-        ,0,269*coeCmToPx+(longitude+distLadoDireitoAltar+distLadoEsquerdoAltar)*tamQuadrado+2*espessuraFaixa + (132+22+125)*coeCmToPx
+        rect(width/2 - (distLateralEsquerda*coeCmToPx+(longitude/2+distLadoEsquerdoAltar)*tamQuadrado+espessuraFaixa)
+        ,0,distLateralEsquerda*coeCmToPx+(longitude+distLadoDireitoAltar+distLadoEsquerdoAltar)*tamQuadrado+2*espessuraFaixa + distLateralDireita*coeCmToPx
         ,height);
         //
 
@@ -78,13 +78,13 @@ class asd{
         qtCadeiras = 0;
         ground();
         things();
-        // linhasImaginarias();
-        // linhasAuxiliares();
+        linhasImaginarias();
+        linhasAuxiliares();
         blocosLaterais();
         blocosCentrais();
         altar();
         pilastras();
-        // dados();
+        dados();
         paredes();
 
         translate(-paddingX,-paddingY);
@@ -94,8 +94,8 @@ class asd{
     }
 
     void title(){
-        String nome = "Mini Miriã";
-        String data = "29/05\n 2025";
+        String nome = "Davi";
+        String data = "02/06\n 2025";
 
         // Nomes
         fill(#000000);
@@ -305,7 +305,7 @@ class asd{
         float px,py,size;
         String texto;
         strokeWeight(tamQuadrado/3);
-        strokeWeight(4);
+        strokeWeight(2);
 
         // meridiano
         stroke(#ff0000);
@@ -393,7 +393,6 @@ class asd{
 
 
     }
-
     void linhasAuxiliares(){
         float centroX,centroY,
         eInitChairs,dInitChairs,
@@ -408,52 +407,34 @@ class asd{
         centroY = espessuraAltar+distBlocosCentrais[0]*tamQuadrado;
         eInitChairs = centroX-espacoAteMeridianoCentral*tamQuadrado;
         dInitChairs = centroX+espacoAteMeridianoCentral*tamQuadrado;
-
-        // pivot montador
-        // fill(#65C16F);
-        // circle(centroX,centroY,10);
+        float qtFileirasLaterais = -1;
+        for (float linha : layoutBlocoLateralEsquerdo){
+            qtFileirasLaterais ++;
+        }
 
         // lateral esquerda
-        diferencaAtual = 0;
-        diferencaDesrregular = 0;
-        posY = centroY;
-        for (int i = 0;i<layoutBlocoLateralEsquerdo.length;i++){
-            float layoutA, layoutB;
-            if (diferencaFileiraLateralEsquerdaP[i] >1.0){
-                diferencaDesrregular += tamCadeira*pow(2,0.5)/2 * (diferencaFileiraLateralEsquerdaP[i]-1.0);
-            }
-            layoutA = layoutBlocoLateralEsquerdo[i];
-            layoutB = layoutBlocosCentrais[i];
-
-            posX1 = eInitChairs - layoutB*tamCadeira - (layoutB-1)*espacoEntreCadeiras;
-            diferencaAtual += diferencaFileiraLateralEsquerdaP[i];
-            posX2 = centroX - (longitude/2-1)*tamQuadrado +diferencaDesrregular+ ( -(espacoEntreFileirasLaterais - espacoEntreCadeiras)/(pow(2,.5)) )*diferencaAtual; // posição fixa onde começa a ponta direita da primeira fileira do BLE
-            
-            stroke(corLinhaInterBlocos);
-            // fill(corLinhaInterBlocos);
-            line(posX1,posY,posX2,posY);
-
-            posY += espacoEntreFileiras+tamCadeira;
-        }
+        float diagonal = layoutBlocoLateralEsquerdo[((int) qtFileirasLaterais)]*tamCadeira + (layoutBlocoLateralEsquerdo[(int)qtFileirasLaterais]-1)*espacoEntreCadeiras;
+        float varX = diagonal*pow(2,.5)/2 + tamCadeira*pow(2,.5)/2;
+        float varY = diagonal*pow(2,.5)/2 - tamCadeira*pow(2,.5)/2;
+        stroke(#ff0000);
+        line(
+            centroX-(longitude/2+2)*tamQuadrado , espessuraAltar+distBlocosCentrais[0]*tamQuadrado-tamQuadrado,
+            centroX-(longitude/2+2)*tamQuadrado , espessuraAltar+distBlocosCentrais[0]*tamQuadrado+qtFileirasLaterais*tamQuadrado*4+tamQuadrado
+        );
+        line(
+            centroX-(longitude/2+2)*tamQuadrado -varX, espessuraAltar+distBlocosCentrais[0]*tamQuadrado-tamQuadrado-varY+(2)*tamQuadrado*4,
+            centroX-(longitude/2+2)*tamQuadrado -varX, espessuraAltar+distBlocosCentrais[0]*tamQuadrado+(qtFileirasLaterais)*tamQuadrado*4+tamQuadrado-varY
+        );
 
         // lateral direita
-        diferencaAtual = 0;
-        posY = centroY;
-        for (int i = 0;i<layoutBlocoLateralDireito.length;i++){
-            float layoutA, layoutB;
-            layoutA = layoutBlocoLateralDireito[i];
-            layoutB = layoutBlocosCentrais[i];
-
-            posX1 = dInitChairs + layoutB*tamCadeira + (layoutB-1)*espacoEntreCadeiras;
-            diferencaAtual += diferencaFileiraLateralDireitaP[i];
-            posX2 = centroX + (longitude/2-1)*tamQuadrado + ( (espacoEntreFileirasLaterais - espacoEntreCadeiras)/(pow(2,.5)) )*diferencaAtual; // posição fixa onde começa a ponta direita da primeira fileira do BLE
-            
-            stroke(corLinhaInterBlocos);
-            // fill(corLinhaInterBlocos);
-            line(posX1,posY,posX2,posY);
-
-            posY += espacoEntreFileiras+tamCadeira;
-        }
+        line(
+            centroX+(longitude/2+2)*tamQuadrado , espessuraAltar+distBlocosCentrais[0]*tamQuadrado-tamQuadrado,
+            centroX+(longitude/2+2)*tamQuadrado , espessuraAltar+distBlocosCentrais[0]*tamQuadrado+qtFileirasLaterais*tamQuadrado*4+tamQuadrado
+        );
+        line(
+            centroX+(longitude/2+2)*tamQuadrado +varX, espessuraAltar+distBlocosCentrais[0]*tamQuadrado-tamQuadrado-varY+(2)*tamQuadrado*4,
+            centroX+(longitude/2+2)*tamQuadrado +varX, espessuraAltar+distBlocosCentrais[0]*tamQuadrado+(qtFileirasLaterais)*tamQuadrado*4+tamQuadrado-varY
+        );
 
         // pivot móvel
         // fill(#ff0000);
@@ -495,21 +476,21 @@ class asd{
     void blocosLaterais(){
         stroke(#000000);
         int linha = 0,variCadeiras=0,qtInitCadeiras =0;
-        float ang = 45,difLateral=0; // descobrindo a reta da função : f(0) = distBlocosLaterais; f(meridiano que tange o bloco) = distsBlocosCentrais[1]; [negativo para horário]
-        float correcaoLinearLateral = 2*(tamCadeira+espacoEntreCadeiras);
-        aberturaCorredor = (-tamCadeira/10*2+(longitude/2-1)*tamQuadrado-espacoAteMeridianoCentral*tamQuadrado-6*tamCadeira-(6-1)*espacoEntreCadeiras)/tamQuadrado;
+        float ang = 45,difLateral=4*tamQuadrado*pow(2,.5)/2, // descobrindo a reta da função : f(0) = distBlocosLaterais; f(meridiano que tange o bloco) = distsBlocosCentrais[1]; [negativo para horário]
+        correcaoLinearLateral = 2*(tamCadeira+espacoEntreCadeiras),
+        varX_E = (paddingX+distLateralEsquerda+espessuraFaixa)*coeCmToPx+(distLadoEsquerdoAltar-2)*tamQuadrado-tamCadeira*pow(2,.5)/2,
+        varX_D = varX_E+(2+longitude+2)*tamQuadrado + tamCadeira*pow(2,.5)/2,
+        varY = espessuraAltar+distBlocosCentrais[1]*tamQuadrado-tamCadeira*pow(2,.5)/2;
         
-        println("abertura do corredor: "+aberturaCorredor);
-        translate(width/2-espacoAteMeridianoCentral*tamQuadrado-layoutBlocosCentrais[0]*tamCadeira-(layoutBlocosCentrais[0]-1)*espacoEntreCadeiras-tamQuadrado*aberturaCorredor,espessuraAltar+distBlocosCentrais[1]*tamQuadrado);
+        translate(varX_E,varY);
         rotate((float) ang*PI/180);
         fill(corCadeirasBLs,alphaCorCadeirasBLs);
         // fill(#ff0000,128);
         // esquerda
         for (float line : layoutBlocoLateralEsquerdo){
             if (qtInitCadeiras==0) qtInitCadeiras=(int) line;
-            difLateral += diferencaFileiraLateralEsquerdaP[linha];
             for (int i = 0 ; i < line;i++){
-                rect(-correcaoLinearLateral+(-i)*(tamCadeira+espacoEntreCadeiras)-difLateral*(tamCadeira+espacoEntreCadeiras)+espacoEntreCadeiras+tamCadeira +1*tamQuadrado - (aberturaCorredor)*tamQuadrado, linha*(espacoEntreFileirasLaterais+tamCadeira)-fileirasLateraisAcima*(tamCadeira+espacoEntreFileiras),tamCadeira,tamCadeira);
+                rect(-i*(tamCadeira+espacoEntreCadeiras) + linha*difLateral,linha*(difLateral), tamCadeira,tamCadeira);
                 qtCadeiras++;
                 // break;
             }
@@ -520,21 +501,20 @@ class asd{
 
         // ajusta pra ficar reto
         rotate((float) (-ang*PI/180));
-        translate(-2.0*(-espacoAteMeridianoCentral*tamQuadrado-layoutBlocosCentrais[0]*tamCadeira-(layoutBlocosCentrais[0]-1)*espacoEntreCadeiras-tamQuadrado*aberturaCorredor),0);
+        translate(-varX_E+varX_D,tamQuadrado);
         rotate((float) (-ang*PI/180));
         // translate(tamQuadrado+espacoEntreCadeiras+,0);
         // reset
-        linha = 0;variCadeiras=0;qtInitCadeiras=0;difLateral=0;
+        linha = 0;variCadeiras=0;qtInitCadeiras=0;
 
         // direita
         for (float line : layoutBlocoLateralDireito){
             if (qtInitCadeiras==0) qtInitCadeiras=(int) line;
-            difLateral += diferencaFileiraLateralDireitaP[linha];
             for (int i = 0 ; i < line;i++){
                 // marca uma especifica
                 //if (i==0 && linha==3) fill(255,0,0);
                 //
-                rect(correcaoLinearLateral +(i)*(tamCadeira+espacoEntreCadeiras)+difLateral*(tamCadeira+espacoEntreCadeiras)-espacoEntreCadeiras-tamCadeira-2*tamQuadrado + (aberturaCorredor)*tamQuadrado, linha*(espacoEntreFileirasLaterais+tamCadeira) -fileirasLateraisAcima*(tamCadeira+espacoEntreFileiras),tamCadeira,tamCadeira);
+                rect(i*(tamCadeira+espacoEntreCadeiras) - linha*difLateral,linha*(difLateral), tamCadeira,tamCadeira);
                 qtCadeiras++;
                 // break;
             }
@@ -544,7 +524,7 @@ class asd{
         }
         // volta pro normal
         rotate((float) (ang*PI/180));
-        translate(-width/2+(-espacoAteMeridianoCentral*tamQuadrado-layoutBlocosCentrais[0]*tamCadeira-(layoutBlocosCentrais[0]-1)*espacoEntreCadeiras-tamQuadrado*aberturaCorredor),-(espessuraAltar+distBlocosCentrais[1]*tamQuadrado));
+        translate(-varX_D,-varY-tamQuadrado);
         
     }
 
