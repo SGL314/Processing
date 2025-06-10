@@ -451,14 +451,7 @@ void mouseWheel(MouseEvent event){
         dragX = x-(-(drx+width/2)/2+width/2);
         dragY = y-(-(dry+height/2)/2+height/2);
         // println((-dragX+drx)+" : "+(-dragY+dry)+" | "+zoom);
-    }
-
-
-
-
-    
-
-    
+    }    
 }
 void mouseAutomatic(){
     // if (nodeSelected == null) nodeCatched = null;
