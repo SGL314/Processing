@@ -516,8 +516,6 @@ void mousePressed(){
                                     nodeSelected.connected.remove(nodeVer);
                                     exists = true;
                                     break;
-                                      git config --global user.email "you@example.com"
-  git config --global user.name "Your Name"
                                 }
                             }
                             if (exists == false) nodeSelected.connected.add(node);

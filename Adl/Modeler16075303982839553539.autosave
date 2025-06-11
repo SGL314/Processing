@@ -34,7 +34,7 @@ class Modeler{
     corAzulejoEscuro = #272200,
     corCaixaDeSom = #434343,
     corParedes = #CECECE,
-    alphaAll = 255,
+    alphaAll = 192,
     alphaCorCadeiras = alphaAll;
 
     int qtCadeiras = 0;
@@ -43,17 +43,11 @@ class Modeler{
     // Things
     ArrayList<Thing> things = new ArrayList<Thing>();
 
-    // Keyboard & Mouse
-    boolean ctrlPressed = false;
-    boolean shiftPressed = false;
+    // Keyboard
     HashMap<String, String> keyMap = new HashMap<String, String>();
-
-    // UI
+    //UI
     float zoom=1, lastZoom=1;
     int dragX=1,dragY=1;
-
-    // Variables
-    int angle = 0;
 
     void init(){
         coeCmToPx = 0.4166666666666;
@@ -106,7 +100,7 @@ class Modeler{
         drawThings();
         altar();
         pilastras();
-        dados();
+        // dados();
         paredes();
 
         translate(-paddingX,-paddingY);
@@ -119,9 +113,6 @@ class Modeler{
     private void drawThings(){
         for (Thing thing : things){
             thing.draw();
-            if (thing.type == "cadeira"){
-                qtCadeiras ++;
-            }
         }
     }
 
@@ -332,6 +323,7 @@ class Modeler{
         circle(797,18,tamQuadrado/1.5); //direito
         circle(201,7,tamQuadrado/1.5); //esquerdo
     }
+
     void linhasImaginarias(){
         float px,py,size;
         String texto;
@@ -564,6 +556,135 @@ class Modeler{
         textSize(20);
         String texto = qtCadeiras+" Cadeiras";
         text(texto,width/2-textWidth(texto)/2,espessuraAltar-textAscent()/2);
+        int pivotPx = 100;
+
+        // Laterais
+        // Esquerdo
+        fill(#ffffff);
+        float size = 20,qt=0;
+        texto = "";
+        int tam = 0;
+        int i = 0;
+        qt = 0;
+        for (float item : layoutBlocoLateralDireito){
+            tam++;
+        }
+        for (float item : layoutBlocoLateralEsquerdo){
+            if (item == 0){
+                continue;
+            }
+            texto += int(item);
+            if (i<tam-1){
+                texto+=", ";
+            }
+            i++;
+            qt += int(item);
+        }
+        texto += " ("+int(qt)+")";
+        float px = 45;
+        float py = 490+addingDownLat-tamCadeira-espacoEntreFileiras;
+        noStroke();
+        textSize(size);
+        rect(px,py-size+3,textWidth(texto),size);
+        fill(#00a000);
+        text(texto,px,py);
+        // Direito
+        fill(#ffffff);
+        size = 20;
+        texto = "";
+        i=0;
+        qt=0;
+        for (float item : layoutBlocoLateralDireito){
+            if (item == 0){
+                continue;
+            }
+            texto += int(item);
+            if (i<tam-1){
+                texto+=", ";
+            }
+            i++;
+            qt += int(item);
+        }
+        texto += " ("+int(qt)+")";
+        px = width-45-textWidth(texto);
+        py = 490+addingDownLat-tamCadeira-espacoEntreFileiras;
+        noStroke();
+        textSize(size);
+        rect(px,py-size+3,textWidth(texto),size);
+        fill(#00a000);
+        text(texto,px,py);
+        // Centrias
+        // Esquerdo
+        fill(#ffffff);
+        size = 20;
+        texto = "";
+        tam = 0;
+        i=0;
+        qt=0;
+        for (float item : layoutBlocosCentrais){
+            tam++;
+        }
+        for (float item : layoutBlocosCentrais){
+            if (item == 0){
+                continue;
+            }
+            texto += int(item);
+            if (i<tam-1){
+                texto+=", ";
+            }
+            i++;
+            qt += int(item);
+        }
+        texto += " ("+int(qt)+")";
+        px = 260;
+        py = 575+addingDownCen-tamCadeira-espacoEntreFileiras;
+        noStroke();
+        textSize(size);
+        rect(px,py-size+3,textWidth(texto),size);
+        fill(#00a000);
+        text(texto,px,py);
+        // Direito
+        fill(#ffffff);
+        size = 20;
+        texto = "";
+        i=0;
+        qt=0;
+        for (float item : layoutBlocosCentrais){
+            texto += int(item);
+            if (i<tam-1){
+                texto+=", ";
+            }
+            i++;
+            qt += int(item);
+        }
+        texto += " ("+int(qt)+")";
+        px = 510;
+        py = 575+addingDownCen-tamCadeira-espacoEntreFileiras;
+        noStroke();
+        textSize(size);
+        rect(px,py-size+3,textWidth(texto),size);
+        fill(#00a000);
+        text(texto,px,py);
+        
+        // Nome dos blocos
+        String[] nomes = {"BLE","BCE","BCD","BLD"};
+        float altCentro = 734+addingDownCen-3*tamQuadrado*3;
+        float altLateral = altCentro;
+        float[][] poss = {{pivotPx,altLateral},{pivotPx+216,altCentro},{pivotPx+466,altCentro},{pivotPx+716,altLateral}};
+
+        for (i=0;i<nomes.length;i++){
+            px = poss[i][0];
+            py = poss[i][1];
+
+            fill(#ffffff);
+            size=30;
+            noStroke();
+            textSize(size);
+            rect(px,py-size+3,textWidth(nomes[i]),size);
+            fill(#000000);
+            text(nomes[i],px,py);
+        }
+
     }
 
     void pilastras(){
@@ -598,10 +719,6 @@ class Modeler{
         textSize(20);
         String texto = mouseX+", "+mouseY;
         text(texto,mouseX/zoom,mouseY/zoom);
-
-        texto = angle+"°";
-        fill(#ff0000);
-        text(texto,mouseX/zoom+textWidth(texto)/2,mouseY/zoom+textAscent());
     }
 
     // modeler
@@ -617,12 +734,6 @@ class Modeler{
         keyMap.put("quit","q");
         keyMap.put("save","s");
         keyMap.put("new-chair","c");
-
-        keyMap.put("zoom","scrol");
-        keyMap.put("angle","shift+scrol");
-
-        keyMap.put("select","ctrl+mouse_left");
-        keyMap.put("deselect","ctrl+mouse_right");
     }
 
     
