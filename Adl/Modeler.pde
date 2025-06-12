@@ -38,7 +38,6 @@ class Modeler{
     alphaCorCadeiras = alphaAll;
 
     int qtCadeiras = 0;
-    int loop = 0;
     
     // Things
     ArrayList<Thing> things = new ArrayList<Thing>();
@@ -53,7 +52,12 @@ class Modeler{
     int dragX=1,dragY=1;
 
     // Variables
+    boolean showPreviewNewChair = false;
+    boolean settedPossSelector = false;
     int angle = 0;
+    int variationAngle = 5;
+    int loop = 0;
+    int[] possSelecter = {0,0};
 
     void init(){
         coeCmToPx = 0.4166666666666;
@@ -83,7 +87,6 @@ class Modeler{
         scale(zoom);
         translate(dragX/zoom,dragY/zoom);
 
-        loop+=1;
         background(#ffffff);
 
         fill(corParedes);
@@ -99,27 +102,27 @@ class Modeler{
         qtCadeiras = 0;
         ground();
         things();
-        // linhasImaginarias();
-        // linhasAuxiliares();
-        // blocosCentrais();
-        // blocosLaterais();
+        
         drawThings();
         altar();
         pilastras();
         dados();
         paredes();
+        previewing(); // preview new chair
 
         translate(-paddingX,-paddingY);
         title();
 
         translate(paddingX-dragX/zoom,paddingY-dragY/zoom);
+        selector();
         position();
+        loop++;
     }
 
     private void drawThings(){
         for (Thing thing : things){
             thing.draw();
-            if (thing.type == "cadeira"){
+            if (thing.type == "cadeira" && thing.alpha != alphaCorCadeiras/2){
                 qtCadeiras ++;
             }
         }
@@ -482,83 +485,6 @@ class Modeler{
         triangle(width/2+longitudeAltar/2,0,width/2+longitudeAltar/2+espessuraAltar,0,width/2+longitudeAltar/2,espessuraAltar);
     }
 
-    void blocosCentrais(){
-        stroke(#000000);
-        int linha = 1;
-        for (float line : layoutBlocosCentrais){
-            // calculo de variação
-            float vari = -(distBlocosCentrais[0]-distBlocosCentrais[1])/(line-1);
-            fill(#CB8221,alphaCorCadeiras);
-            // esquerda
-            for (int i =0 ; i < line;i++){
-                rect(width/2-espacoAteMeridianoCentral*tamQuadrado-(tamCadeira*(i+1))-(i*espacoEntreCadeiras),espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras),tamCadeira,tamCadeira);
-                qtCadeiras++;
-            }
-            // direita
-            for (int i =0 ; i < line;i++){
-                rect(width/2+espacoAteMeridianoCentral*tamQuadrado+(tamCadeira*(i))+(i*espacoEntreCadeiras),espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras),tamCadeira,tamCadeira);
-                qtCadeiras++;
-            }
-            linha++;
-            // break;
-        }
-    }
-
-    void blocosLaterais(){
-        stroke(#000000);
-        int linha = 0,variCadeiras=0,qtInitCadeiras =0;
-        float ang = 45,difLateral=4*tamQuadrado*pow(2,.5)/2, // descobrindo a reta da função : f(0) = distBlocosLaterais; f(meridiano que tange o bloco) = distsBlocosCentrais[1]; [negativo para horário]
-        correcaoLinearLateral = 2*(tamCadeira+espacoEntreCadeiras),
-        varX_E = (paddingX+distLateralEsquerda+espessuraFaixa)*coeCmToPx+(distLadoEsquerdoAltar-2)*tamQuadrado-tamCadeira*pow(2,.5)/2,
-        varX_D = varX_E+(2+longitude+2)*tamQuadrado + tamCadeira*pow(2,.5)/2,
-        varY = espessuraAltar+distBlocosCentrais[1]*tamQuadrado-tamCadeira*pow(2,.5)/2;
-        
-        translate(varX_E,varY);
-        rotate((float) ang*PI/180);
-        fill(corCadeiras,alphaCorCadeiras);
-        // fill(#ff0000,128);
-        // esquerda
-        for (float line : layoutBlocoLateralEsquerdo){
-            if (qtInitCadeiras==0) qtInitCadeiras=(int) line;
-            for (int i = 0 ; i < line;i++){
-                rect(-i*(tamCadeira+espacoEntreCadeiras) + linha*difLateral,linha*(difLateral), tamCadeira,tamCadeira);
-                qtCadeiras++;
-                // break;
-            }
-            linha++;
-            variCadeiras++;
-            // break;
-        }
-
-        // ajusta pra ficar reto
-        rotate((float) (-ang*PI/180));
-        translate(-varX_E+varX_D,tamQuadrado);
-        rotate((float) (-ang*PI/180));
-        // translate(tamQuadrado+espacoEntreCadeiras+,0);
-        // reset
-        linha = 0;variCadeiras=0;qtInitCadeiras=0;
-
-        // direita
-        for (float line : layoutBlocoLateralDireito){
-            if (qtInitCadeiras==0) qtInitCadeiras=(int) line;
-            for (int i = 0 ; i < line;i++){
-                // marca uma especifica
-                //if (i==0 && linha==3) fill(255,0,0);
-                //
-                rect(i*(tamCadeira+espacoEntreCadeiras) - linha*difLateral,linha*(difLateral), tamCadeira,tamCadeira);
-                qtCadeiras++;
-                // break;
-            }
-            linha++;
-            variCadeiras++;
-            // break;
-        }
-        // volta pro normal
-        rotate((float) (ang*PI/180));
-        translate(-varX_D,-varY-tamQuadrado);
-        
-    }
-
     void dados(){
         fill(#ffffff);
         textSize(20);
@@ -577,7 +503,6 @@ class Modeler{
         pilastra(fimFaixaDireita+125*coeCmToPx,alturaAltar*tamQuadrado+distParedeFrontal_1pilastra+ladoPilastra+dist1pilastra_2pilastra);
         pilastra(fimFaixaDireita+125*coeCmToPx,alturaAltar*tamQuadrado+distParedeFrontal_1pilastra+ladoPilastra*2+dist1pilastra_2pilastra+dist2pilastra_3pilastra);
     }
-
     void pilastra(float px,float py){
         fill(#5A5A5A);
         rect(px,py,32*0.41666666666,32*0.41666666666);
@@ -592,7 +517,6 @@ class Modeler{
         textSize(size);
         text(texto,px,py);
     }
-
     void position(){
         fill(#000000);
         textSize(20);
@@ -602,6 +526,65 @@ class Modeler{
         texto = angle+"°";
         fill(#ff0000);
         text(texto,mouseX/zoom+textWidth(texto)/2,mouseY/zoom+textAscent());
+    }
+
+    private void previewing(){
+        Thing chair;
+
+        float px = mouseX/modeler.zoom-modeler.dragX/modeler.zoom;
+        float py = mouseY/modeler.zoom-modeler.dragY/modeler.zoom - modeler.tamCadeira;
+        chair = new Thing("cadeira",px,py,modeler.tamCadeira,modeler.tamCadeira,modeler.angle,modeler.corCadeiras,modeler.alphaCorCadeiras/2);
+        
+        if (loop == 0){
+            // translate(-modeler.dragX/modeler.zoom,-modeler.dragY/modeler.zoom);
+            things.add(chair);
+        }
+        for (Thing thing : things){
+            thing.px = px;
+            thing.py = py;
+            thing.angle = angle;
+            break;
+        }
+    
+    }
+    private void selector(){
+        if (shiftPressed){
+            if (modeler.settedPossSelector == false){
+                modeler.possSelecter[0] = mouseX;
+                modeler.possSelecter[1] = mouseY;
+            }
+            modeler.settedPossSelector = true;
+            fill(#0000ff,64);
+            rect(modeler.possSelecter[0],modeler.possSelecter[1],mouseX-modeler.possSelecter[0],mouseY-modeler.possSelecter[1]);
+            
+            // selector 
+            for (Thing thing : things){
+                thing.selected = false;
+                if (thing.alpha != alphaCorCadeiras/2){
+                    float ax = thing.px
+                    ,ay = thing.py
+                    ,bx = thing.px + tamCadeira
+                    ,by = thing.py + tamCadeira
+                    ;
+                    boolean conf1 = modeler.possSelecter[0] < ax && ax < mouseX;
+                    boolean conf2 = modeler.possSelecter[0] < bx && bx < mouseX;
+                    boolean conf3 = modeler.possSelecter[1] < ay && ay < mouseY;
+                    boolean conf4 = modeler.possSelecter[1] < by && by < mouseY;
+                    println(conf1+" "+conf2+" "+conf3+" "+conf4+" ");
+                    println(ax+" "+ay+" "+bx+" "+by+" ");
+
+                    if (conf1 && conf2 && conf3 && conf4){
+                        thing.selected = true;
+                        println("sel");
+                    }
+                }
+            }
+        }else{
+            modeler.possSelecter[0] = 0;
+            modeler.possSelecter[1] = 0;
+            modeler.settedPossSelector = false;
+        }
+        
     }
 
     // modeler
@@ -617,9 +600,14 @@ class Modeler{
         keyMap.put("quit","q");
         keyMap.put("save","s");
         keyMap.put("new-chair","c");
+        keyMap.put("show-preview-new-chair","h");
+        keyMap.put("angleUP","ctrl+UP");
+        keyMap.put("angleDOWN","ctrl+DOWN");
 
+        // Mouse
         keyMap.put("zoom","scrol");
         keyMap.put("angle","shift+scrol");
+        
 
         keyMap.put("select","ctrl+mouse_left");
         keyMap.put("deselect","ctrl+mouse_right");

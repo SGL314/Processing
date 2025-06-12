@@ -25,7 +25,7 @@ void draw() {
 
 void mouseWheel(MouseEvent event){
     if (modeler.ctrlPressed){
-        modeler.angle += event.getCount()*(-1);
+        modeler.angle += event.getCount()*(-1)*modeler.variationAngle;
         if (modeler.angle < 0) modeler.angle += 360;
         if (modeler.angle > 360) modeler.angle -= 360;
     }else{
@@ -51,22 +51,38 @@ void mouseWheel(MouseEvent event){
     }    
 }
 void mouseDragged(){
-    modeler.dragX += mouseX-pmouseX;
-    modeler.dragY += mouseY-pmouseY; //  type,float px,float py,float wid,float hei,int cor,float alp
+    if (modeler.shiftPressed){
+        // pass
+    }else{
+        modeler.settedPossSelector = false;
+        modeler.dragX += mouseX-pmouseX;
+        modeler.dragY += mouseY-pmouseY;
+    }
 }
 
 void keyReleased(){
     char chave = (""+key).toLowerCase().toCharArray()[0];
+    if (modeler.ctrlPressed){
+        if (keyCode == UP){ // angleUP
+            modeler.variationAngle ++;
+        }else if (keyCode == DOWN){ // angleDOWN
+            modeler.variationAngle --;
+        }
+        if (modeler.variationAngle < 1) modeler.variationAngle = 1;
+        if (modeler.variationAngle > 10) modeler.variationAngle = 10;
+   
+    }else{
+        if (chave == modeler.keyMap.get("new-chair").toCharArray()[0]){ // new-chair
 
-    if (chave == modeler.keyMap.get("new-chair").toCharArray()[0]){
-        float px = mouseX/modeler.zoom-modeler.tamCadeira/2-modeler.dragX/modeler.zoom;
-        float py = mouseY/modeler.zoom-modeler.tamCadeira/2-modeler.dragY/modeler.zoom;
-        // translate(-modeler.dragX/modeler.zoom,-modeler.dragY/modeler.zoom);
-
-        modeler.things.add(new Thing("cadeira",px,py,modeler.tamCadeira,modeler.tamCadeira,modeler.angle,modeler.corCadeiras,modeler.alphaCorCadeiras));
-    
-    }else if (chave == modeler.keyMap.get("quit").toCharArray()[0]){
-        exit();
+            float px = mouseX/modeler.zoom-modeler.dragX/modeler.zoom;
+            float py = mouseY/modeler.zoom-modeler.dragY/modeler.zoom - modeler.tamCadeira;
+            modeler.things.add(new Thing("cadeira",px,py,modeler.tamCadeira,modeler.tamCadeira,modeler.angle,modeler.corCadeiras,modeler.alphaCorCadeiras));
+        
+        }else if (chave == modeler.keyMap.get("quit").toCharArray()[0]){ // quit
+            exit();
+        }else if (chave == modeler.keyMap.get("show-preview-new-chair").toCharArray()[0]){ // show-preview-new-chair
+            modeler.showPreviewNewChair = (modeler.showPreviewNewChair) ? false : true;
+        }
     }
 
     switch (keyCode){

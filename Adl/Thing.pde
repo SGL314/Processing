@@ -26,10 +26,11 @@ class Thing{
     }
 
     public void draw(){
-        float vx = (float) Math.sin((float) angle*PI/180)*wid/2;
-        float vy = (float) Math.cos((float) angle*PI/180)*wid/2;
-        translate(px+vx,py+vy);
+        float vx = (float) Math.sin((float) angle*PI/180)*wid-wid/2;
+        float vy = (float) Math.cos((float) angle*PI/180)*wid-wid/2;
+        translate(px,py);
         rotate((float) angle*PI/180);
+        translate(vx,vy);
         switch (type){
             case "pilastra":
                 noStroke();
@@ -54,7 +55,7 @@ class Thing{
         }
         //selecting
         if (selected){
-            fill(#ffffff,255);
+            fill(#ff0000,255);
             switch (type){
                 case "pilastra":
                     noStroke();
@@ -66,16 +67,17 @@ class Thing{
                     break;
                 case "caixa de som":
                     noStroke();
-                    rect(0,0,(wid+hei)/2/2,(wid+hei)/2/2);
+                    rect(wid/4,wid/4,(wid+hei)/2/2,(wid+hei)/2/2);
                     break;
                 case "cadeira":
                     noStroke();
-                    rect(0,0,(wid+hei)/2/2,(wid+hei)/2/2);
+                    rect(wid/4,wid/4,(wid+hei)/2/2,(wid+hei)/2/2);
                     break;
             }
         }
+        translate(-vx,-vy);
         rotate((float) -angle*PI/180);
-        translate(-px-vx,-py-vy);
+        translate(-px,-py);
 
 
     }
