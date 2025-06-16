@@ -2,7 +2,7 @@ Padrao padrao = new Padrao();
 Miriam miriam = new Miriam();
 Mini_Miriam mini_miriam = new Mini_Miriam();
 Davi davi = new Davi();
-Modeler modeler = new Modeler();
+Modeler modeler = new Modeler("Modelos","Coliseu_model"); // somente o nome, sem o '.txt' e sem '/'
 
 void setup() {
     // padrao.init();
@@ -82,6 +82,12 @@ void keyReleased(){
             exit();
         }else if (chave == modeler.keyMap.get("show-preview-new-chair").toCharArray()[0]){ // show-preview-new-chair
             modeler.showPreviewNewChair = (modeler.showPreviewNewChair) ? false : true;
+        }else if (chave == modeler.keyMap.get("clear-selecteds").toCharArray()[0]){
+            for (Thing thing : modeler.things){
+                thing.selected = false;
+            }
+        }else if (chave == modeler.keyMap.get("save").toCharArray()[0]){
+            modeler.saveModel();
         }
     }
 
@@ -101,6 +107,20 @@ void keyPressed(){
             break;
         case SHIFT:
             modeler.shiftPressed = true;
+            break;
+        case DELETE:
+            ArrayList<Thing> remover = new ArrayList<Thing>();
+
+            for (Thing thing : modeler.things){
+                if (thing.selected){
+                    remover.add(thing);
+                }
+            }
+
+            for (Thing thing : remover){
+                modeler.things.remove(thing);
+            }
+
             break;
     }
 }

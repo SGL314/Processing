@@ -4,6 +4,8 @@ class Thing{
     int cor,angle;
 
     boolean selected = false;
+    boolean overPosition = false;
+    int[] coresAlternadas = {#ff0000,#ff00ff,#0000ff,#00ffff,#00ff00,#ffff00};
 
     Thing(String type,float px,float py,float raw,int cor,int angle,float alpha){ // pilastra, extintor
         this.type = type;
@@ -30,26 +32,17 @@ class Thing{
         float vy = (float) Math.cos((float) angle*PI/180)*wid-wid/2;
         translate(px,py);
         rotate((float) angle*PI/180);
-        translate(vx,vy);
+        translate(vx,vy);       
+
         switch (type){
-            case "pilastra":
-                noStroke();
-                fill(cor,alpha);
-                circle(0,0,raw*2);
-                break;
-            case "extintor":
-                noStroke();
-                fill(cor,alpha);
-                circle(0,0,raw*2);
-                break;
-            case "caixa de som":
-                noStroke();
-                fill(cor,alpha);
-                rect(0,0,wid,hei);
-                break;
             case "cadeira":
                 noStroke();
                 fill(cor,alpha);
+                if (overPosition){
+                    int ind = (modeler.loop%(300)-modeler.loop%(300)%50)/50;
+                    
+                    fill(coresAlternadas[ind],alpha);
+                }
                 rect(0,0,wid,hei);
                 break;
         }
@@ -57,27 +50,24 @@ class Thing{
         if (selected){
             fill(#ff0000,255);
             switch (type){
-                case "pilastra":
-                    noStroke();
-                    circle(0,0,raw/2);
-                    break;
-                case "extintor":
-                    noStroke();
-                    circle(0,0,raw/2);
-                    break;
-                case "caixa de som":
-                    noStroke();
-                    rect(wid/4,wid/4,(wid+hei)/2/2,(wid+hei)/2/2);
-                    break;
                 case "cadeira":
                     noStroke();
                     rect(wid/4,wid/4,(wid+hei)/2/2,(wid+hei)/2/2);
                     break;
             }
         }
+
+        // // mostra posição
+        String texto = px+" "+py;
+        fill(#000000);
+        textSize(10);
+        text(texto,0,0);
+
         translate(-vx,-vy);
         rotate((float) -angle*PI/180);
         translate(-px,-py);
+
+        
 
 
     }

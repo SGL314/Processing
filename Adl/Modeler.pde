@@ -1,4 +1,11 @@
 class Modeler{
+    String arquivo,pasta;
+
+    Modeler (String pasta, String arquivo){
+        this.arquivo = arquivo;
+        this.pasta = pasta;
+    }
+
     int longitude = 30,
     distLadoEsquerdoAltar = 8, distLadoDireitoAltar = 7,
     altura = 39, alturaAltar = 2, // em y: do altar e do altar até a faixa perto da mesa de som
@@ -49,7 +56,7 @@ class Modeler{
 
     // UI
     float zoom=1, lastZoom=1;
-    int dragX=1,dragY=1;
+    int dragX=0,dragY=0;
 
     // Variables
     boolean showPreviewNewChair = false;
@@ -109,6 +116,10 @@ class Modeler{
         dados();
         paredes();
         previewing(); // preview new chair
+        overPositions(); // mark the chairs who are overPositioneds
+
+        linhasAuxiliares();
+        linhasImaginarias();
 
         translate(-paddingX,-paddingY);
         title();
@@ -130,7 +141,7 @@ class Modeler{
 
     void title(){
         String nome = "Modeler";
-        String data = "11/06\n 2025";
+        String data = "15/06\n 2025";
 
         // Nomes
         fill(#000000);
@@ -526,7 +537,52 @@ class Modeler{
         texto = angle+"°";
         fill(#ff0000);
         text(texto,mouseX/zoom+textWidth(texto)/2,mouseY/zoom+textAscent());
+
+        texto = dragX+" "+dragY;
+        fill(#0000ff);
+        text(texto,mouseX/zoom+textWidth(texto),mouseY/zoom+textAscent());
     }
+
+    
+    // modeler
+    // UI
+
+    private void overPositions(){
+        ArrayList<Thing> restante = new ArrayList<Thing>();
+        for (Thing thing : things){
+            if (thing.alpha != alphaCorCadeiras/2){
+                restante.add(thing);
+            }
+            thing.overPosition = false;
+        }
+
+        for (Thing thingA : things){
+            if (thingA.alpha == alphaCorCadeiras/2) continue;
+            for (Thing thingB : restante){
+                if (thingA != thingB){
+                    boolean a = thingA.px <= thingB.px && thingB.px <= thingA.px+tamCadeira;
+                    boolean b = thingA.px <= thingB.px+tamCadeira && thingB.px+tamCadeira <= thingA.px+tamCadeira;
+                    boolean c = thingA.py <= thingB.py && thingB.py <= thingA.py+tamCadeira;
+                    boolean d = thingA.py <= thingB.py+tamCadeira && thingB.py+tamCadeira <= thingA.py+tamCadeira;
+                    
+                    if (a&&c||b&&d){
+                        thingA.overPosition = true;
+                        thingB.overPosition = true;
+
+                        restante.remove(thingA);
+                        restante.remove(thingB);
+
+                        break;
+                    }
+                }
+            }
+
+            restante.remove(thingA);
+        }
+        
+    }
+
+    //
 
     private void previewing(){
         Thing chair;
@@ -556,22 +612,40 @@ class Modeler{
             modeler.settedPossSelector = true;
             fill(#0000ff,64);
             rect(modeler.possSelecter[0],modeler.possSelecter[1],mouseX-modeler.possSelecter[0],mouseY-modeler.possSelecter[1]);
+            // coloca os drags definindo os p__
+            float pax=possSelecter[0]-dragX
+            ,pbx=mouseX-dragX,
+            pay=possSelecter[1]-dragY,
+            pby=mouseY-dragY;
             
+            // coloca as posições do maior pro menor
+            if (pax>pbx){
+                float a = pax;
+                pax = pbx;
+                pbx = a;
+            }
+            if (pay>pby){
+                float a = pay;
+                pay = pby;
+                pby = a;
+            }
+
             // selector 
             for (Thing thing : things){
-                thing.selected = false;
                 if (thing.alpha != alphaCorCadeiras/2){
                     float ax = thing.px
                     ,ay = thing.py
-                    ,bx = thing.px + tamCadeira
-                    ,by = thing.py + tamCadeira
+                    ,bx = thing.px+tamCadeira
+                    ,by = thing.py+tamCadeira
                     ;
-                    boolean conf1 = modeler.possSelecter[0] < ax && ax < mouseX;
-                    boolean conf2 = modeler.possSelecter[0] < bx && bx < mouseX;
-                    boolean conf3 = modeler.possSelecter[1] < ay && ay < mouseY;
-                    boolean conf4 = modeler.possSelecter[1] < by && by < mouseY;
-                    println(conf1+" "+conf2+" "+conf3+" "+conf4+" ");
-                    println(ax+" "+ay+" "+bx+" "+by+" ");
+
+                    boolean conf1 = pax <= ax && ax <= pbx;
+                    boolean conf2 = pax <= bx && bx <= pbx;
+                    boolean conf3 = pay <= ay && ay <= pby;
+                    boolean conf4 = pay <= by && by <= pby;
+
+                    // println(conf1+" "+conf2+" "+conf3+" "+conf4+" ");
+                    // println(ax+" "+ay+" "+bx+" "+by+" ");
 
                     if (conf1 && conf2 && conf3 && conf4){
                         thing.selected = true;
@@ -579,6 +653,33 @@ class Modeler{
                     }
                 }
             }
+
+            // test selector 
+            // for (float x = 0; x < width;x+=5){
+            //     for (float y = 0; y < height;y+=5){
+            //         fill(#0000ff);
+                    
+            //         float ax = x+dragX
+            //         ,ay = y-dragY
+            //         ,bx = x+dragX
+            //         ,by = y-dragY
+            //         ;
+
+            //         boolean conf1 = pax <= ax && ax <= pbx;
+            //         boolean conf2 = pax <= bx && bx <= pbx;
+            //         boolean conf3 = pay <= ay && ay <= pby;
+            //         boolean conf4 = pay <= by && by <= pby;
+
+
+            //         if (conf1 && conf2 && conf3 && conf4){
+            //             println("sel");
+            //             fill(#ff0000);
+            //         }
+                    
+            //         circle(x,y,2);
+            //     }
+            // }
+
         }else{
             modeler.possSelecter[0] = 0;
             modeler.possSelecter[1] = 0;
@@ -587,20 +688,51 @@ class Modeler{
         
     }
 
-    // modeler
-    // UI
+    public void saveModel(){
+        String texto = "";
+        int qt = 0;
+        for (Thing thing : things){
+            // if (thing.alpha == alphaCorCadeiras/2) continue;
+            texto += thing.type+" "+thing.px+" "+thing.py+" "+thing.wid+" "+thing.hei+" "+thing.angle+"\n";
+            qt++;
+        }
 
-    //
+        PrintWriter writer = createWriter("/"+pasta+"/"+this.arquivo+".txt");
+        
+        writer.print(texto);
+        
+        writer.flush();
+        writer.close();
 
-
-    private void saveModel(){
-
+        println("Salvos "+qt+" cadeiras.");
     }
+    public void copyModel(){
+        String texto = "";
+        int qt = 0;
+        for (Thing thing : things){
+            // if (thing.alpha == alphaCorCadeiras/2) continue;
+            texto += thing.type+" "+thing.px+" "+thing.py+" "+thing.wid+" "+thing.hei+" "+thing.angle+"\n";
+            qt++;
+        }
+
+        PrintWriter writer = createWriter("/"+pasta+"/"+this.arquivo+".txt");
+        
+        writer.print(texto);
+        
+        writer.flush();
+        writer.close();
+
+        println("Salvo "+qt+"!");
+    }
+
     private void defineKeyMap(){
         keyMap.put("quit","q");
         keyMap.put("save","s");
         keyMap.put("new-chair","c");
+        keyMap.put("clear-selecteds","l");
         keyMap.put("show-preview-new-chair","h");
+        keyMap.put("remove-selecteds","DELETE");
+
         keyMap.put("angleUP","ctrl+UP");
         keyMap.put("angleDOWN","ctrl+DOWN");
 
