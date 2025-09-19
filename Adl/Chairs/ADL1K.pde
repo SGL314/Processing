@@ -18,12 +18,14 @@ class ADL1K{
     fileirasLateraisAcima = 2,
     distLateralDireita = 132+22+125, distLateralEsquerda = 269;
 
-    float[] distBlocosCentrais = {10.0,10.0},
-    layoutBlocosCentrais =       {8,8,8,8,8,8,8,8,8},
-    layoutBlocoLateralDireito =  {7,8,8,8,8,8,6},
-    layoutBlocoLateralEsquerdo = {7,8,8,8,8,8,6},
-    diferencaFileiraLateralDireitaP =  {0,0,0,0,0,0,0,-2}, // espaço de 1 cadeira e 1 espacoEntreCadeiras
-    diferencaFileiraLateralEsquerdaP = {0,0,0,0,0,0,0,-2}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
+    float[] distBlocosCentrais = {0,0},
+    layoutBlocosCentrais =       {0,18,18,18,18,18,18,18,18,18,18,18,18,18,19,20,20,20},
+    diferencaFileiraCentralE=    {0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,-1,-2,-2,-2 ,0,0},
+    layoutBlocosCentraisD =      {0,18,18,18,18,18,18,18,18,18,18,18,18,18},
+    layoutBlocoLateralDireito =  {7,9,9,7,9,9,9,9},
+    layoutBlocoLateralEsquerdo = {7,9,9,9,9,9,9,9,9,9,9},
+    diferencaFileiraLateralDireitaP =  {0,0,0,0,0,0,0,0   ,0,0,0,0}, // espaço de 1 cadeira e 1 espacoEntreCadeiras
+    diferencaFileiraLateralEsquerdaP = {0,0,0,0,0,0,0,0   ,0,0,0,0,0,0,0,0,0,0,0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
     
     // Apresentation
     float addingDownLat = 3.5+(layoutBlocoLateralDireito.length-7); // ajustado em init
@@ -40,6 +42,8 @@ class ADL1K{
     alphaCorCadeirasBLs = alphaAll, alphaCorCadeirasBCs = alphaAll;
 
     int qtCadeiras = 0;
+    int qtCadeirasRemoved = 0;
+    int removeChairs[] = {376,466};
     int loop = 0;
     float cacheMovel[][] = {{0,0}}; // ultima pilastra desenhada,
 
@@ -49,8 +53,13 @@ class ADL1K{
         espessuraAltar = alturaAltar * tamQuadrado;
         longitudeAltar = longitude * tamQuadrado;
         tamCadeira = 21.6666666666;
-        espacoEntreFileiras = 3*tamQuadrado-tamCadeira;
+        espacoEntreFileiras = 2.75*tamQuadrado-tamCadeira;
+        println("espacoEntreFileiras: "+espacoEntreFileiras/coeCmToPx);
         espacoEntreFileirasLaterais=4*tamQuadrado-tamCadeira; // -2*tamCadeira + 3*sqrt(2)*tamCadeira + tamCadeira;
+
+        // espacoEntreFileiras = 3*tamQuadrado-tamCadeira;
+        // espacoEntreFileirasLaterais=4*tamQuadrado-tamCadeira; // -2*tamCadeira + 3*sqrt(2)*tamCadeira + tamCadeira;
+
         espessuraFaixa = 17*coeCmToPx; // 17cm 
         // 1px = 2.4cm
         // 1cm = 0.4166666px
@@ -79,6 +88,7 @@ class ADL1K{
 
         //
         qtCadeiras = 0;
+        qtCadeirasRemoved = 0;
         int difAlteracaoWidth = 0;
         ground();
         things();
@@ -86,7 +96,7 @@ class ADL1K{
         linhasAuxiliares();
 
         // translate(difAlteracaoWidth,0);
-        blocosLaterais();
+        // blocosLaterais();
         // translate(-difAlteracaoWidth*1.5,0);
         altar();
         paredes();
@@ -102,7 +112,7 @@ class ADL1K{
         position();
 
         // salva os trem
-        if (loop == 1){
+        if (loop >= 1 && loop <= 10){
             saveModel();
         }
     }
@@ -157,6 +167,7 @@ class ADL1K{
         caixasDeSom();
         translate(-(width-1000)/2,0);    
         mesas();
+        bebedouro();
     }
     void caixasDeSom(){
         //direito
@@ -206,7 +217,12 @@ class ADL1K{
     void mesas(){
         // led & som
         rect(cacheMovel[0][0]-19*tamQuadrado-(125+17)*coeCmToPx,cacheMovel[0][1]+(43)*coeCmToPx,500,255*coeCmToPx);
-    } 
+    }
+    void bebedouro(){
+        float x = width/2-(longitude/2+distLadoEsquerdoAltar-3)*tamQuadrado;
+        float y = espessuraAltar+altura*tamQuadrado+(17+23-38)*coeCmToPx+(4+2+2)*tamQuadrado*pow(2,.5);
+        rect(x,y,45*coeCmToPx,38*coeCmToPx);
+    }
 
     private void putChair(float px,float py,float angle){
         
@@ -214,7 +230,7 @@ class ADL1K{
 
     }
     private void saveModel(){
-        PrintWriter writer = createWriter("/Modelos/Davi_model.txt");
+        PrintWriter writer = createWriter("Adl1k.txt");
         
         writer.print(textoExport);
         
@@ -229,7 +245,15 @@ class ADL1K{
         faixas();
         blackTiles();   
     }
-    void blackTiles(){
+    void blackTiles(){fill(#ffffff);
+        // float size = 20;
+        // String texto = "Pilastra";
+        // px += -10;
+        // py += 31;
+        // rect(px,py-size+3,textWidth(texto),size);
+        // fill(#000000);
+        // textSize(size);
+        // text(texto,px,py);
         // lado direito
         superBlackTile(width/2+(1+longitude/2)*tamQuadrado,espessuraAltar); // na entrada da escada direita
         strangeTiles(); // azulejos estranhos
@@ -290,7 +314,7 @@ class ADL1K{
         line = 0;
         float distX = 0;
         float initX = width/2-95*coeCmToPx+tamQuadrado*pow(2,0.5)/2;
-        float initY = (altura+alturaAltar)*tamQuadrado; // +4*tamQuadrado*pow(2,.5) +(17)*coeCmToPx + 23
+        float initY = espessuraAltar+(altura)*tamQuadrado+1.5*tamQuadrado*pow(2,.5)+(17+23)*coeCmToPx+4*tamQuadrado*pow(2,.5); // +4*tamQuadrado*pow(2,.5)  
         for (int type : chain3){
             switch (type){
                 case 0: // nada
@@ -334,7 +358,7 @@ class ADL1K{
             }
             line+=distRaios;
             distX += tamQuadrado*pow(2,0.5);
-            break;          
+            // break;          
         }
 
     }
@@ -374,8 +398,11 @@ class ADL1K{
         
         // translate(0,-paddingY);
         rect(width/2-95*coeCmToPx+tamQuadrado*pow(2,0.5)/2,
-        cacheMovel[0][1] + (23)*coeCmToPx+(2)*tamQuadrado*pow(2,.5), 
-        50,25*coeCmToPx);
+        espessuraAltar+(altura)*tamQuadrado+(17+23)*coeCmToPx+(4+2+2)*tamQuadrado*pow(2,.5), //  
+        500,50);
+        rect((width-1000)/2-10,
+        espessuraAltar+(altura)*tamQuadrado+(17+23)*coeCmToPx+(4+2+2)*tamQuadrado*pow(2,.5), //  
+        500,50);
         // translate(0,paddingY);
         // +52.5 +(2)*tamQuadrado*pow(2,.5)
 
@@ -587,20 +614,56 @@ class ADL1K{
         for (float line : layoutBlocosCentrais){
             // calculo de variação
             float vari = -(distBlocosCentrais[0]-distBlocosCentrais[1])/(line-1),px,py;
-            fill(#CB8221,alphaCorCadeirasBCs);
             // esquerda
             for (int i =0 ; i < line;i++){
-                px = width/2-espacoAteMeridianoCentral*tamQuadrado-(tamCadeira*(i+1))-(i*espacoEntreCadeiras);
+                boolean next = false;
+                for (int rem : removeChairs){
+                    if (rem == qtCadeiras){
+                        next = true;
+                        qtCadeiras++;
+                        qtCadeirasRemoved++;
+                        break;
+                    }
+                }
+                if (next) continue;
+                fill(#CB8221,alphaCorCadeirasBCs);
+                px = width/2-espacoAteMeridianoCentral*tamQuadrado-(tamCadeira*(i+1))-(i*espacoEntreCadeiras) - diferencaFileiraCentralE[linha-1]*(tamCadeira+espacoEntreCadeiras);
                 py = espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras);
                 rect(px,py,tamCadeira,tamCadeira);
+
+                textSize(15);
+                fill(#00ff00);
+                text(qtCadeiras,px,py+textAscent());
+
                 qtCadeiras++;
                 putChair(px,py,0);
             }
+            linha++;
+        }
+        linha = 1;
+        for (float line : layoutBlocosCentraisD){
+            float vari = -(distBlocosCentrais[0]-distBlocosCentrais[1])/(line-1),px,py;
             // direita
             for (int i =0 ; i < line;i++){
+                boolean next = false;
+                for (int rem : removeChairs){
+                    if (rem == qtCadeiras){
+                        next = true;
+                        qtCadeiras++;
+                        qtCadeirasRemoved++;
+                        break;
+                    }
+                }
+                if (next) continue;
+                fill(#CB8221,alphaCorCadeirasBCs);
                 px = width/2+espacoAteMeridianoCentral*tamQuadrado+(tamCadeira*(i))+(i*espacoEntreCadeiras);
                 py = espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras);
                 rect(px,py,tamCadeira,tamCadeira);
+
+                textSize(15);
+                fill(#00ff00);
+                text(qtCadeiras,px,py+textAscent());
+
                 qtCadeiras++;
                 putChair(px,py,0);
             }
@@ -613,7 +676,7 @@ class ADL1K{
         stroke(#000000);
         translate((width-1000)/2,0);
         int linha = 0,variCadeiras=0,qtInitCadeiras =0;
-        float ang = 45,difLateral=4*tamQuadrado*pow(2,.5)/2,px,py, // descobrindo a reta da função : f(0) = distBlocosLaterais; f(meridiano que tange o bloco) = distsBlocosCentrais[1]; [negativo para horário]
+        float ang = 0,difLateral=4*tamQuadrado*pow(2,.5)/2,px,py, // descobrindo a reta da função : f(0) = distBlocosLaterais; f(meridiano que tange o bloco) = distsBlocosCentrais[1]; [negativo para horário]
         correcaoLinearLateral = 2*(tamCadeira+espacoEntreCadeiras),
         varX_E = (paddingX+distLateralEsquerda+espessuraFaixa)*coeCmToPx+(distLadoEsquerdoAltar-2)*tamQuadrado-tamCadeira*pow(2,.5)/2,
         varX_D = varX_E+(2+longitude+2)*tamQuadrado + tamCadeira*pow(2,.5)/2,
@@ -627,6 +690,7 @@ class ADL1K{
         for (float line : layoutBlocoLateralEsquerdo){
             if (qtInitCadeiras==0) qtInitCadeiras=(int) line;
             for (int i = 0 ; i < line;i++){
+                println(linha+1);
                 px = -i*(tamCadeira+espacoEntreCadeiras) + linha*difLateral + diferencaFileiraLateralEsquerdaP[linha+1]*(tamCadeira+espacoEntreCadeiras);
                 py = linha*(difLateral);
                 rect(px,py, tamCadeira,tamCadeira);
@@ -653,7 +717,7 @@ class ADL1K{
                 // marca uma especifica
                 //if (i==0 && linha==3) fill(255,0,0);
                 //
-                px = i*(tamCadeira+espacoEntreCadeiras) - linha*difLateral - diferencaFileiraLateralEsquerdaP[linha+1]*(tamCadeira+espacoEntreCadeiras);
+                px = i*(tamCadeira+espacoEntreCadeiras) - linha*difLateral - diferencaFileiraLateralDireitaP[linha+1]*(tamCadeira+espacoEntreCadeiras);
                 py = linha*(difLateral);
                 rect(px,py,tamCadeira,tamCadeira);
                 qtCadeiras++;
@@ -675,8 +739,19 @@ class ADL1K{
         fill(#ffffff);
         float size = 20;
         String texto = "Led & Som";
-        float px  = 695;
-        float py = 778;
+        float px  = 703+(width-1200)/2;
+        float py = 767;
+        rect(px,py-size+3,textWidth(texto)+25,size);
+        fill(#000000);
+        textSize(size);
+        text(texto,px,py);
+
+        // Coisas
+        fill(#ffffff);
+        size = 20;
+        texto = "Bebedouro";
+        px  = 233+(width-1200)/2;
+        py = 900;
         rect(px,py-size+3,textWidth(texto),size);
         fill(#000000);
         textSize(size);
@@ -685,139 +760,139 @@ class ADL1K{
         // Cadeiras
         fill(#ffffff);
         textSize(20);
-        texto = qtCadeiras+" Cadeiras";
+        texto = (qtCadeiras-qtCadeirasRemoved)+" Cadeiras";
         text(texto,width/2-textWidth(texto)/2,espessuraAltar-textAscent()/2);
         int pivotPx = 100;
 
-        // Laterais
-        // Esquerdo
-        fill(#ffffff);
-        size = 20;
-        int qt=0;
-        texto = "";
-        int tam = 0;
-        int i = 0;
-        qt = 0;
-        for (float item : layoutBlocoLateralDireito){
-            tam++;
-        }
-        for (float item : layoutBlocoLateralEsquerdo){
-            if (item == 0){
-                continue;
-            }
-            texto += int(item);
-            if (i<tam-1){
-                texto+=", ";
-            }
-            i++;
-            qt += int(item);
-        }
-        texto += " ("+int(qt)+")";
-        px = 45+(width-1000)/2;
-        py = 490+addingDownLat-tamCadeira-espacoEntreFileiras;
-        noStroke();
-        textSize(size);
-        rect(px,py-size+3,textWidth(texto),size);
-        fill(#00a000);
-        text(texto,px,py);
-        // Direito
-        fill(#ffffff);
-        size = 20;
-        texto = "";
-        i=0;
-        qt=0;
-        for (float item : layoutBlocoLateralDireito){
-            if (item == 0){
-                continue;
-            }
-            texto += int(item);
-            if (i<tam-1){
-                texto+=", ";
-            }
-            i++;
-            qt += int(item);
-        }
-        texto += " ("+int(qt)+")";
-        px = width-45-textWidth(texto)-(width-1000)/2;
-        py = 490+addingDownLat-tamCadeira-espacoEntreFileiras;
-        noStroke();
-        textSize(size);
-        rect(px,py-size+3,textWidth(texto),size);
-        fill(#00a000);
-        text(texto,px,py);
-        // Centrias
-        // Esquerdo
-        fill(#ffffff);
-        size = 20;
-        texto = "";
-        tam = 0;
-        i=0;
-        qt=0;
-        for (float item : layoutBlocosCentrais){
-            tam++;
-        }
-        for (float item : layoutBlocosCentrais){
-            if (item == 0){
-                continue;
-            }
-            texto += int(item);
-            if (i<tam-1){
-                texto+=", ";
-            }
-            i++;
-            qt += int(item);
-        }
-        texto += " ("+int(qt)+")";
-        px = 260+(width-1000)/2;
-        py = 575+addingDownCen-tamCadeira-espacoEntreFileiras;
-        noStroke();
-        textSize(size);
-        rect(px,py-size+3,textWidth(texto),size);
-        fill(#00a000);
-        text(texto,px,py);
-        // Direito
-        fill(#ffffff);
-        size = 20;
-        texto = "";
-        i=0;
-        qt=0;
-        for (float item : layoutBlocosCentrais){
-            texto += int(item);
-            if (i<tam-1){
-                texto+=", ";
-            }
-            i++;
-            qt += int(item);
-        }
-        texto += " ("+int(qt)+")";
-        px = 510+(width-1000)/2;
-        py = 575+addingDownCen-tamCadeira-espacoEntreFileiras;
-        noStroke();
-        textSize(size);
-        rect(px,py-size+3,textWidth(texto),size);
-        fill(#00a000);
-        text(texto,px,py);
-
-        return; // PARADA
-        
-        // // Nome dos blocos
-        // String[] nomes = {"BLE","BCE","BCD","BLD"};
-        // float altCentro = 734+addingDownCen-3*tamQuadrado*3;
-        // float altLateral = altCentro;
-        // float[][] poss = {{pivotPx,altLateral},{pivotPx+216,altCentro},{pivotPx+466,altCentro},{pivotPx+716,altLateral}};
-
-        // for (i=0;i<nomes.length;i++){
-        //     px = poss[i][0];
-        //     py = poss[i][1];
-
-        //     fill(#ffffff);
-        //     size=30;
-        //     noStroke();
-        //     textSize(size);
-        //     rect(px,py-size+3,textWidth(nomes[i]),size);
-        //     fill(#000000);
-        //     text(nomes[i],px,py);
+        // // Laterais
+        // // Esquerdo
+        // fill(#ffffff);
+        // size = 20;
+        // int qt=0;
+        // texto = "";
+        // int tam = 0;
+        // int i = 0;
+        // qt = 0;
+        // for (float item : layoutBlocoLateralDireito){
+        //     tam++;
         // }
+        // for (float item : layoutBlocoLateralEsquerdo){
+        //     if (item == 0){
+        //         continue;
+        //     }
+        //     texto += int(item);
+        //     if (i<tam-1){
+        //         texto+=", ";
+        //     }
+        //     i++;
+        //     qt += int(item);
+        // }
+        // texto += " ("+int(qt)+")";
+        // px = 45+(width-1000)/2;
+        // py = 490+addingDownLat-tamCadeira-espacoEntreFileiras;
+        // noStroke();
+        // textSize(size);
+        // rect(px,py-size+3,textWidth(texto),size);
+        // fill(#00a000);
+        // text(texto,px,py);
+        // // Direito
+        // fill(#ffffff);
+        // size = 20;
+        // texto = "";
+        // i=0;
+        // qt=0;
+        // for (float item : layoutBlocoLateralDireito){
+        //     if (item == 0){
+        //         continue;
+        //     }
+        //     texto += int(item);
+        //     if (i<tam-1){
+        //         texto+=", ";
+        //     }
+        //     i++;
+        //     qt += int(item);
+        // }
+        // texto += " ("+int(qt)+")";
+        // px = width-45-textWidth(texto)-(width-1000)/2;
+        // py = 490+addingDownLat-tamCadeira-espacoEntreFileiras;
+        // noStroke();
+        // textSize(size);
+        // rect(px,py-size+3,textWidth(texto),size);
+        // fill(#00a000);
+        // text(texto,px,py);
+        // // Centrias
+        // // Esquerdo
+        // fill(#ffffff);
+        // size = 20;
+        // texto = "";
+        // tam = 0;
+        // i=0;
+        // qt=0;
+        // for (float item : layoutBlocosCentrais){
+        //     tam++;
+        // }
+        // for (float item : layoutBlocosCentrais){
+        //     if (item == 0){
+        //         continue;
+        //     }
+        //     texto += int(item);
+        //     if (i<tam-1){
+        //         texto+=", ";
+        //     }
+        //     i++;
+        //     qt += int(item);
+        // }
+        // texto += " ("+int(qt)+")";
+        // px = 260+(width-1000)/2;
+        // py = 575+addingDownCen-tamCadeira-espacoEntreFileiras;
+        // noStroke();
+        // textSize(size);
+        // rect(px,py-size+3,textWidth(texto),size);
+        // fill(#00a000);
+        // text(texto,px,py);
+        // // Direito
+        // fill(#ffffff);
+        // size = 20;
+        // texto = "";
+        // i=0;
+        // qt=0;
+        // for (float item : layoutBlocosCentrais){
+        //     texto += int(item);
+        //     if (i<tam-1){
+        //         texto+=", ";
+        //     }
+        //     i++;
+        //     qt += int(item);
+        // }
+        // texto += " ("+int(qt)+")";
+        // px = 510+(width-1000)/2;
+        // py = 575+addingDownCen-tamCadeira-espacoEntreFileiras;
+        // noStroke();
+        // textSize(size);
+        // rect(px,py-size+3,textWidth(texto),size);
+        // fill(#00a000);
+        // text(texto,px,py);
+
+        // return; // PARADA
+        
+        // // // Nome dos blocos
+        // // String[] nomes = {"BLE","BCE","BCD","BLD"};
+        // // float altCentro = 734+addingDownCen-3*tamQuadrado*3;
+        // // float altLateral = altCentro;
+        // // float[][] poss = {{pivotPx,altLateral},{pivotPx+216,altCentro},{pivotPx+466,altCentro},{pivotPx+716,altLateral}};
+
+        // // for (i=0;i<nomes.length;i++){
+        // //     px = poss[i][0];
+        // //     py = poss[i][1];
+
+        // //     fill(#ffffff);
+        // //     size=30;
+        // //     noStroke();
+        // //     textSize(size);
+        // //     rect(px,py-size+3,textWidth(nomes[i]),size);
+        // //     fill(#000000);
+        // //     text(nomes[i],px,py);
+        // // }
 
     }
 
@@ -841,15 +916,15 @@ class ADL1K{
         fill(#5A5A5A);
         rect(px,py,32*0.41666666666,32*0.41666666666);
 
-        fill(#ffffff);
-        float size = 20;
-        String texto = "Pilastra";
-        px += -10;
-        py += 31;
-        rect(px,py-size+3,textWidth(texto),size);
-        fill(#000000);
-        textSize(size);
-        text(texto,px,py);
+        // fill(#ffffff);
+        // float size = 20;
+        // String texto = "Pilastra";
+        // px += -10;
+        // py += 31;
+        // rect(px,py-size+3,textWidth(texto),size);
+        // fill(#000000);
+        // textSize(size);
+        // text(texto,px,py);
     }
 
     void position(){

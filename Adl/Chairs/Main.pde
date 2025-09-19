@@ -17,7 +17,7 @@ void setup() {
     // davi_hrpst.init();
     // modeler.init();
     adl1k.init();
-    size(1200,1000);
+    size(1200,1080);
 }
 
 void draw() {
