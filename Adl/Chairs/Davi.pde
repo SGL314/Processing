@@ -28,6 +28,7 @@ class Davi{
     // Apresentation
     float addingDownLat = 2.5; // ajustado em init
     float addingDownCen = 0.5; // ajustado em init
+    String textoExport = "";
 
     // Cores
     int corCadeirasBLs = #CB8221,
@@ -91,6 +92,11 @@ class Davi{
 
         title();
         position();
+
+        // salva os trem
+        if (loop == 1){
+            saveModel();
+        }
     }
 
     void title(){
@@ -229,6 +235,19 @@ class Davi{
 
 
 
+    }
+    private void putChair(float px,float py,float angle){
+        
+        textoExport += "cadeira "+px+" "+py+" "+tamCadeira+" "+tamCadeira+" "+angle+" "+corCadeirasBLs+" 255.0\n";
+
+    }
+    private void saveModel(){
+        PrintWriter writer = createWriter("/Modelos/Davi_model.txt");
+        
+        writer.print(textoExport);
+        
+        writer.flush();
+        writer.close();
     }
 
     void ground(){
@@ -456,17 +475,23 @@ class Davi{
         int linha = 1;
         for (float line : layoutBlocosCentrais){
             // calculo de variação
-            float vari = -(distBlocosCentrais[0]-distBlocosCentrais[1])/(line-1);
+            float vari = -(distBlocosCentrais[0]-distBlocosCentrais[1])/(line-1),px,py;
             fill(#CB8221,alphaCorCadeirasBCs);
             // esquerda
             for (int i =0 ; i < line;i++){
-                rect(width/2-espacoAteMeridianoCentral*tamQuadrado-(tamCadeira*(i+1))-(i*espacoEntreCadeiras),espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras),tamCadeira,tamCadeira);
+                px = width/2-espacoAteMeridianoCentral*tamQuadrado-(tamCadeira*(i+1))-(i*espacoEntreCadeiras);
+                py = espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras);
+                rect(px,py,tamCadeira,tamCadeira);
                 qtCadeiras++;
+                putChair(px,py,0);
             }
             // direita
             for (int i =0 ; i < line;i++){
-                rect(width/2+espacoAteMeridianoCentral*tamQuadrado+(tamCadeira*(i))+(i*espacoEntreCadeiras),espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras),tamCadeira,tamCadeira);
+                px = width/2+espacoAteMeridianoCentral*tamQuadrado+(tamCadeira*(i))+(i*espacoEntreCadeiras);
+                py = espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras);
+                rect(px,py,tamCadeira,tamCadeira);
                 qtCadeiras++;
+                putChair(px,py,0);
             }
             linha++;
             // break;
@@ -476,7 +501,7 @@ class Davi{
     void blocosLaterais(){
         stroke(#000000);
         int linha = 0,variCadeiras=0,qtInitCadeiras =0;
-        float ang = 45,difLateral=4*tamQuadrado*pow(2,.5)/2, // descobrindo a reta da função : f(0) = distBlocosLaterais; f(meridiano que tange o bloco) = distsBlocosCentrais[1]; [negativo para horário]
+        float ang = 45,difLateral=4*tamQuadrado*pow(2,.5)/2,px,py, // descobrindo a reta da função : f(0) = distBlocosLaterais; f(meridiano que tange o bloco) = distsBlocosCentrais[1]; [negativo para horário]
         correcaoLinearLateral = 2*(tamCadeira+espacoEntreCadeiras),
         varX_E = (paddingX+distLateralEsquerda+espessuraFaixa)*coeCmToPx+(distLadoEsquerdoAltar-2)*tamQuadrado-tamCadeira*pow(2,.5)/2,
         varX_D = varX_E+(2+longitude+2)*tamQuadrado + tamCadeira*pow(2,.5)/2,
@@ -490,7 +515,9 @@ class Davi{
         for (float line : layoutBlocoLateralEsquerdo){
             if (qtInitCadeiras==0) qtInitCadeiras=(int) line;
             for (int i = 0 ; i < line;i++){
-                rect(-i*(tamCadeira+espacoEntreCadeiras) + linha*difLateral,linha*(difLateral), tamCadeira,tamCadeira);
+                px = -i*(tamCadeira+espacoEntreCadeiras) + linha*difLateral;
+                py = linha*(difLateral);
+                rect(px,py, tamCadeira,tamCadeira);
                 qtCadeiras++;
                 // break;
             }

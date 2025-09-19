@@ -1,0 +1,177 @@
+Padrao padrao = new Padrao();
+Miriam miriam = new Miriam();
+Mini_Miriam mini_miriam = new Mini_Miriam();
+Davi davi = new Davi();
+ADL1K adl1k = new ADL1K();
+Davi_Ungido davi_ung = new Davi_Ungido();
+// Davi_Harpista davi_hrpst = new Davi_Harpista();
+Modeler modeler = new Modeler("Modelos","Davi_model"); // somente o nome, sem o '.txt' e sem '/'
+int internLoop = 0;
+
+void setup() {
+    // padrao.init();
+    // miriam.init();
+     //mini_miriam.init();
+    // davi.init();
+    // davi_ung.init();
+    // davi_hrpst.init();
+    // modeler.init();
+    adl1k.init();
+    size(1200,1000);
+}
+
+void draw() {
+    // padrao.draw();
+    // miriam.draw();    
+     //mini_miriam.draw();
+    if (internLoop==0){
+        //davi.draw();
+        // davi_ung.draw();
+        // davi_hrpst.draw();
+    }else{
+        
+        // modeler.draw();
+    }
+    adl1k.draw();
+    internLoop++;
+}
+
+// UI
+
+void mouseWheel(MouseEvent event){
+    if (modeler.ctrlPressed){
+        modeler.angle += event.getCount()*(-1)*modeler.variationAngle;
+        for (Thing thing : modeler.things){
+            if (!thing.selected) continue;
+            thing.angle = modeler.angle;
+        }
+        if (modeler.angle < 0) modeler.angle += 360;
+        if (modeler.angle > 360) modeler.angle -= 360;
+    }else{
+        int x = mouseX;
+        int y = mouseY;
+        int drx = modeler.dragX;
+        int dry = modeler.dragY;
+
+        modeler.lastZoom = modeler.zoom; 
+        modeler.lastZoom *= pow(2,event.getCount()*(-1));
+
+        modeler.zoom = modeler.lastZoom;
+        
+        if (pow(2,event.getCount()*(-1)) > 1){
+            modeler.dragX += (width/2-mouseX);
+            modeler.dragY += (height/2-mouseY);
+            modeler.dragX += -x+drx;
+            modeler.dragY += -y+dry;
+        }else{
+            modeler.dragX = x-(-(drx+width/2)/2+width/2);
+            modeler.dragY = y-(-(dry+height/2)/2+height/2);
+        }
+    }    
+}
+void mouseDragged(){
+    if (modeler.shiftPressed || modeler.ctrlPressed){
+        // pass
+    }else{
+        modeler.settedPossSelector = false;
+        modeler.dragX += mouseX-pmouseX;
+        modeler.dragY += mouseY-pmouseY;
+    }
+}
+
+void keyReleased(){
+    char chave = (""+key).toLowerCase().toCharArray()[0];
+    if (modeler.ctrlPressed){
+        if (keyCode == UP){ // angleUP
+            modeler.variationAngle ++;
+        }else if (keyCode == DOWN){ // angleDOWN
+            modeler.variationAngle --;
+        }
+        if (modeler.variationAngle < 1) modeler.variationAngle = 1;
+        if (modeler.variationAngle > 10) modeler.variationAngle = 10;
+   
+    }else{
+        if (chave == modeler.keyMap.get("new-chair").toCharArray()[0]){ // new-chair
+
+            float px = mouseX/modeler.zoom-modeler.dragX/modeler.zoom;
+            float py = mouseY/modeler.zoom-modeler.dragY/modeler.zoom - modeler.tamCadeira;
+            modeler.things.add(new Thing("cadeira",px,py,modeler.tamCadeira,modeler.tamCadeira,modeler.angle,modeler.corCadeiras,modeler.alphaCorCadeiras));
+        
+        }else if (chave == modeler.keyMap.get("quit").toCharArray()[0]){ // quit
+            exit();
+        }else if (chave == modeler.keyMap.get("show-preview-new-chair").toCharArray()[0]){ // show-preview-new-chair
+            modeler.showPreviewNewChair = (modeler.showPreviewNewChair) ? false : true;
+        }else if (chave == modeler.keyMap.get("clear-selecteds").toCharArray()[0]){
+            for (Thing thing : modeler.things){
+                thing.selected = false;
+            }
+        }else if (chave == modeler.keyMap.get("save").toCharArray()[0]){
+            modeler.saveModel();
+        }else if (chave == modeler.keyMap.get("copy-selecteds").toCharArray()[0]){
+            modeler.copySelecteds();
+        }else if (chave == modeler.keyMap.get("show-position").toCharArray()[0]){
+            modeler.showPosition = (modeler.showPosition) ? false : true;
+        }else if (chave == modeler.keyMap.get("move-selecteds").toCharArray()[0]){
+            modeler.moveSelecteds = (modeler.moveSelecteds) ? false : true;
+        }
+    }
+
+    switch (keyCode){
+        case CONTROL:
+            modeler.ctrlPressed = false;
+            break;
+        case SHIFT:
+            modeler.shiftPressed = false;
+            break;
+    }
+}
+void keyPressed(){
+    switch (keyCode){
+        case CONTROL:
+            modeler.ctrlPressed = true;
+            break;
+        case SHIFT:
+            modeler.shiftPressed = true;
+            break;
+        case DELETE:
+            ArrayList<Thing> remover = new ArrayList<Thing>();
+
+            for (Thing thing : modeler.things){
+                if (thing.selected){
+                    remover.add(thing);
+                }
+            }
+
+            for (Thing thing : remover){
+                modeler.things.remove(thing);
+            }
+            break;
+        case UP:
+            if (modeler.moveSelecteds){
+                modeler.moveSelecteds(0,-modeler.movementMoveSelecteds);
+            }else{
+                modeler.movementMoveSelecteds += 1;
+            }
+            break;
+        case DOWN:
+            if (modeler.moveSelecteds){
+                modeler.moveSelecteds(0,modeler.movementMoveSelecteds);
+            }else{
+                modeler.movementMoveSelecteds += -1;
+            }
+            if (modeler.movementMoveSelecteds < 1){
+                modeler.movementMoveSelecteds = 1;
+            }
+            break;
+        case LEFT:
+            if (modeler.moveSelecteds){
+                modeler.moveSelecteds(-modeler.movementMoveSelecteds,0);
+            }
+            break;
+        case RIGHT:
+            if (modeler.moveSelecteds){
+                modeler.moveSelecteds(modeler.movementMoveSelecteds,0);
+            }
+            break;
+    }
+}

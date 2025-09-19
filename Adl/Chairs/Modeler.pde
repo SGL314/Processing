@@ -59,12 +59,15 @@ class Modeler{
     int dragX=0,dragY=0;
 
     // Variables
+    boolean moveSelecteds = false;
     boolean showPreviewNewChair = false;
     boolean settedPossSelector = false;
+    boolean showPosition = true;
     int angle = 0;
     int variationAngle = 5;
     int loop = 0;
     int[] possSelecter = {0,0};
+    int movementMoveSelecteds = 5;
 
     void init(){
         coeCmToPx = 0.4166666666666;
@@ -86,6 +89,7 @@ class Modeler{
         dragX = paddingX;
         dragY = paddingY;
 
+        
         defineKeyMap();
     }
 
@@ -128,12 +132,13 @@ class Modeler{
         selector();
         position();
         loop++;
+        if (loop == 1) copyModel();
     }
 
     private void drawThings(){
         for (Thing thing : things){
             thing.draw();
-            if (thing.type == "cadeira" && thing.alpha != alphaCorCadeiras/2){
+            if ("cadeira".equals(thing.type) && ((int)thing.alpha) != ((int)alphaCorCadeiras/2)){
                 qtCadeiras ++;
             }
         }
@@ -529,20 +534,31 @@ class Modeler{
         text(texto,px,py);
     }
     void position(){
+        if (!showPosition) return;
+
         fill(#000000);
         textSize(20);
         String texto = mouseX+", "+mouseY;
-        text(texto,mouseX/zoom,mouseY/zoom);
+        text(texto,(int) (mouseX/zoom+tamCadeira*Math.pow(2,.5)/2),mouseY/zoom);
 
         texto = angle+"°";
         fill(#ff0000);
-        text(texto,mouseX/zoom+textWidth(texto)/2,mouseY/zoom+textAscent());
+        text(texto,(int) (tamCadeira*Math.pow(2,.5)/2)+mouseX/zoom+textWidth(texto)/2,mouseY/zoom+textAscent());
 
         texto = dragX+" "+dragY;
         fill(#0000ff);
         text(texto,mouseX/zoom+textWidth(texto),mouseY/zoom+textAscent());
-    }
 
+        textSize(10);
+        texto = variationAngle+"°/scr"; // graus por scrolling
+        fill(#ff0000,192);
+        text(texto,(int) (-tamCadeira*Math.pow(2,.5)/2)+mouseX/zoom-textWidth(texto),mouseY/zoom+textAscent()+3);
+
+        texto = movementMoveSelecteds+"px/arr"; // graus por arrow
+        fill(#000000,192);
+        text(texto,(int) (-tamCadeira*Math.pow(2,.5)/2)+mouseX/zoom-textWidth(texto),mouseY/zoom);
+
+    }
     
     // modeler
     // UI
@@ -564,8 +580,8 @@ class Modeler{
                     boolean b = thingA.px <= thingB.px+tamCadeira && thingB.px+tamCadeira <= thingA.px+tamCadeira;
                     boolean c = thingA.py <= thingB.py && thingB.py <= thingA.py+tamCadeira;
                     boolean d = thingA.py <= thingB.py+tamCadeira && thingB.py+tamCadeira <= thingA.py+tamCadeira;
-                    
-                    if (a&&c||b&&d){
+
+                    if ((a||b)&&(c||d)){
                         thingA.overPosition = true;
                         thingB.overPosition = true;
 
@@ -604,14 +620,21 @@ class Modeler{
     
     }
     private void selector(){
-        if (shiftPressed){
+        if (shiftPressed || ctrlPressed){
             if (modeler.settedPossSelector == false){
                 modeler.possSelecter[0] = mouseX;
                 modeler.possSelecter[1] = mouseY;
             }
             modeler.settedPossSelector = true;
-            fill(#0000ff,64);
+            if (shiftPressed){
+                fill(#0000ff,64);
+            }else if (ctrlPressed){
+                fill(#ff0000,64);
+            }else{
+                print("ERRO mouseButton: "+mouseButton);
+            }
             rect(modeler.possSelecter[0],modeler.possSelecter[1],mouseX-modeler.possSelecter[0],mouseY-modeler.possSelecter[1]);
+            
             // coloca os drags definindo os p__
             float pax=possSelecter[0]-dragX
             ,pbx=mouseX-dragX,
@@ -634,22 +657,21 @@ class Modeler{
             for (Thing thing : things){
                 if (thing.alpha != alphaCorCadeiras/2){
                     float ax = thing.px
-                    ,ay = thing.py
-                    ,bx = thing.px+tamCadeira
-                    ,by = thing.py+tamCadeira
+                    ,ay = thing.py+tamCadeira
                     ;
 
                     boolean conf1 = pax <= ax && ax <= pbx;
-                    boolean conf2 = pax <= bx && bx <= pbx;
-                    boolean conf3 = pay <= ay && ay <= pby;
-                    boolean conf4 = pay <= by && by <= pby;
+                    boolean conf2 = pay <= ay && ay <= pby;
 
                     // println(conf1+" "+conf2+" "+conf3+" "+conf4+" ");
                     // println(ax+" "+ay+" "+bx+" "+by+" ");
 
-                    if (conf1 && conf2 && conf3 && conf4){
-                        thing.selected = true;
-                        println("sel");
+                    if (conf1 && conf2){
+                        if (shiftPressed){
+                            thing.selected = true;
+                        }else if (ctrlPressed){
+                            thing.selected = false;
+                        }
                     }
                 }
             }
@@ -687,13 +709,38 @@ class Modeler{
         }
         
     }
+    public void copySelecteds(){
+        int variX = (int)(tamCadeira/2),variY = (int)(tamCadeira/2);
+        ArrayList<Thing> copy = new ArrayList<Thing>();
+
+        for (Thing thing : things){
+            if (!thing.selected) continue;
+            Thing newThing = thing.copy();
+            thing.selected = false;
+            newThing.px += variX;
+            newThing.py += variY;
+            newThing.selected = true;
+            copy.add(newThing);
+        }
+
+        for (Thing thing : copy){
+            things.add(thing);
+        }
+    }
+    public void moveSelecteds(int vx,int vy){
+        for (Thing thing : things){
+            if (!thing.selected) continue;
+            thing.px += vx;
+            thing.py += vy;
+        }
+    }
 
     public void saveModel(){
         String texto = "";
         int qt = 0;
         for (Thing thing : things){
-            // if (thing.alpha == alphaCorCadeiras/2) continue;
-            texto += thing.type+" "+thing.px+" "+thing.py+" "+thing.wid+" "+thing.hei+" "+thing.angle+"\n";
+            if (thing.alpha == alphaCorCadeiras/2) continue;
+            texto += thing.type+" "+thing.px+" "+thing.py+" "+thing.wid+" "+thing.hei+" "+thing.angle+" "+thing.cor+" "+thing.alpha+"\n";
             qt++;
         }
 
@@ -707,42 +754,56 @@ class Modeler{
         println("Salvos "+qt+" cadeiras.");
     }
     public void copyModel(){
-        String texto = "";
+        String[] lines = loadStrings(sketchPath("/"+pasta+"/"+this.arquivo+".txt"));
         int qt = 0;
-        for (Thing thing : things){
-            // if (thing.alpha == alphaCorCadeiras/2) continue;
-            texto += thing.type+" "+thing.px+" "+thing.py+" "+thing.wid+" "+thing.hei+" "+thing.angle+"\n";
+
+        for (String line : lines){
+            String[] block = split(line, " ");
+            things.add(new Thing(
+                block[0],
+                float(block[1]),
+                float(block[2]),
+                float(block[3]),
+                float(block[4]),
+                int(block[5]),
+                int(block[6]),
+                float(block[7])
+            ));
             qt++;
         }
 
-        PrintWriter writer = createWriter("/"+pasta+"/"+this.arquivo+".txt");
-        
-        writer.print(texto);
-        
-        writer.flush();
-        writer.close();
-
-        println("Salvo "+qt+"!");
+        println("Cópia de "+qt+" cadeiras.");
     }
+    // I'd 
 
     private void defineKeyMap(){
         keyMap.put("quit","q");
         keyMap.put("save","s");
-        keyMap.put("new-chair","c");
+        keyMap.put("new-chair","n");
+        keyMap.put("copy-selecteds","c");
         keyMap.put("clear-selecteds","l");
+        keyMap.put("move-selecteds","m");
         keyMap.put("show-preview-new-chair","h");
+        keyMap.put("show-position","p");
         keyMap.put("remove-selecteds","DELETE");
 
         keyMap.put("angleUP","ctrl+UP");
         keyMap.put("angleDOWN","ctrl+DOWN");
+
+        // moveSelecteds
+        keyMap.put("up-selecteds","mv_sls+UP");
+        keyMap.put("down-selecteds","mv_sls+DOWN");
+        keyMap.put("left-selecteds","mv_sls+LEFT");
+        keyMap.put("right-selecteds","mv_sls+RIGHT");
+
 
         // Mouse
         keyMap.put("zoom","scrol");
         keyMap.put("angle","shift+scrol");
         
 
-        keyMap.put("select","ctrl+mouse_left");
-        keyMap.put("deselect","ctrl+mouse_right");
+        keyMap.put("select","shift");
+        keyMap.put("deselect","ctrl");
     }
 
     

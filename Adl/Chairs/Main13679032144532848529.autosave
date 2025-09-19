@@ -2,23 +2,35 @@ Padrao padrao = new Padrao();
 Miriam miriam = new Miriam();
 Mini_Miriam mini_miriam = new Mini_Miriam();
 Davi davi = new Davi();
-Modeler modeler = new Modeler("Modelos","Coliseu_model"); // somente o nome, sem o '.txt' e sem '/'
+Davi_Ungido davi_ung = new Davi_Ungido();
+Davi_Harpista davi_hrpst = new Davi_Harpista();
+Modeler modeler = new Modeler("Modelos","Davi_model"); // somente o nome, sem o '.txt' e sem '/'
+int internLoop = 0;
 
 void setup() {
     // padrao.init();
     // miriam.init();
-    // mini_miriam.init();
-     //davi.init();
-    modeler.init();
+     //mini_miriam.init();
+    // davi.init();
+    // davi_ung.init();
+    davi_hrpst.init();
+    // modeler.init();
     size(1000,1000);
 }
 
 void draw() {
     // padrao.draw();
     // miriam.draw();    
-    // mini_miriam.draw(); 
-     //davi.draw();
-    modeler.draw();
+     //mini_miriam.draw();
+    if (internLoop==0){
+        //davi.draw();
+        // davi_ung.draw();
+        davi_hrpst.draw();
+    }else{
+        
+        // modeler.draw();
+    }
+    internLoop++;
 }
 
 // UI
@@ -26,6 +38,10 @@ void draw() {
 void mouseWheel(MouseEvent event){
     if (modeler.ctrlPressed){
         modeler.angle += event.getCount()*(-1)*modeler.variationAngle;
+        for (Thing thing : modeler.things){
+            if (!thing.selected) continue;
+            thing.angle = modeler.angle;
+        }
         if (modeler.angle < 0) modeler.angle += 360;
         if (modeler.angle > 360) modeler.angle -= 360;
     }else{
@@ -51,7 +67,7 @@ void mouseWheel(MouseEvent event){
     }    
 }
 void mouseDragged(){
-    if (modeler.shiftPressed){
+    if (modeler.shiftPressed || modeler.ctrlPressed){
         // pass
     }else{
         modeler.settedPossSelector = false;
@@ -88,6 +104,12 @@ void keyReleased(){
             }
         }else if (chave == modeler.keyMap.get("save").toCharArray()[0]){
             modeler.saveModel();
+        }else if (chave == modeler.keyMap.get("copy-selecteds").toCharArray()[0]){
+            modeler.copySelecteds();
+        }else if (chave == modeler.keyMap.get("show-position").toCharArray()[0]){
+            modeler.showPosition = (modeler.showPosition) ? false : true;
+        }else if (chave == modeler.keyMap.get("move-selecteds").toCharArray()[0]){
+            modeler.moveSelecteds = (modeler.moveSelecteds) ? false : true;
         }
     }
 
@@ -120,7 +142,33 @@ void keyPressed(){
             for (Thing thing : remover){
                 modeler.things.remove(thing);
             }
-
+            break;
+        case UP:
+            if (modeler.moveSelecteds){
+                modeler.moveSelecteds(0,-modeler.movementMoveSelecteds);
+            }else{
+                modeler.movementMoveSelecteds += 1;
+            }
+            break;
+        case DOWN:
+            if (modeler.moveSelecteds){
+                modeler.moveSelecteds(0,modeler.movementMoveSelecteds);
+            }else{
+                modeler.movementMoveSelecteds += -1;
+            }
+            if (modeler.movementMoveSelecteds < 1){
+                modeler.movementMoveSelecteds = 1;
+            }
+            break;
+        case LEFT:
+            if (modeler.moveSelecteds){
+                modeler.moveSelecteds(-modeler.movementMoveSelecteds,0);
+            }
+            break;
+        case RIGHT:
+            if (modeler.moveSelecteds){
+                modeler.moveSelecteds(modeler.movementMoveSelecteds,0);
+            }
             break;
     }
 }

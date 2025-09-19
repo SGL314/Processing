@@ -1,0 +1,3 @@
+Node{identificator='84_86_73', x='677', y='459', raw='20', id='', cor='-13894424', connected='91_39_22', minorisWay=''}
+Node{identificator='91_39_22', x='858', y='457', raw='20', id='', cor='-11574907', connected='', minorisWay=''}
+Node{identificator='64_39_23', x='863', y='687', raw='20', id='', cor='-15098989', connected='91_39_22 84_86_73', minorisWay=''}
