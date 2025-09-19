@@ -19,9 +19,10 @@ class ADL1K{
     distLateralDireita = 132+22+125, distLateralEsquerda = 269;
 
     float[] distBlocosCentrais = {0,0},
-    layoutBlocosCentrais =       {0,18,18,18,18,18,18,18,18,18,18,18,18,18,19,20,20,20},
-    diferencaFileiraCentralE=    {0,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,-1,-2,-2,-2 ,0,0},
-    layoutBlocosCentraisD =      {0,18,18,18,18,18,18,18,18,18,18,18,18,18},
+    layoutBlocosCentrais =       {0,9 ,9 ,9,18,18,18,18,18,18,18,18,18,18,18,18,19,20,20,20,20},
+    diferencaFileiraCentralE=    {0,9,9 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,-1,-2,-2,-2,-2 ,-2,0},
+    layoutBlocosCentraisD =      {0,9,9,9,18,18,18,18,18,18,18,18,18,18,18,18},
+    diferencaFileiraCentralD=    {0,9,9,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0},
     layoutBlocoLateralDireito =  {7,9,9,7,9,9,9,9},
     layoutBlocoLateralEsquerdo = {7,9,9,9,9,9,9,9,9,9,9},
     diferencaFileiraLateralDireitaP =  {0,0,0,0,0,0,0,0   ,0,0,0,0}, // espaço de 1 cadeira e 1 espacoEntreCadeiras
@@ -43,7 +44,7 @@ class ADL1K{
 
     int qtCadeiras = 0;
     int qtCadeirasRemoved = 0;
-    int removeChairs[] = {376,466};
+    int removeChairs[] = {403,404,422,511,512,530};
     int loop = 0;
     float cacheMovel[][] = {{0,0}}; // ultima pilastra desenhada,
 
@@ -53,7 +54,7 @@ class ADL1K{
         espessuraAltar = alturaAltar * tamQuadrado;
         longitudeAltar = longitude * tamQuadrado;
         tamCadeira = 21.6666666666;
-        espacoEntreFileiras = 2.75*tamQuadrado-tamCadeira;
+        espacoEntreFileiras = 2.75*tamQuadrado-tamCadeira-16*coeCmToPx;
         println("espacoEntreFileiras: "+espacoEntreFileiras/coeCmToPx);
         espacoEntreFileirasLaterais=4*tamQuadrado-tamCadeira; // -2*tamCadeira + 3*sqrt(2)*tamCadeira + tamCadeira;
 
@@ -92,8 +93,8 @@ class ADL1K{
         int difAlteracaoWidth = 0;
         ground();
         things();
-        linhasImaginarias();
-        linhasAuxiliares();
+        // linhasImaginarias();
+        // linhasAuxiliares();
 
         // translate(difAlteracaoWidth,0);
         // blocosLaterais();
@@ -118,8 +119,8 @@ class ADL1K{
     }
 
     void title(){
-        String nome = "ADL 1K";
-        String data = "18/09\n 2025";
+        String nome = "Zona";
+        String data = "19/09\n 2025";
 
         // Nomes
         fill(#000000);
@@ -656,7 +657,7 @@ class ADL1K{
                 }
                 if (next) continue;
                 fill(#CB8221,alphaCorCadeirasBCs);
-                px = width/2+espacoAteMeridianoCentral*tamQuadrado+(tamCadeira*(i))+(i*espacoEntreCadeiras);
+                px = width/2+espacoAteMeridianoCentral*tamQuadrado+(tamCadeira*(i))+(i*espacoEntreCadeiras) + diferencaFileiraCentralD[linha-1]*(tamCadeira+espacoEntreCadeiras);
                 py = espessuraAltar+(distBlocosCentrais[0]+vari*i)*tamQuadrado+(linha-1)*(tamCadeira+espacoEntreFileiras);
                 rect(px,py,tamCadeira,tamCadeira);
 
