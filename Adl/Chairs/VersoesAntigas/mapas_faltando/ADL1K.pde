@@ -1,4 +1,4 @@
-class ADL1K extends Modelo{
+class ADL1K{
     int longitude = 30,
     distLadoEsquerdoAltar = 8, distLadoDireitoAltar = 7,
     altura = 39, alturaAltar = 2, // em y: do altar e do altar até a faixa perto da mesa de som
@@ -18,13 +18,13 @@ class ADL1K extends Modelo{
     fileirasLateraisAcima = 2,
     distLateralDireita = 132+22+125, distLateralEsquerda = 269;
 
-    float[] distBlocosCentrais = {10,10},
-    layoutBlocosCentrais =       {9,9,9,9,9,9},
-    diferencaFileiraCentralE=    {0,0,0,0,0,0},
-    layoutBlocosCentraisD =      {9,9,9,9,9,9},
-    diferencaFileiraCentralD=    {0,0,0,0,0,0},
-    layoutBlocoLateralDireito =  {7,8,8,7,8,8},
-    layoutBlocoLateralEsquerdo = {7,8,8,8,8,8},
+    float[] distBlocosCentrais = {0,0},
+    layoutBlocosCentrais =       {0,9 ,9 ,9,18,18,18,18,18,18,18,18,18,18,18,18,19,20,20,20,20},
+    diferencaFileiraCentralE=    {0,9,9 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0,-1,-2,-2,-2,-2 ,-2,0},
+    layoutBlocosCentraisD =      {0,9,9,9,18,18,18,18,18,18,18,18,18,18,18,18},
+    diferencaFileiraCentralD=    {0,9,9,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0},
+    layoutBlocoLateralDireito =  {7,9,9,7,9,9,9,9},
+    layoutBlocoLateralEsquerdo = {7,9,9,9,9,9,9,9,9,9,9},
     diferencaFileiraLateralDireitaP =  {0,0,0,0,0,0,0,0   ,0,0,0,0}, // espaço de 1 cadeira e 1 espacoEntreCadeiras
     diferencaFileiraLateralEsquerdaP = {0,0,0,0,0,0,0,0   ,0,0,0,0,0,0,0,0,0,0,0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
     

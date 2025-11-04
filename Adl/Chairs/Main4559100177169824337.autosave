@@ -8,39 +8,31 @@ Davi_Ungido davi_ung = new Davi_Ungido();
 Modeler modeler = new Modeler("Modelos","Davi_model"); // somente o nome, sem o '.txt' e sem '/'
 int internLoop = 0;
 
-ArrayList<Modelo> modelosAtuais;
-int modeloAtual = 0;
-
 void setup() {
     // padrao.init();
     // miriam.init();
      //mini_miriam.init();
     // davi.init();
     davi_ung.init();
-    adl1k.init();
     // davi_hrpst.init();
     // modeler.init();
-    modelosAtuais = new ArrayList();
-    modelosAtuais.add(davi_ung);    
-    modelosAtuais.add(adl1k);
-    size(1100,1000);
+     //adl1k.init();
+    size(1000,1000);
 }
 
 void draw() {
     // padrao.draw();
     // miriam.draw();    
      //mini_miriam.draw();
-    // if (internLoop==0){
-    //     //davi.draw();
-    //     davi_ung.draw();
-    //     // davi_hrpst.draw();
-    // }else{
+    if (internLoop==0){
+        //davi.draw();
+        davi_ung.draw();
+        // davi_hrpst.draw();
+    }else{
         
-    //     // modeler.draw();
-    // }
-    // adl1k.draw();
-    modelosAtuais.get(modeloAtual).draw(); 
-
+        // modeler.draw();
+    }
+     //adl1k.draw();
     internLoop++;
 }
 
@@ -94,44 +86,34 @@ void keyReleased(){
             modeler.variationAngle ++;
         }else if (keyCode == DOWN){ // angleDOWN
             modeler.variationAngle --;
-        }else 
-        
-
+        }
         if (modeler.variationAngle < 1) modeler.variationAngle = 1;
         if (modeler.variationAngle > 10) modeler.variationAngle = 10;
    
     }else{
-        // if (chave == modeler.keyMap.get("new-chair").toCharArray()[0]){ // new-chair
+        if (chave == modeler.keyMap.get("new-chair").toCharArray()[0]){ // new-chair
 
-        //     float px = mouseX/modeler.zoom-modeler.dragX/modeler.zoom;
-        //     float py = mouseY/modeler.zoom-modeler.dragY/modeler.zoom - modeler.tamCadeira;
-        //     modeler.things.add(new Thing("cadeira",px,py,modeler.tamCadeira,modeler.tamCadeira,modeler.angle,modeler.corCadeiras,modeler.alphaCorCadeiras));
+            float px = mouseX/modeler.zoom-modeler.dragX/modeler.zoom;
+            float py = mouseY/modeler.zoom-modeler.dragY/modeler.zoom - modeler.tamCadeira;
+            modeler.things.add(new Thing("cadeira",px,py,modeler.tamCadeira,modeler.tamCadeira,modeler.angle,modeler.corCadeiras,modeler.alphaCorCadeiras));
         
-        // }else if (chave == modeler.keyMap.get("quit").toCharArray()[0]){ // quit
-        //     exit();
-        // }else if (chave == modeler.keyMap.get("show-preview-new-chair").toCharArray()[0]){ // show-preview-new-chair
-        //     modeler.showPreviewNewChair = (modeler.showPreviewNewChair) ? false : true;
-        // }else if (chave == modeler.keyMap.get("clear-selecteds").toCharArray()[0]){
-        //     for (Thing thing : modeler.things){
-        //         thing.selected = false;
-        //     }
-        // }else if (chave == modeler.keyMap.get("save").toCharArray()[0]){
-        //     modeler.saveModel();
-        // }else if (chave == modeler.keyMap.get("copy-selecteds").toCharArray()[0]){
-        //     modeler.copySelecteds();
-        // }else if (chave == modeler.keyMap.get("show-position").toCharArray()[0]){
-        //     modeler.showPosition = (modeler.showPosition) ? false : true;
-        // }else if (chave == modeler.keyMap.get("move-selecteds").toCharArray()[0]){
-        //     modeler.moveSelecteds = (modeler.moveSelecteds) ? false : true;
-        // }
-
-        if (keyCode == LEFT){ // sizeDsOWN
-            modeloAtual -= 1;
-        }else if (keyCode == RIGHT){ // sizeUP
-            modeloAtual += 1;
+        }else if (chave == modeler.keyMap.get("quit").toCharArray()[0]){ // quit
+            exit();
+        }else if (chave == modeler.keyMap.get("show-preview-new-chair").toCharArray()[0]){ // show-preview-new-chair
+            modeler.showPreviewNewChair = (modeler.showPreviewNewChair) ? false : true;
+        }else if (chave == modeler.keyMap.get("clear-selecteds").toCharArray()[0]){
+            for (Thing thing : modeler.things){
+                thing.selected = false;
+            }
+        }else if (chave == modeler.keyMap.get("save").toCharArray()[0]){
+            modeler.saveModel();
+        }else if (chave == modeler.keyMap.get("copy-selecteds").toCharArray()[0]){
+            modeler.copySelecteds();
+        }else if (chave == modeler.keyMap.get("show-position").toCharArray()[0]){
+            modeler.showPosition = (modeler.showPosition) ? false : true;
+        }else if (chave == modeler.keyMap.get("move-selecteds").toCharArray()[0]){
+            modeler.moveSelecteds = (modeler.moveSelecteds) ? false : true;
         }
-        modeloAtual = (modeloAtual>modelosAtuais.size()-1) ? modeloAtual-1 : modeloAtual;
-        modeloAtual = (modeloAtual<0) ? 0: modeloAtual;
     }
 
     switch (keyCode){
