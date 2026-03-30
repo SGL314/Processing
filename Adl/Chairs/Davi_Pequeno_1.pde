@@ -1,4 +1,4 @@
-class Davi_Ungido extends Modelo{
+class Davi_Pequeno extends Modelo{
 	int longitude = 30,
 	distLadoEsquerdoAltar = 8, distLadoDireitoAltar = 7,
 	altura = 39, alturaAltar = 2, // em y: do altar e do altar até a faixa perto da mesa de som
@@ -19,16 +19,16 @@ class Davi_Ungido extends Modelo{
 	distLateralDireita = 132+22+125, distLateralEsquerda = 269;
 
 	float[] distBlocos= {7.0,8.0}, // {7.0,7.0} {10.0,10.0}
-	layoutBlocosCentrais =       {8,8,8,8,8,8,8,8,8},
-	layoutBlocoLateralDireito =        {5,7,8,7,8,8,8},
-	layoutBlocoLateralEsquerdo =       {5,7,8,8,8,8,8},
+	layoutBlocosCentrais =       {8,8,8,8,8,8,8,8},
+	layoutBlocoLateralDireito =        {5,7,8,8,8},
+	layoutBlocoLateralEsquerdo =       {5,7,8,8,8},
 	diferencaFileiraLateralDireitaP =  {0,0,0,0,0,0,0,0,0,-2,0,0,0,0,0,0}, // espaço de 1 cadeira e 1 espacoEntreCadeiras
 	diferencaFileiraLateralEsquerdaP = {0,0,0,0,0,0,0,0,0,-2,0,0,0,0,0,0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
 
 
 	// Apresentation
-	float addingDownLat = 3.0+(layoutBlocoLateralDireito.length-7); // ajustado em init
-	float addingDownCen = 0.5+(layoutBlocosCentrais.length-8); // ajustado em init -> 2 = duas fileiras a mais
+	float addingDownLat = 2.0+(layoutBlocoLateralDireito.length-7); // ajustado em init
+	float addingDownCen = 1.25+(layoutBlocosCentrais.length-8); // ajustado em init -> 2 = duas fileiras a mais
 	String textoExport = "";
 
 	// Cores
@@ -42,9 +42,10 @@ class Davi_Ungido extends Modelo{
 
 	int qtCadeiras = 0;
 	int qtCadeirasRemoved = 0;
-	int removeChairs[] = {403,404,422,511,512,530};
+	int removeChairs[] = {};
 	int loop = 0;
 	float cacheMovel[][] = {{0,0}}; // ultima pilastra desenhada,
+	float points[][] = {{0,0},{0,0}};
 
 	void init(){
 		coeCmToPx = 0.4166666666666;
@@ -118,8 +119,8 @@ class Davi_Ungido extends Modelo{
 	}
 
 	void title(){
-		String nome = "Davi Ungido v1.2";
-		String data = "04/11\n 2025";
+		String nome = "Davi Pequeno";
+		String data = "16/01\n 2026";
 
 		// Nomes
 		fill(#000000);
@@ -787,11 +788,12 @@ class Davi_Ungido extends Modelo{
 		dist1pilastra_2pilastra = (8+12)*coeCmToPx+9*pow(2,.5)*tamQuadrado,
 		dist2pilastra_3pilastra = (12+51.5)*coeCmToPx+8*pow(2,.5)*tamQuadrado,
 		ladoPilastra = 32*coeCmToPx;
+		float dfaixaPil = 145;
 
-		pilastra(fimFaixaDireita+125*coeCmToPx,alturaAltar*tamQuadrado+distParedeFrontal_1pilastra);
-		pilastra(fimFaixaDireita+125*coeCmToPx,alturaAltar*tamQuadrado+distParedeFrontal_1pilastra+ladoPilastra+dist1pilastra_2pilastra);
-		pilastra(fimFaixaDireita+125*coeCmToPx,alturaAltar*tamQuadrado+distParedeFrontal_1pilastra+ladoPilastra*2+dist1pilastra_2pilastra+dist2pilastra_3pilastra);
-		cacheMovel[0][0] = fimFaixaDireita+125*coeCmToPx;
+		pilastra(fimFaixaDireita+dfaixaPil*coeCmToPx,alturaAltar*tamQuadrado+distParedeFrontal_1pilastra);
+		pilastra(fimFaixaDireita+dfaixaPil*coeCmToPx,alturaAltar*tamQuadrado+distParedeFrontal_1pilastra+ladoPilastra+dist1pilastra_2pilastra);
+		pilastra(fimFaixaDireita+dfaixaPil*coeCmToPx,alturaAltar*tamQuadrado+distParedeFrontal_1pilastra+ladoPilastra*2+dist1pilastra_2pilastra+dist2pilastra_3pilastra);
+		cacheMovel[0][0] = fimFaixaDireita+dfaixaPil*coeCmToPx;
 		cacheMovel[0][1] = alturaAltar*tamQuadrado+distParedeFrontal_1pilastra+ladoPilastra*2+dist1pilastra_2pilastra+dist2pilastra_3pilastra;
 	
 	}

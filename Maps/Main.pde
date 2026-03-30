@@ -618,7 +618,7 @@ void keyPressed(){
             }
         }else if (key == 'a'){ // Algorithm
             thread("algorithm");
-        }else if (key == 'w'){ // Write on the node or show iamges
+        }else if (key == 'w'){ // Write on the node or show images
             if (nodeSelected != null) writeNode = true;
             else toDrawImages = (toDrawImages) ? false : true;
         }else if (key == 'n'){ // Add new node

@@ -18,15 +18,15 @@ class ADL1K extends Modelo{
     fileirasLateraisAcima = 2,
     distLateralDireita = 132+22+125, distLateralEsquerda = 269;
 
-    float[] distBlocosCentrais = {10,10},
-    layoutBlocosCentrais =       {9,9,9,9,9,9},
-    diferencaFileiraCentralE=    {0,0,0,0,0,0},
-    layoutBlocosCentraisD =      {9,9,9,9,9,9},
-    diferencaFileiraCentralD=    {0,0,0,0,0,0},
-    layoutBlocoLateralDireito =  {7,8,8,7,8,8},
-    layoutBlocoLateralEsquerdo = {7,8,8,8,8,8},
-    diferencaFileiraLateralDireitaP =  {0,0,0,0,0,0,0,0   ,0,0,0,0}, // espaço de 1 cadeira e 1 espacoEntreCadeiras
-    diferencaFileiraLateralEsquerdaP = {0,0,0,0,0,0,0,0   ,0,0,0,0,0,0,0,0,0,0,0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
+    float[] distBlocosCentrais = {7,7},
+    layoutBlocosCentrais =       {18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18},
+    diferencaFileiraCentralE=    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    layoutBlocosCentraisD =      {17,17,16,17,17,17,17,17,16,17,17,17,17},
+    diferencaFileiraCentralD=    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    layoutBlocoLateralDireito =  {7,8,8,7,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8},
+    layoutBlocoLateralEsquerdo = {7,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8},
+    diferencaFileiraLateralDireitaP =  {0,0,0,0,0,0,0,0   ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // espaço de 1 cadeira e 1 espacoEntreCadeiras
+    diferencaFileiraLateralEsquerdaP = {0,0,0,0,0,0,0,0   ,0,0,0,0,0,0,0,0,0,0,0 ,0,0,0,0,0,0,0,0,0,0,0}; // pimeiro sempre '0';  inicial: 0,0.5,1.5,0.33333333333,0.8,1.5
     
     // Apresentation
     float addingDownLat = 3.5+(layoutBlocoLateralDireito.length-7); // ajustado em init
@@ -44,7 +44,7 @@ class ADL1K extends Modelo{
 
     int qtCadeiras = 0;
     int qtCadeirasRemoved = 0;
-    int removeChairs[] = {403,404,422,511,512,530};
+    int removeChairs[] = {};
     int loop = 0;
     float cacheMovel[][] = {{0,0}}; // ultima pilastra desenhada,
 
@@ -113,14 +113,14 @@ class ADL1K extends Modelo{
         position();
 
         // salva os trem
-        if (loop >= 1 && loop <= 10){
-            saveModel();
-        }
+        // if (loop >= 1 && loop <= 10){
+        //     saveModel();
+        // }
     }
 
     void title(){
         String nome = "Zona";
-        String data = "19/09\n 2025";
+        String data = "27/11\n 2025";
 
         // Nomes
         fill(#000000);

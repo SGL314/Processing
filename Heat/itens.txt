@@ -1,0 +1,60 @@
+🧠 💥 METAIS (os “reis” do calor)
+Alumínio → 205
+Bronze → 60
+Cobre → 385
+Ferro → 80
+Latão → 120
+Níquel → 90
+Ouro → 315
+Prata → 430 (o maior de todos 💀)
+Titânio → 22
+Tungstênio → 170
+🧱 🏗️ CONSTRUÇÃO
+Argamassa → 1.0
+Asfalto → 0.75
+Cimento → 1.4
+Concreto → 1.7
+Gesso → 0.48
+Granito → 3.0
+Mármore → 2.5
+Tijolo → 0.6
+Vidro comum → 1.0
+Vidro duplo → 0.8
+🌳 🌿 ORGÂNICOS / NATURAIS
+Algodão → 0.04
+Borracha → 0.13
+Cortiça → 0.04
+Couro → 0.14
+Madeira (geral) → 0.12
+Papel → 0.05
+Plástico (médio) → 0.2
+PVC → 0.19
+Poliestireno (isopor) → 0.03
+Tecido → 0.04
+🌊 💧 LÍQUIDOS
+Água → 0.6
+Água do mar → 0.6
+Álcool etílico → 0.17
+Gasolina → 0.15
+Glicerina → 0.29
+Mercúrio → 8.3
+Óleo vegetal → 0.17
+Óleo mineral → 0.13
+Leite → 0.5
+Sangue → 0.5
+🌬️ 🌫️ GASES (os piores condutores)
+Ar → 0.024
+CO₂ → 0.016
+Hélio → 0.15
+Hidrogênio → 0.18
+Nitrogênio → 0.025
+Oxigênio → 0.026
+Vapor d’água → 0.02
+Metano → 0.034
+Propano → 0.018
+Amônia → 0.02
+🧠 💡 Insight BRABO (decora isso):
+Metais → k alto → conduzem MUITO
+Sólidos não metálicos → médio
+Líquidos → baixo
+Gases → MUITO baixo (isolantes naturais)

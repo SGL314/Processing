@@ -1,0 +1,90 @@
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.Serializable;
+
+// movement
+float zoom = 1,lastZoom = 1,dragX=0,dragY=0;
+// keybinding
+String localMenu = "principal";
+HashSet<HashSet<String[]>> keybinding = new HashSet<HashSet<String[]>>();
+addingKeybinding("principal");
+addingInKeybinding("principal","adding","a","1");
+// tecla, muda localMenu (1 yes, 0 no)
+//
+ArrayList<Component> components = new ArrayList<Component>();
+
+void setup(){
+	size(500,500);
+	frameRate(100);
+    
+}
+
+void draw(){
+	scale(zoom);
+    translate(dragX/zoom,dragY/zoom);
+	//
+	background(0);
+
+	showComponents();
+}
+
+// admin
+void addingKeybinding(String local){
+	HashSet<String[]> aux = new HashSet<String[]>();
+	keybinding.put(local);
+}
+void addingInKeybinding(String menu,String thing,String key,String code){
+	HashSet<String[]> _thing = new HashSet<String[]>();
+	String[] keys = {key,code};
+	_thing.put(thing,keys);
+	keybingding.get(menu).add(_thing);
+}
+//
+void showComponents(){
+	
+}
+
+// keyboard
+void keyPressed(){
+	foreach (String i of keybinding[localMenu]){
+		if (key == i[0]) print(i[0]+" "+i[1]);
+	}
+}
+// movement
+void mouseDragged() {
+    // translate(mouseX-pmouseX,);
+    dragX += mouseX-pmouseX;
+    dragY += mouseY-pmouseY;
+}
+void mouseWheel(MouseEvent event){
+    // translate(dragX*zoom,dragY*zoom);
+    int x = mouseX;
+    int y = mouseY;
+    int drx = (int)dragX;
+    int dry = (int)dragY;
+
+    lastZoom = zoom; 
+    lastZoom *= pow(2,event.getCount()*(-1));
+
+    zoom = lastZoom;
+    
+    if (pow(2,event.getCount()*(-1)) > 1){
+        dragX += (width/2-mouseX);
+        dragY += (height/2-mouseY);
+        dragX += -x+drx;
+        dragY += -y+dry;
+    }else{
+        dragX = x-(-(drx+width/2)/2+width/2);
+        dragY = y-(-(dry+height/2)/2+height/2);
+        // println((-dragX+drx)+" : "+(-dragY+dry)+" | "+zoom);
+    }    
+}
