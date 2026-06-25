@@ -1,0 +1,107 @@
+class Particle{
+	float x;
+	float y;
+	float vx;
+	float vy;
+	float r;
+	String type;
+	int cor;
+	//
+	float potAttracktion = 10,potRepulsionStrong = 4;
+	String mapForces = "raraararr";
+	//
+	Particle(String type,float x, float y){
+		this.type = type;
+		this.x = x;
+		this.y = y;
+		form();
+	}
+	void form(){
+		this.r = 3;
+		this.vx = 0;
+		this.vy = 0;
+		switch (type) {
+			case "b":
+				this.cor = color(255,0,0);
+				break;
+			case "c":
+				this.cor = color(0,255,0);
+				break;
+			case "a":
+				this.cor = color(0,0,255);
+				break;
+			default:
+				this.cor = color(255,255,255);
+		}
+	}
+
+	void update(){
+		this.x += this.vx;
+		this.y += this.vy;
+		// attractions
+				
+		for (Particle p : particles) {
+			if (p != this) {
+				float dx = p.x - this.x;
+				float dy = p.y - this.y;
+				float dist = sqrt(dx*dx + dy*dy);
+				float force = 0;
+				if (dist <= potAttracktion*this.r && dist > potRepulsionStrong*this.r) {
+					force = 0.1; // Simple inverse distance force
+					force *= getSignalForce(this.type, p.type);
+				}else if (dist <= potRepulsionStrong*this.r) {
+					force = 0; // Stronger rep
+				}
+				if (dist == 0){
+					this.x += 1*random(-1,1);
+					this.y += 1*random(-1,1);
+					continue;
+				}
+				this.vx += force * dx / dist;
+				this.vy += force * dy / dist;
+			}
+		}
+		// max vel
+		float maxVel = 1;
+		if (mag(this.vx, this.vy) > maxVel) {
+			this.vx = this.vx / mag(this.vx, this.vy) * maxVel;
+			this.vy = this.vy / mag(this.vx, this.vy) * maxVel;
+		}
+		// arrasto
+		float arr = 0.02;
+		this.vx *= 1-arr;
+		this.vy *= 1-arr;
+	}
+
+	float getSignalForce(String type1, String type2) {
+		switch (type1+type2) {
+			case "aa":
+				return -1;
+			case "bb":
+				return -1;
+			case "cc":
+				return 1;
+			case "ab":
+			case "ba":
+				return 1; // Repulsion
+			case "bc":
+			case "cb":
+				return -1;	
+			case "ac":
+			case "ca":
+				return -1; // Attraction
+			default:
+				return 0; 
+		}
+	}
+
+
+	void show(){
+  noStroke();
+		fill(this.cor,128);
+		circle(this.x,this.y,this.r*2);
+		// shadow attracktion
+		// fill(255,255,255,50);
+		// circle(x,y,potAttracktion*r*2);
+	}
+}

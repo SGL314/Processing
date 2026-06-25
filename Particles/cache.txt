@@ -1,0 +1,16 @@
+// attractions
+		for (Particle p : particles) {
+			if (p != this) {
+				float dx = p.x - this.x;
+				float dy = p.y - this.y;
+				float dist = sqrt(dx * dx + dy * dy);
+				if (dist > potAttracktion * this.r) continue;
+				// calculate density
+				if (p.type == this.type) {
+					density += 1 - dist / (potAttracktion * this.r);
+				} else{
+					density += (1 - dist / (potRepulsionStrong * this.r)) * .5;
+				}
+			}
+		}
+		// calculate forces
