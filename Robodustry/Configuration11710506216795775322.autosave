@@ -1,0 +1,48 @@
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+
+class Configuration {
+	boolean showPosition = true;
+	private HashMap<String, Integer> colors = new HashMap<>();
+	private ArrayList<Material> materials = new ArrayList<Material>();
+	private ArrayList<Construction> prefabs = new ArrayList<Construction>();
+	
+	Configuration() {
+		defineColors();
+		definePreFabs();
+	}
+	//PRIVATE
+	private void defineColors() {
+		colors.put("metal",color(#027EAA));
+	}
+	private void readPreFabs() {
+		List<String> red;
+		try{
+			red = Files.readAllLines(Path.of("prefabs.txt"));
+for (String line : red) {
+      println(line);
+    }
+		} catch(Exception e) {
+			println("ERRO ao ler prefabs:\n\n" + e);
+		}
+		
+	}
+	private void definePreFabs() {
+		readPreFabs();
+		// //
+		// Piece prefab;
+		// prefab = new Piece("Connector","connector",initialTamSquare,0,);
+		// prefabs.add();
+		// //
+	}
+	
+	// PUBLIC
+	color getColor(String name) {
+		return colors.get(name);
+	}
+	void redefinePreFabs() {
+		prefabs.clear();
+		definePreFabs();
+	}
+}

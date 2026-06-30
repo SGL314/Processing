@@ -1,0 +1,6 @@
+reformular inventory pra colcoar grid de coisas
+colocar sistema de energia
+colocar sistema de robos e energia deles
+colocar sistema de ar: calor, humidade
+Deixar butoes rect bonitos
+refazer o trem q conectar 2connector pra colocar o pipe invex da linha

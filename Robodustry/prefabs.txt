@@ -1,0 +1,6 @@
+/ 
+/
+P;Connector;connector;metal;init;0;0;metal,10_aluminium,4
+P;Pipe;pipe;metal;init;0;0;metal,8
+/
+/

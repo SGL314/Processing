@@ -1,0 +1,537 @@
+1import java.nio.file.Files;
+import java.nio.file.Path;
+
+class Particle {
+	float x;
+	float y;
+	float vx;
+	float vy;
+	float r;
+	String type;
+	int cor;
+	boolean shined = false,selected = false;
+	//
+	
+	Particle(String type,float x, float y) {
+		this.type = type;
+		this.x = x;
+		this.y = y;
+		r = 10;
+		cor = color(255,0,0);
+	}
+	
+	void update() {
+		this.x += this.vx;
+		this.y += this.vy;
+	}
+	
+	void show() {
+		noStroke();
+		fill(cor);
+		ellipse(x,y,r,r);
+	}
+}
+// Variables
+// mapa onde as coisas acontecem
+int mapX = 1000,mapY = mapX,loop;
+// movimentação atual da tela, em curso
+float movX,movY;
+// movimentação real da tela
+float transX = 0,transY = 0,zoom = 1;
+// Constantes
+final int initialTamSquare = 32;
+// Game variables
+ArrayList<Particle> particles = new ArrayList<Particle>();
+ArrayList<Menu> menus = new ArrayList<Menu>();
+Configuration Cfg = new Configuration();
+Particle selectedParticle = null,overParticle = null;
+Construction onHandConstruction = null,selectedConstruction = null,overConstruction = null;
+float tamSquare = initialTamSquare;
+// Definition variables
+
+boolean running = true;
+int tamGrid = 20;
+
+// float sliderValues[] = {potAttracktion,potRepulsionStrong,deltaTime,;};
+// float sliderValue = 0;
+
+void setup() {
+	size(800, 800);
+	// Lê arquivo
+	try {
+		// red = Files.readString(Path.of(arquivo));
+	}
+	
+	catch(Exception e) {
+	}
+	// Define mov inicial
+	movX = (mapX - width) / 2;
+	movY = (mapY - height) / 2;
+	
+	// read(red,typesParticles);
+	particles.add(new Particle("A",width / 2,height / 2));
+	defineMenus();
+	modusMenu("Geral",true);
+}
+
+void readDefinedForces(String red) {
+	//Divide a leitura
+	// String splited[] = red.split("_");
+	for (int i = 0; i < 10; i++) {
+		// String key = splited[i].split(",")[0];
+		// String forceValue = splited[i].split(",")[1];
+		// Parse
+		// float f = Float.parseFloat(forceValue);
+	}
+}
+
+void draw() {
+	// inicial
+	translate(transX,transY);
+	scale(zoom);
+	background(0);
+	//
+	//
+	// codigo normal
+	formGrid();
+	for (Particle p : particles) {
+		if (running) p.update();
+		p.show();
+	}
+	//
+	//
+	// clique do mouse
+	mouseAutomatic();
+	// volta zoom e translate pra colocar no lugar na tela
+	scale(1 / zoom);
+	translate( -transX, -transY);
+	// mouse position
+	if (Cfg.showPosition) {
+		textSize(16);
+		fill(128,64,64);
+		text(mouseX + "," + mouseY, mouseX,mouseY);
+	}
+	//
+	showMenus();
+	//
+	//
+	// codigo sem translate e zoom
+	//
+	//
+	// textSize(16);
+	// fill(255);
+	// text(10 + " " + 10, 20, 20);
+	
+	// if (showConfigs) {
+	// 	configs();
+	// }
+	// loop
+	loop += 1;
+}
+
+void formGrid() {
+	// grid geral
+	fill(255,255,255);
+	float center = 0;
+	// if (tamGrid/2*tamSquare < width/2)
+	center = width / 2 - tamGrid / 2 * tamSquare;
+	for (int i = 0; i < tamGrid; i++) {
+		stroke(1);
+		for (int j = 0; j < tamGrid; j++) {
+			rect(tamSquare * i + center,tamSquare * j + center,tamSquare,tamSquare);
+		}
+	}
+}
+
+void configs() {
+	// float tamCircle = 30,gapWall = gapWall_configs;
+	// fill(128,128,128,64);
+	
+	// if (inConfigs) {
+	// 	fill(0,128,0,128);
+	// 	stroke(10);
+	// }
+	// rect(gapWall,gapWall,areaConfigsX,areaConfigsY);
+	// stroke(0);
+	/* GRID OF BUTTONS */
+	{
+	// // grid geral
+	// for(int i = 0;
+	// i < typesParticles.length(); i++) {
+	// 	fill(models.get(i).cor);
+	// 	circle(gapWall + tamCircle *(i + 2), gapWall + tamCircle, tamCircle); // linha
+	// 	circle(gapWall + tamCircle, gapWall + tamCircle *(i + 2), tamCircle); // coluna
+	// 	//grid
+	// 	for(int j = 0;
+	// j < typesParticles.length(); j++) {
+	// 		String localForce = String.valueOf(typesParticles.charAt(i)) + String.valueOf(typesParticles.charAt(j));
+	// 		float k = geralMapForces.get(localForce);
+	// 		fill(255 * k,0, -255 * k,255);
+	// 		float px = gapWall + tamCircle *(i + 1.5), py = gapWall + tamCircle +(j +.5) * tamCircle;
+	// 		rect(px, py, tamCircle,tamCircle); // linha
+	// 		// aciona
+	// 		if (mouseX > px - 5 && mouseX < px + tamCircle + 5 && mouseY > py - 5 && mouseY < py + tamCircle + 5) {
+	// 			selectTypeForce = localForce;
+	// 			if (mouseButton == RIGHT && mousePressed) geralMapForces.put(selectTypeForce, 0f);  // zera a força
+	// 		}
+	// 		// valor
+	// 		textSize(10);
+	// 		fill(255);
+	// 		text(nf(k,1,2), px + 5, py + tamCircle / 2 + 5);
+	// 	}
+	// }
+}
+	/* SLIDERS */ 
+	{
+		// // variables particles
+		// String names[] = {
+		// "Attraction","Repulsion","deltaTime","Region"}
+		// ;
+		// // float realValues[] = {
+		//   potAttracktion,potRepulsionStrong,deltaTime,;
+		// }
+		// ;
+		// // calc
+		// float initX = gapWall + tamCircle * 1, initY = gapWall + tamCircle +(typesParticles.length() + 2) * tamCircle;
+		// boolean catchSlider = false;
+		// for(int i = 0;
+		// i < names.length; i++) {
+		// 	float gapY = 36 * i,espY = 10;
+		// 	float tamSlide = 150,diam = 15;
+		// 	// slide
+		// 	noStroke();
+		// 	fill(200);
+		// 	circle(initX,initY + gapY + espY,diam);
+		// 	rect(initX,initY + gapY + espY - diam / 2,tamSlide,diam);
+		// 	circle(initX + tamSlide,initY + gapY + espY,diam);
+		// 	// knob
+		// 	float knobX = initX + sliderValues[i] * tamSlide;
+		// 	fill(50);
+		// 	// cacth knob
+		// 	if (mouseX > initX - diam / 2 && mouseX < initX + tamSlide + diam / 2 && mouseY > initY + gapY + espY - diam / 2 && mouseY < initY + gapY + espY + diam / 2) {
+		// 		if (mouseButton == LEFT && mousePressed) {
+		// 			sliderValue =(mouseX - initX) / tamSlide;
+		// 			if (sliderValue > 1) sliderValue = 1f;
+		// 			if (sliderValue < 0) sliderValue = 0f;
+		// 			sliderValues[i] = sliderValue;
+		// 			// referencer
+		
+		// 			switch(i) {
+		// 				case 0:
+		// 					potAttracktion = int(sliderValue * max_potAtt);
+		// 					break;
+		// 				case 1:
+		// 					potRepulsionStrong = int(sliderValue * max_potRep);
+		// 					break;
+		// 				case 2:
+		// 					deltaTime = sliderValue * max_deltaTime;
+		// 					break;
+		// 				case 3:
+		// 					regionConnection = int(sliderValue * max_regionConnection);
+		// 					break;
+		// 			}
+		// 			//
+		// 			catchSlider = true;
+		// 			fill(0,255,0);
+		// 		}
+		// 	}
+		// 	circle(knobX, initY + gapY + espY, diam * 1.3);
+		// 	// text
+		// 	fill(255);
+		// 	textSize(18);
+		// 	text(names[i] + " " + realValues[i],initX,initY + gapY);
+		// }
+		// if (!catchSlider) {
+		// 	sliderPosition = -1;
+		// }
+	}
+}
+
+void mouseWheel(MouseEvent event) {
+	float e = event.getCount();
+	
+	if (true) {
+		zoom -= e * 0.1;
+		if (zoom > 10) zoom = 10;
+		if (zoom < 0.1) zoom = 0.1;
+	}
+}
+
+void mouseAutomatic() {
+	boolean overed = false;
+	for (Particle p : particles) {
+		float pax,pbx,px,pay,pby,py;
+		px = (mouseX - transX) / zoom;
+		py = (mouseY - transY) / zoom;
+		pax = p.x - p.r;
+		pbx = p.x + p.r;
+		pay = p.y - p.r;
+		pby = p.y + p.r;
+		if (pax <= px && px <= pbx && pay <= py && py <= pby) {
+			overParticle = p;
+			p.shined = true;
+			overed = true;
+		}
+		else p.shined = false;
+	}
+	if (!overed) overParticle = null;
+}
+
+void mousePressed() {
+	/*
+	// scroll do mouse tbm
+	float scroll = mouseWheel;
+	configs
+	inConfigs = false;
+	
+	if (showConfigs) {
+	if (mouseX > gapWall_configs && mouseX < gapWall_configs + areaConfigsX && mouseY > gapWall_configs && mouseY < gapWall_configs + areaConfigsY) {
+	inConfigs = true;
+}
+}
+	
+	if ((mouseButton == LEFT)) {
+	qnd pressiona o but direito 2 vzs
+	particles.add(new Particle(selectType,(mouseX - transX) / zoom,(mouseY - transY) / zoom));
+	selectTypeForce = "--";
+}
+	*/
+	updateMenus(mouseButton == LEFT,mouseButton == RIGHT);
+	if (mouseButton == LEFT) {
+		// move a telaf
+		movX = mouseX;
+		movY = mouseY;
+	}
+	/*
+	else if (mouseButton == RIGHT) {
+	if (selectedParticle == overParticle && selectedParticle != null) {
+	selectedParticle.selected = false;
+	selectedParticle = null;
+}
+	else if (selectedParticle != null && overParticle != null) {
+	// selectedParticle.add(overParticle);
+	// overParticle.add(selectedParticle);
+	selectedParticle.selected = false;
+	selectedParticle = overParticle;
+	selectedParticle.selected = true;
+}
+	else if (overParticle != null) {
+	selectedParticle = overParticle;
+	overParticle.selected = true;
+}
+}
+	*/
+}
+
+void mouseDragged() {
+	// move a tela
+	if (mouseButton == LEFT) {
+		transX += (mouseX - movX);
+		transY += (mouseY - movY);
+		movX = mouseX;
+		movY = mouseY;
+	}
+}
+
+void keyPressed() {
+	boolean ret;
+	Menu menuS = null;
+	String name,id;
+	
+	switch(key) {
+		case 'p' : // show position
+			Cfg.showPosition = !Cfg.showPosition;
+			break;
+		case 'c' : // construction mode
+			toggleMenu("Construction");
+			break;
+		case 'f' : // redefine prefabs
+			// Cfg.redefinePreFabs();
+			break;
+		// LEVELS
+		case '1' : // level 1
+	    name = "Level 1";id = "lvl1";
+			for (Menu menu : menus) {
+				if (menu.name.equals("Construction")) {
+					menuS = menu;
+					break;
+				}
+			}
+			menuS.deactiveAllLess(name);
+			ret = toggleMenu(name);
+			menuS.active = ret;
+			if (menuS.active == false) menuS.deactiveAll(); 
+			break;
+		case '2' : // level 2
+	    name = "Level 2"; id = "lvl2";
+			for (Menu menu : menus) {
+				if (menu.name.equals("Construction")) {
+					menuS = menu;
+					break;
+				}
+			}
+			menuS.deactiveAllLess(name);
+			ret = toggleMenu(name);
+			menuS.active = ret;
+	    println(ret);
+			if (menuS.active == false) menuS.deactiveAll(); 
+			break;
+	}
+	// Write on a file
+	String text = "";
+	// for(String key : geralMapForces.keySet()) {
+	// text += key + "," + geralMapForces.get(key) + "_";
+	
+	// }
+}
+// GAME
+
+// LAYER MENU
+void defineMenus() {
+	float px = 0,py = 0,w = 0,h = 0;
+	float step,hBtUp,wBtUp;
+	int localX = 0,localY = 0;
+	Menu[] menusA = {
+		new Menu("Geral",color(#DBDBDB,64)),
+			new Menu("Construction",color(#A8FCCF)),
+			new Menu("Level 1",color(#FF7040)),
+			new Menu("Level 2",color(#FFD640)),
+			new Menu("Putting",color(#FF9B9B,64))
+		};
+	//0 left, 1 right, 2 both
+	for (int i = 0;
+	i	 < menusA.length;
+	i++) {
+		Menu menu = menusA[i];
+		menus.add(menu);
+		localX = 0;
+		
+		switch(menu.name) {
+			case "Geral":
+				px = 0;
+				h = 100;
+				py = width - 100;
+				w = 50;
+				step = 5;
+				hBtUp = 20;
+				wBtUp = 20;
+				// up
+				menu.addButton(new Button("CONS.","rect","Construction",color(#FF7040),px + step + localX * (step + wBtUp),py + step,wBtUp,hBtUp,0));
+				// localX++;
+				// menu.addButton(new Button("Level 2","rect","lvl2",color(#FFD640),px+step+localX*(step+wBtUp),py-hBtUp,wBtUp,hBtUp,0));
+				break;
+			case "Construction":
+				px = 50;
+				h = 100;
+				py = width - h;
+				w = width - px * 2;
+				step = 10;
+				hBtUp = 20;
+				wBtUp = 50;
+				// up
+				menu.addButton(new Button("Level 1","rect","lvl1",color(#FF7040),px + step + localX * (step + wBtUp),py - hBtUp,wBtUp,hBtUp,0));
+				localX++;
+				menu.addButton(new Button("Level 2","rect","lvl2",color(#FFD640),px + step + localX * (step + wBtUp),py - hBtUp,wBtUp,hBtUp,0));
+				break;
+			case "Level 1":
+				px = 52;
+				h = 80;
+				py = width - 10;
+				w = 5;
+				step = 10;
+				hBtUp = 70;
+				wBtUp = 50;
+				// up
+				menu.addButton(new Button("Connector","rect","connector",menu.cor,11,px + step + localX * (step + wBtUp),py - hBtUp,wBtUp,hBtUp,0));
+				localX++;
+				menu.addButton(new Button("Pipe","rect","pipe",menu.cor,11,px + step + localX * (step + wBtUp),py - hBtUp,wBtUp,hBtUp,0));
+				break;
+			case "Level 2":
+				px = 52;
+				h = 80;
+				py = width - 10;
+				w = 5;
+				step = 10;
+				hBtUp = 20;
+				wBtUp = 50;
+				// up
+				// menu.addButton(new Button("Level 1","rect","lvl1",color(#FF7040),px+step+localX*(step+wBtUp),py-hBtUp,wBtUp,hBtUp,0));
+				localX++;
+				// menu.addButton(new Button("Level 2","rect","lvl2",color(#FFD640),px+step+localX*(step+wBtUp),py-hBtUp,wBtUp,hBtUp,0));
+				break;
+			
+		}
+		menu.defineConfigurations(px,py,w,h);
+	}
+}
+boolean toggleMenu(String menuName) {
+	for	(Menu menu : menus) {
+		if	(menu.name == menuName) {
+			menu.active = !menu.active;
+			if (menu.active ==  false) menu.deactiveAll();
+			return menu.active;
+		}
+	}
+	println("ERRO ao processar menu:\n   menu nao reconhecido: '" + menuName + "'");
+	return false;
+}
+void modusMenu(String menuName,boolean active) {
+	for	(Menu menu : menus) {
+		if	(menu.name == menuName) {
+			menu.active = active;
+			if	(menu.active ==  false) menu.deactiveAll();
+		}
+	}
+}
+void	showMenus() {
+	for	(Menu	menu : menus) {
+		if	(menu.active == false) continue;
+		menu.show();
+		menu.update(mouseX,mouseY,false,false);
+	}
+}
+void	updateMenus(boolean left, boolean right) {
+	for	(Menu	menu : menus) {
+		if	(menu.active == false) continue;
+		String	ret	 = menu.update(mouseX,mouseY,left,right);
+		if	(ret!= 	"none") {
+			//	desativa tds buttons less this
+			menu.deactiveAllLess(ret);
+		}
+	}
+}
+//	LAYER	BUTTON
+void	modusButton(Button bt,boolean active) {
+	_identifyButtonFunction(bt,active,"m");
+}
+void	toggleButton(Button bt) {
+	_identifyButtonFunction(bt,false,"t");
+}
+void	_identifyButtonFunction(Button bt,boolean active,String mode) {
+	switch(bt.id)	{
+		//	menus
+		case	"Construction" : // cons
+		if	(mode	 ==  	"m") modusMenu(bt.id,active);
+		else	toggleMenu(bt.id);
+		break;
+		//	sub	menus
+		case	"lvl1":
+		case	"lvl2":
+		if	(mode	 ==  	"m") modusMenu(bt.name,active);
+		else	toggleMenu(bt.name);
+		break;
+		//	pieces
+		case	"pipe":
+		case	"connector":
+		putOnHand(bt.id);
+		break;
+	}
+}
+//	LAYER	PIECES
+void	putOnHand(String id) {
+	for	(Construction	cons : Cfg.prefabs) {
+		if	(cons.id	!= 	id) continue;
+		if	(onHandConstruction.id.equals(cons.id)) onHandConstruction = null;
+		else	onHandConstruction = cons;
+	}
+}
