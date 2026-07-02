@@ -1,4 +1,4 @@
-public class Menu{
+class Menu{
 	private ArrayList<Button> buttons = new ArrayList<Button>();
 	String name;
 	boolean active = false;

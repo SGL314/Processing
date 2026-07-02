@@ -1,0 +1,3 @@
+class Materia{
+	float temperature;
+}

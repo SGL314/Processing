@@ -1,11 +1,12 @@
 class Button{
+	
 	float px, py, w, h, r;
 	int tamText = 0;
 	int typeDetection;
-	String id, type, name;
+	String id, type,name;
 	color cor;
 	Construction construction = null;
-	Material material = null;
+	String material = null;
 	float qtdMaterial = 0;
 	
 	Button(String name,String type, String id,color cor, float x, float y, float w, float h,int typeDetection) { // rect
@@ -91,48 +92,35 @@ class Button{
 		}
 	}
 	private String getRealName() {
-		if (id.startsWith("var-")) {
-			switch(id.split("-")[1]) {
-				case "onHand":
+		if (name.startsWith("var-")) {
+			switch(name.split("-")[1]) {
+				case "onHandConstruction":
 					if (onHandConstruction!= null) return onHandConstruction.name;
 					break;
 				default:
-				println("ERRO ao processar real name in BYtton.getRealName():\n   type nao reconhecido: '" + name + "'");
+					println("ERRO ao processar real name in BYtton.getRealName():\n   type nao reconhecido: '" + name + "'");
 			}
-		} else if (id.startsWith("invmat-")) {
-			if (this.material == null) {
-				println(id.split("-")[1]);
-				this.material = Inv.getMaterial(id.split("-")[1]);
-				this.material.tam *= 3;
-			}
-			this.qtdMaterial = Inv.getQtdMaterial(this.material.id);
+		}else if (name.startsWith("invmat-")) {
+			if (this.material == null) this.material = Inv.getMaterial(name.split("-")[1]);
+			this.qtdMaterial = Inv.getQtdMaterial(this.material);
 			return this.material.name;
-		}
+ 		}
 		return name;
 	}
-	private boolean redefineAll() {
+	private void redefineAll() {
 		switch(this.id) {
-			case "var-onHand":
-				if (onHandConstruction == null) return true;
+			case "onHand":
+				if (onHandConstruction == null) return;
 				this.id = onHandConstruction.id;// redefine o construction pra ser detectado no setup
 				setupMe(); // define o construction
-				this.id = "var-onHand"; // volta pro inicial
+				this.id = "onHand"; // volta pro inicial
 				// this.construction.py += this.construction.tam / 2 + 5;
 				break;
-			default:
-			if (this.id.contains("-")) {
-				switch(this.id.split("-")[0]) {
-					case "invmat":
-						if (!Inv.dislockedMaterials.get(this.id.split("-")[1])) return false;
-						break;
-				}
-			}
 		}
-		return true;
 	}
 	
 	void show() {
-		if (!redefineAll()) return;
+		redefineAll();
 		//
 		noStroke();
 		fill(this.cor);
@@ -142,14 +130,13 @@ class Button{
 				break;
 			case "rect":
 				rect(px,py,w,h);
-				
+				//
+				fill(0);
+				textSize(tamText);
+				String nameNow = getRealName();
+				text(nameNow,px + w / 2 - textWidth(nameNow) / 2,py + h - 1);
 				break;
 		}
-		//
-		fill(0);
-		textSize(tamText);
-		String nameNow = getRealName();
-		boolean textShown = false;
 		if (this.construction != null) {
 			this.construction.show();
 			Material[] mats = this.construction.materials.keySet().toArray(new Material[0]);
@@ -164,19 +151,15 @@ class Button{
 				text(qtd,x - textWidth("" + qtd) / 2,y + 1 + textAscent() + textDescent());
 			}
 		}
-		else if (this.material != null) {
-			textShown = true;
-			nameNow = Cfg.getAbrevName(nameNow,3);
-			text(nameNow,px + w / 2 - textWidth(nameNow) / 2,py + 10);
-			float x = px + w / 2, y = py + this.material.tam / 2 + 12;
-			this.material.px = x;
-			this.material.py = y;
-			this.material.show();
-			String txt = "" + round(qtdMaterial * 1000) / 1000f;
-			fill(0);
-			text(txt,x - textWidth(txt) / 2,py + h - 2);
+		else if (this.material != null){
+				float x = px, y = py;
+				this.material.px = x;
+				this.material.py = y;
+				this.material.show();
+				fill(0);
+				text(qtdMaterial,x - textWidth("" + qtdMaterial) / 2,y + 1 + textAscent() + textDescent());
+			}
 		}
-		if (!textShown) text(nameNow,px + w / 2 - textWidth(nameNow) / 2,py + h - 1);
 	}
 	
 	boolean[] typeOfDetection(boolean left, boolean right) {

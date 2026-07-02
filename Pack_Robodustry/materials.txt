@@ -1,0 +1,13 @@
+/water
+metal
+/sand
+/coal
+/glass
+/iron
+/cooper
+aluminium
+/lead
+/silicon
+titanium
+/thorium
+/uranium

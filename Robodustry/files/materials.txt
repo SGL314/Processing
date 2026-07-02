@@ -1,0 +1,14 @@
+water
+iron
+metal
+bauxite
+aluminium
+copper
+lead
+sand
+coal
+glass
+silicon
+titanium
+thorium
+uranium

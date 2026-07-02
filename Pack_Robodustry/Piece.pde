@@ -2,6 +2,7 @@ class Piece extends Construction {
 	color cor;
 	Material material; // material geral
 	
+	
 	Piece(String name,String id,float tam,Material material, float px,float py,LinkedHashMap<Material,Float> materials) {
 		super(id);
 		super.type = "P";
@@ -26,16 +27,16 @@ class Piece extends Construction {
 	}
 	protected void _show(boolean canPut) {
 		color corNow = material.cor;
-		if (!canPut || this.negativeShined) {
+		if (!canPut) {
 			corNow = color(255,0,0,128);
 		}
-		else if (selected && shined) {
+		else if (selected && shined){
 			corNow = color(128,255,0,192);
 		}
-		else if (selected) {
+		else if (selected){
 			corNow = color(255,255,0,128);
 		}
-		else if (shined) {
+		else if (shined){
 			corNow = color(0,255,0,128);
 		}
 		fill(corNow);
@@ -51,11 +52,6 @@ class Piece extends Construction {
 						}
 						endShape(CLOSE);
 					} else{
-						// posição no game, no mapa
-						// super.pax = super.connections.get(0).px * zoom + transX;
-						// super.pay	 = super.connections.get(0).py * zoom + transY;
-						super.pax = super.connections.get(0).px;
-						super.pay	 = super.connections.get(0).py;
 						float ang = atan2(super.pby - super.pay, super.pbx - super.pax) * 180 / PI;
 						ang	 *= -1;
 						if	(ang < 0) { // normalization
@@ -69,21 +65,9 @@ class Piece extends Construction {
 						strokeWeight(8);
 						line(super.pax,super.pay,super.pbx,super.pby);
 						strokeWeight(1);
-						// materials
-						float coe = sqrt(pow(super.pax - super.pbx,2) + pow(super.pay - super.pby,2)) / this.tam;
-						float a = 0,stepY=10;
 						textSize(10);
 						fill(0);
-
-						for (Material mat : super.materials.keySet()) {
-							mat.px = Cfg.localMaterials.px+5;
-							mat.py = Cfg.localMaterials.py + stepY * a;
-							mat.show();
-							text(materials.get(mat) * coe,mat.px,mat.py);
-							a++;
-							// println(materials.get(mat) * coe);
-						}
-						
+						text(ang,super.pbx,super.pby);
 					}
 				} else{
 					stroke(1);
@@ -114,11 +98,54 @@ class Piece extends Construction {
 				println("ERRO ao processar prefab:\n   type '" + id + "' is not a type of pipe");
 				return;
 			}
-			
+			super.pax = this.px + this.tam / 2;
+			super.pay = this.py + this.tam / 2;
 		}
 		modusLinearis = true;
 		super.pbx = a;
 		super.pby = b;
+	}
+	void effectiveModusLinearis() {
+		effectiveModusLinearis = true;
+		// pontos dos connects
+		super.pax = super.connections.get(0).px;
+		super.pay = super.connections.get(0).py;
+		super.pbx = super.connections.get(1).px;
+		super.pby = super.connections.get(1).py;
+		// angulo
+		float ang = atan2(super.pby - super.pay, super.pbx - super.pax) * 180 / PI;
+		ang *= -1;
+		if (ang < 0) { // normalization
+			ang *= -1;
+			if (ang > 90)
+				ang = 270 - (ang - 90);
+			else
+				ang = 360 - ang;
+		} 					
+		float beta = 90 - ang;
+		// println(beta);
+		// println(super.pax + " " + super.pay + ";" + super.pbx + " " + super.pby);
+		ang = ang / 180 * PI;
+		beta = beta / 180 * PI;
+		// connections
+		super.connections.get(0).connections.add(this);
+		super.connections.get(1).connections.add(this);
+		// raws
+		float r1 = super.connections.get(0).r, r2 = super.connections.get(1).r;
+		
+		// println(r1 + " " + r2);
+		// points
+		PVector[] pts = {
+			new PVector(super.pax + cos(beta) * r1,super.pay - sin(beta) * r1 * ( -1)),
+				new PVector(super.pbx + cos(beta) * r2,super.pby - sin(beta) * r2 * ( -1)),
+				new PVector(super.pbx - cos(beta) * r2,super.pby + sin(beta) * r2 * ( -1)),
+				new PVector(super.pax - cos(beta) * r2,super.pay + sin(beta) * r2 * ( -1))
+			};
+		int i = 0;
+		for (PVector p : pts) {
+			points[i] = p;
+			i++;
+		}
 	}
 	
 	String getFormatter() {
