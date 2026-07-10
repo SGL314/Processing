@@ -1,6 +1,6 @@
 class Piece extends Construction {
-	color cor;
-	Material material; // material geral
+	color cor,colorCannotPut = color(255,0,0,128);
+	MacroPiece macroPiece = null;
 	
 	Piece(String name,String id,float tam,Material material, float px,float py,LinkedHashMap<Material,Float> materials) {
 		super(id);
@@ -13,7 +13,7 @@ class Piece extends Construction {
 		this.material = material;
 		this.materials = materials;
 	} 	
-	
+
 	void show(String modus,boolean what) {
 		switch(modus) {
 			case "canPut":
@@ -25,9 +25,11 @@ class Piece extends Construction {
 		_show(true);
 	}
 	protected void _show(boolean canPut) {
+		
 		color corNow = material.cor;
+		if (onHandConstruction==this) _showMaterials();
 		if (!canPut || this.negativeShined) {
-			corNow = color(255,0,0,128);
+			corNow = colorCannotPut;
 		}
 		else if (selected && shined) {
 			corNow = color(128,255,0,192);
@@ -38,6 +40,11 @@ class Piece extends Construction {
 		else if (shined) {
 			corNow = color(0,255,0,128);
 		}
+		stroke(1); // stroke here
+		if (hide){
+			noStroke();
+			corNow = color(corNow,32);
+		}
 		fill(corNow);
 		switch(id) {
 			case "pipe" : // Pipe
@@ -46,14 +53,60 @@ class Piece extends Construction {
 						noStroke();
 						fill(corNow);
 						beginShape();
-						for (PVector p : points) {
-							vertex(p.x,p.y);
+						for (float[] p : points) {
+							vertex(p[0],p[1]);
 						}
 						endShape(CLOSE);
 					} else{
-						// posição no game, no mapa
-						// super.pax = super.connections.get(0).px * zoom + transX;
-						// super.pay	 = super.connections.get(0).py * zoom + transY;
+						//effective show
+						stroke(corNow);
+						strokeWeight(8);
+						line(super.pax,super.pay,super.pbx,super.pby);
+						strokeWeight(1);				
+					}
+				} else{
+					rect(px,py,tam,tam);
+				}
+				break;
+			case "connector" : // COnnector
+				circle(px,py,tam);
+				break;
+			
+			default:
+				println("ERRO ao mostrar piece:\n   type '" + id + "' is not a type of piece Piece._show()");
+		}
+		if (Cfg.showIds){
+			fill(0);
+			textSize(20);
+			String idShow = specificId.split("-")[0] + "-" + specificId.split("-")[1];
+			text(idShow,px + 5,py + 5);
+		}
+		hide = false;
+	}
+	void _showMaterials() {
+		float a = 0,stepY = 10;
+		scale(1 / zoom);
+		translate( -transX, -transY);
+		textSize(10);
+		for (Material mat : super.materials.keySet()) {
+			mat.px = Cfg.localMaterials.px + 5;
+			mat.py = Cfg.localMaterials.py + 15 + stepY * a;
+			mat.show();
+			float qtd = super.materials.get(mat) * super.coeMats;
+			if (Inv.canRemoveMaterials(mat,qtd)) fill(0);
+			else fill(#ED3737);
+			text(qtd,mat.px + 5,mat.py);
+			a++;
+		}
+		translate(transX, transY);
+		scale(zoom);
+	}
+	
+	void update() {
+		switch(id) {
+			case "pipe" : // Pipe
+				if (modusLinearis) {					
+					if (!effectiveModusLinearis) { // calculating vertexes
 						super.pax = super.connections.get(0).px;
 						super.pay	 = super.connections.get(0).py;
 						float ang = atan2(super.pby - super.pay, super.pbx - super.pax) * 180 / PI;
@@ -65,52 +118,31 @@ class Piece extends Construction {
 							else
 								ang = 360 - ang;
 						} 
-						stroke(corNow);
-						strokeWeight(8);
-						line(super.pax,super.pay,super.pbx,super.pby);
-						strokeWeight(1);
-						// materials
-						float coe = sqrt(pow(super.pax - super.pbx,2) + pow(super.pay - super.pby,2)) / this.tam;
-						float a = 0,stepY=10;
-						textSize(10);
-						fill(0);
-
-						for (Material mat : super.materials.keySet()) {
-							mat.px = Cfg.localMaterials.px+5;
-							mat.py = Cfg.localMaterials.py + stepY * a;
-							mat.show();
-							text(materials.get(mat) * coe,mat.px,mat.py);
-							a++;
-							// println(materials.get(mat) * coe);
-						}
+						//	materials
+						super.coeMats = sqrt(pow(super.pax - super.pbx,2) + pow(super.pay - super.pby,2)) / this.tam;
 						
 					}
-				} else{
-					stroke(1);
-					rect(px,py,tam,tam);
 				}
 				break;
-			case "connector" : // COnnector
-				stroke(1);
-				circle(px,py,tam);
-				break;
+		}
+		super.canPutByMaterials = true;
+		for (Material mat : super.materials.keySet()) {
+			float qtd = super.materials.get(mat) * super.coeMats;
+			super.canPutByMaterials = super.canPutByMaterials && Inv.canRemoveMaterials(mat,qtd);
+			if (!super.canPutByMaterials) break;
 		}
 	}
-	
-	void update() {
-		// println(getFormatter());
-	}
 	void modusLinearis(float a, float b) {
-		if (effectiveModusLinearis) return;
-		if (!modusLinearis) {
+		if	(effectiveModusLinearis) return;
+		if	(!modusLinearis) {
 			boolean canContinue = false;
-			for (String typeOfPipe : typeOfPipes) {
-				if (id.equals(typeOfPipe)) {
+			for	(String typeOfPipe : typeOfPipes) {
+				if	(id.equals(typeOfPipe)) {
 					canContinue = true;
 					break;
 				}
 			}
-			if (!canContinue) {
+			if	(!canContinue) {
 				println("ERRO ao processar prefab:\n   type '" + id + "' is not a type of pipe");
 				return;
 			}
@@ -119,38 +151,6 @@ class Piece extends Construction {
 		modusLinearis = true;
 		super.pbx = a;
 		super.pby = b;
-	}
-	
-	String getFormatter() {
-		// P;Connector;connector;metal;init;0;0;metal,10_aluminium,4
-		String text = super.type + ";" + super.name + ";" + super.id + ";" + material.id + ";" + super.tam;
-		text += ";" + super.px + ";" + super.py + ";";
-		
-		for (int i = 0;i < materials.size();i++) {
-			Material mat = materials.keySet().toArray(new Material[0])[i];
-			float qtd = materials.get(mat);
-			text += mat.id + "," + qtd;
-			if (i < materials.size() - 1) text += "_";
-		}
-		return text;
-	}
-	String getStringOfMe() {
-		// P;Connector;connector;metal;tam;px;py;metal,10_aluminium,4;
-		// specificId;id_id_id;modusLin.;effect.ModusLin.;istypeofpipe;
-		String text = getFormatter() + ";" + super.specificId + ";";
-		
-		for (int i = 0;i < connections.size();i++) {
-			text += connections.get(i).specificId;
-			if (i < connections.size() - 1) text += "_";
-		}
-		if (connections.size() == 0) text += "---";
-		text += ";" + super.modusLinearis + ";" + super.effectiveModusLinearis + ";" + super.isTypeOfPipe;
-		return text;
-	}
-	
-	Construction copy() {
-		Construction copy = Cfg.disformatter(this.getFormatter());
-		return copy;
 	}
 	
 	

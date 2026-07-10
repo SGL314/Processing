@@ -514,13 +514,9 @@ boolean verifyCollision(Construction consA){
 	boolean canPut=true,breakar = false;
 	float pa,pb,pc,pd;
 	float relx = (consA.px),rely = (consA.py);
-	// geral -> macro OK
-	// macro -> geral ??
-	// macro -> macro ??
 
 	for (Construction cons : constructions) {
 		cons.negativeShined = false;
-		boolean verByVectorialProduct = false;
 		switch(consA.id) {
 			// R
 			case "pipe":
@@ -563,7 +559,7 @@ boolean verifyCollision(Construction consA){
 				switch(cons.id) {
 					// CR
 					case "pipe":
-						verByVectorialProduct = false;
+						boolean verByVectorialProduct = false;
 						if (cons.modusLinearis) {
 							verByVectorialProduct = cons.verByVectorialProduct(consA);
 						}
@@ -580,27 +576,16 @@ boolean verifyCollision(Construction consA){
 							breakar = true;
 						}
 						break;
-					// piece -> macropiece
-					case "collector":
-						verByVectorialProduct = cons.verByVectorialProduct(consA);
-						if (((Piece)consA).macroPiece == cons) break;
-						if (verByVectorialProduct) {
-							canPut = false;
-							cons.negativeShined = false; // coloca pra n ficar neg.shined
-							breakar = true;
-						}
-						break;
-
 					default:
-						println("ERRO ao processar collison:\n   type nao reconhecido: '" + consA.id + "' in in Main.verifyCollision()");
+						println("ERRO ao processar collison:\n   type nao reconhecido: '" + consA.id + "' in in Main.processPutting()");
 				}
 				break;
 				// marcopieces
 			case "collector":
-				verByVectorialProduct = false;
+				boolean verByVectorialProduct = false;
 				verByVectorialProduct = consA.verByVectorialProduct(cons);
 				for (Piece pc2 : ((MacroPiece)consA).pieces){
-					verByVectorialProduct |= verifyCollision(pc2);
+					verByVectorialProduct &= verifyCollision(pc2);
 				}
 				if (verByVectorialProduct) {
 					canPut = false;
@@ -610,7 +595,7 @@ boolean verifyCollision(Construction consA){
 				break;
 			
 			default:
-			println("ERRO ao processar collison:\n   type nao reconhecido: '" + cons.id + "' in Main.verifyCollision()");
+			println("ERRO ao processar collison:\n   type nao reconhecido: '" + cons.id + "' in Main.processPutting()");
 		}
 		
 		if (breakar) {

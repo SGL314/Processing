@@ -1,5 +1,5 @@
 water,1000.0
 iron,500.0
-metal,500.0
+metal,280.04688
 bauxite,500.0
-aluminium,500.0
+aluminium,460.0

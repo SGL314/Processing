@@ -6,6 +6,10 @@ Deixar butoes rect bonitos
 refazer o trem q conectar 2connector pra colocar o pipe invex da linha
 atualizar inventory pro txt
 colocar limite pra construção
+colocar pra n colocar piece qnd n tem itens
+colocar limite de itens
+colocar arco no collector
+poder realocar pieces
 
 colocar materias complexos
 torianita

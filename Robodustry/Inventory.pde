@@ -34,6 +34,11 @@ class Inventory{
 		return materials.get(mat);
 	}
 	// MATERIALS FOR CONSTRUCTION
+	boolean canRemoveMaterials(Material mat,float qtd) {
+		if (!materials.containsKey(mat.id)) return false;
+		if (materials.get(mat.id) < qtd) return false;
+		return true;
+	}
 	boolean removeMaterialsForConstruction(Construction cons) {
 		for (Material mat : cons.materials.keySet()) {
 			float qtd = cons.materials.get(mat);

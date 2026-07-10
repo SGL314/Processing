@@ -1,10 +1,13 @@
 / 
 /
 P;Connector;connector;metal;init;0;0;metal,10/titanium,10_aluminium,4
-P;Pipe;pipe;metal;init;0;0;metal,8/titanium,8/aluminium,8
+P;Pipe;pipe;metal;init;0;0;metal,8/titanium,8/aluminium,4
+// macropieces
+Mp;Collector;collector;metal;init;0;0;metal,50/titanium,50_aluminium,10;connector
 /
 /
 #
+primeiro material é quem define a imagem dele
 water
 iron
 metal

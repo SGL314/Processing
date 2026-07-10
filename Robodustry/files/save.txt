@@ -1,0 +1,9 @@
+P;Connector;connector;metal;32.0;272.0;304.0;metal,10.0_aluminium,4.0;connector-80E-idr.12:53:23*9:7:2026-5568;---;false;false;false
+Mp;Collector;collector;metal;32.0;272.0;304.0;metal,50.0_aluminium,10.0;connector-80E-idr.12:53:23*9:7:2026-5568;0.0;collector-45M-idr.12:53:23*9:7:2026-5568;---;false;false;false
+P;Connector;connector;metal;32.0;496.0;448.0;metal,10.0_aluminium,4.0;connector-7U-idr.22:3:20*9:7:2026-6361;---;false;false;false
+Mp;Collector;collector;metal;32.0;496.0;448.0;metal,50.0_aluminium,10.0;connector-7U-idr.22:3:20*9:7:2026-6361;0.0;collector-38F-idr.22:3:20*9:7:2026-6361;---;false;false;false
+P;Connector;connector;metal;32.0;320.0;384.0;metal,10.0_aluminium,4.0;connector-1S-idr.22:15:31*9:7:2026-3109;pipe-21Z-idr.22:21:36*9:7:2026-7886;false;false;false
+P;Connector;connector;metal;32.0;256.0;560.0;metal,10.0_aluminium,4.0;connector-44K-idr.22:21:36*9:7:2026-2694;pipe-76U-idr.22:21:36*9:7:2026-5979;false;false;false
+P;Connector;connector;metal;32.0;192.0;432.0;metal,10.0_aluminium,4.0;connector-15F-idr.22:21:36*9:7:2026-3072;pipe-76U-idr.22:21:36*9:7:2026-5979_pipe-21Z-idr.22:21:36*9:7:2026-7886;false;false;false
+P;Pipe;pipe;metal;32.0;176.0;416.0;metal,35.77709;pipe-76U-idr.22:21:36*9:7:2026-5979;connector-44K-idr.22:21:36*9:7:2026-2694_connector-15F-idr.22:21:36*9:7:2026-3072;true;true;true
+P;Pipe;pipe;metal;32.0;304.0;368.0;metal,34.176014;pipe-21Z-idr.22:21:36*9:7:2026-7886;connector-15F-idr.22:21:36*9:7:2026-3072_connector-1S-idr.22:15:31*9:7:2026-3109;true;true;true

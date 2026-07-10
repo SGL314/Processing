@@ -6,6 +6,8 @@ class Button{
 	color cor;
 	Construction construction = null;
 	Material material = null;
+	boolean showMe = true,active = true,over = false;
+	int typeSelection = 0;// 0 none, 1 yes, -1 no
 	float qtdMaterial = 0;
 	
 	Button(String name,String type, String id,color cor, float x, float y, float w, float h,int typeDetection) { // rect
@@ -18,7 +20,7 @@ class Button{
 		this.py = y;
 		this.w = w;
 		this.h = h;
-		setupMe();
+		initialProcess();
 		
 	}
 	Button(String name,String type, String id,color cor, int tamText,float x, float y, float w, float h,int typeDetection) { // rect
@@ -32,7 +34,7 @@ class Button{
 		this.w = w;
 		this.h = h;
 		this.tamText = tamText;
-		setupMe();
+		initialProcess();
 		
 	}
 	Button(String name,String type, String id,color cor, float x, float y, float r,int typeDetection) { // circle
@@ -44,15 +46,21 @@ class Button{
 		this.px = x;
 		this.py = y;
 		this.r = r;
-		setupMe();
+		initialProcess();
 		
 	}
+	private void initialProcess() {
+		update();
+		setupMe();
+	}
 	private void setupMe() {
+		
 		// detect piece
 		for (int i = 0; i < Cfg.prefabs.size(); i++) {
 			Construction cons = Cfg.prefabs.get(i);
 			if (cons.id.equals(id)) {
-				this.construction = cons.copy();
+				if (onHandConstruction == null) this.construction = cons.copy();
+				else this.construction = onHandConstruction.copy();
 				switch(cons.id) {
 					// circle
 					case "connector" :
@@ -63,6 +71,11 @@ class Button{
 					case "pipe" : 
 						this.construction.px = px + w / 2 - this.construction.tam / 2;
 						this.construction.py = py + 5;
+						break;
+					// macropieces
+					case "collector":
+						((MacroPiece)this.construction).piecePivot.px = px + w / 2;
+						((MacroPiece)this.construction).piecePivot.py = py + this.construction.tam / 2 + 5;
 						break;
 					default:
 					println("Id desconhecido: '" + cons.id + "'; para desenhar em button (" + name + "), Button.setupMe()");
@@ -97,7 +110,7 @@ class Button{
 					if (onHandConstruction!= null) return onHandConstruction.name;
 					break;
 				default:
-				println("ERRO ao processar real name in BYtton.getRealName():\n   type nao reconhecido: '" + name + "'");
+				println("ERRO ao processar real name in Button.getRealName():\n   type nao reconhecido: '" + name + "'");
 			}
 		} else if (id.startsWith("invmat-")) {
 			if (this.material == null) {
@@ -107,6 +120,10 @@ class Button{
 			}
 			this.qtdMaterial = Inv.getQtdMaterial(this.material.id);
 			return this.material.name;
+		} else if (id.startsWith("optMats-")) { // options dos materials
+			// return id.split("-")[1]+"-"+id.split("-")[2]; // retorno da posição bonitinha
+			// return "";
+			// tem q deixar o nome normal
 		}
 		return name;
 	}
@@ -123,7 +140,11 @@ class Button{
 			if (this.id.contains("-")) {
 				switch(this.id.split("-")[0]) {
 					case "invmat":
-						if (!Inv.dislockedMaterials.get(this.id.split("-")[1])) return false;
+						if (!Inv.dislockedMaterials.get(this.id.split("-")[1])) showMe = false;
+						else showMe = true;
+						break;
+					case "lcl" : // a local is just a local, not a button, so it will be innactivated
+						active = false;
 						break;
 				}
 			}
@@ -132,10 +153,21 @@ class Button{
 	}
 	
 	void show() {
-		if (!redefineAll()) return;
+		if (!showMe) return;
+		boolean textShown = false;
 		//
 		noStroke();
-		fill(this.cor);
+		switch(typeSelection) {
+			case 0:
+				fill(this.cor);
+				break;
+			case 1:
+				fill(#00FF00);
+				break;
+			case - 1:
+				fill(#FF0000);
+				break;
+		}
 		switch(type) {
 			case "circle":
 				circle(px,py,r);
@@ -149,38 +181,87 @@ class Button{
 		fill(0);
 		textSize(tamText);
 		String nameNow = getRealName();
-		boolean textShown = false;
-		if (this.construction != null) {
-			this.construction.show();
-			Material[] mats = this.construction.materials.keySet().toArray(new Material[0]);
-			for (int i = 0; i < this.construction.materials.size(); i++) {
-				Material mat = mats[i];
-				float x = px + 10 + i * 15, y = py + 10 + this.construction.tam + 5;
-				mat.px = x;
-				mat.py = y;
-				mat.show();
-				int qtd = this.construction.materials.get(mat).intValue();
-				fill(0);
-				text(qtd,x - textWidth("" + qtd) / 2,y + 1 + textAscent() + textDescent());
+		// switch mais simples pra definir as paradas
+		String initial = nameNow.split("-")[0];
+		switch(initial) {
+			case "optMats":
+				textShown = true;
+				if (this.material != null) {
+					this.material.px = px + 3 * w / 2;
+					this.material.py = py + h / 2;
+					this.material.show();
+				}
+				break;
+			case "conf":
+				String[] aux;
+				textShown = true;
+				if (this.over) {
+					aux = new String[Cfg.timers.size() - 1]; // - 1 pro init
+					int pi = 0;
+					for (String key : Cfg.timers.keySet()) { 
+						if (!key.startsWith("e_")) continue;
+						aux[pi] = key.split("_")[1] + " " + Cfg.timers.get(key) + "ms";
+						pi++;
+					}
+				} else{
+					String[] keys = {"Particles","Pieces","Total"};
+					aux = new String[keys.length];
+					for (int j = 0; j < keys.length; j++) {
+						aux[j] = keys[j] + " " + Cfg.timers.get("e_" + keys[j]) + "ms";
+					}
+				}
+				fill(255,255,255);
+				int j=0;
+				for (j = 0; j < aux.length; j++) {
+					text(aux[j],px + 2,py + 10 + (textAscent() + textDescent()) * j);
+				}
+				if (Cfg.adminMode){
+					int qtdPcs = constructions.size();
+					int qtdPrts = particles.size();
+					text(qtdPcs+" Pcs.",px + 2,py + 10 + (textAscent() + textDescent()) * j);j++;
+					text(qtdPrts+" Prts.",px + 2,py + 10 + (textAscent() + textDescent()) * j);j++;
+				}
+				over = false;
+				break;
+			default:
+			if (this.construction != null) {
+				this.construction.show();
+				Material[] mats = this.construction.materials.keySet().toArray(new Material[0]);
+				for (int i = 0; i < this.construction.materials.size(); i++) {
+					Material mat = mats[i];
+					float x = px + 10 + i * 15, y = py + 10 + this.construction.tam + 5;
+					mat.px = x;
+					mat.py = y;
+					mat.show();
+					int qtd = this.construction.materials.get(mat).intValue();
+					fill(0);
+					text(qtd,x - textWidth("" + qtd) / 2,y + 1 + textAscent() + textDescent());
+				}
 			}
+			else if (this.material != null) {
+				textShown = true;
+				nameNow = Cfg.getAbrevName(nameNow,3);
+				text(nameNow,px + w / 2 - textWidth(nameNow) / 2,py + 10);
+				float x = px + w / 2, y = py + this.material.tam / 2 + 12;
+				this.material.px = x;
+				this.material.py = y;
+				this.material.show();
+				String txt = "" + round(qtdMaterial * 1000) / 1000f;
+				fill(0);
+				text(txt,x - textWidth(txt) / 2,py + h - 2);
+			}
+			break;
 		}
-		else if (this.material != null) {
-			textShown = true;
-			nameNow = Cfg.getAbrevName(nameNow,3);
-			text(nameNow,px + w / 2 - textWidth(nameNow) / 2,py + 10);
-			float x = px + w / 2, y = py + this.material.tam / 2 + 12;
-			this.material.px = x;
-			this.material.py = y;
-			this.material.show();
-			String txt = "" + round(qtdMaterial * 1000) / 1000f;
-			fill(0);
-			text(txt,x - textWidth(txt) / 2,py + h - 2);
-		}
+		
 		if (!textShown) text(nameNow,px + w / 2 - textWidth(nameNow) / 2,py + h - 1);
+	}
+	void update() {
+		redefineAll();
 	}
 	
 	boolean[] typeOfDetection(boolean left, boolean right) {
 		boolean[] ret = {true,false};
+		if (!active) return ret;
 		// println(left + " " + right);
 		switch(typeDetection) {
 			case 0:
@@ -198,6 +279,7 @@ class Button{
 	} 
 	
 	boolean[] seeIfClicked(float mpx,float mpy, boolean left, boolean right) {
+		
 		switch(type) {
 			case "circle":
 				if (dist(mpx,mpy,px,py) < r) {
@@ -206,7 +288,6 @@ class Button{
 				break;
 			case "rect":
 				if (mpx > px && mpx < px + w && mpy > py && mpy < py + h) {
-					
 					return typeOfDetection(left,right);
 				}
 				break;

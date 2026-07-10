@@ -1,0 +1,97 @@
+// switch(cons.id) {
+		// 	// R
+		// 	case "pipe":
+		// 		pa = cons.px;pb = cons.px + cons.tam;pc = cons.py;pd = cons.py + cons.tam;
+		// 		switch(consA.id) {
+		// 			// RR
+		// 			case "pipe":
+		// 			boolean verBySimple_RR = relx > pa && relx < pb && rely > pc && rely < pd ||
+		// 			relx + consA.tam > pa && relx + consA.tam < pb && rely > pc && rely < pd ||
+		// 			relx + consA.tam > pa && relx + consA.tam < pb && rely + consA.tam > pc && rely + consA.tam < pd ||
+		// 			relx > pa && relx < pb && rely + consA.tam > pc && rely + consA.tam < pd ||
+		// 			pow(pow(relx + consA.tam / 2 - pa - cons.tam / 2,2) + pow(rely + consA.tam / 2 - pc - cons.tam / 2,2),.5) < consA.tam;
+		// 			boolean verByVectorialProduct = false;
+		// 			if (cons.modusLinearis && consA.modusLinearis) {
+		// 				verByVectorialProduct = consA.verByVectorialProduct(cons);
+		// 			}
+		// 			if (verBySimple_RR || verByVectorialProduct) {
+		// 				canPut = false;
+		// 				breakar = true;
+		// 			}
+		// 		break;
+		// 		// RC
+		// 		case "connector":
+		// 			if (pow(pow(relx - pa,2) + pow(rely - pc,2),.5) < consA.r ||
+		// 				pow(pow(relx - pb,2) + pow(rely - pc,2),.5) < consA.r ||
+		// 				pow(pow(relx - pb,2) + pow(rely - pd,2),.5) < consA.r ||
+		// 				pow(pow(relx - pa,2) + pow(rely - pd,2),.5) < consA.r ||
+		// 				pow(pow(relx - pa - cons.tam / 2,2) + pow(rely - pc - cons.tam / 2,2),.5) < consA.r) {
+		// 				canPut = false;
+		// 				breakar = true;
+		// 			}
+		// 			break;
+		// 		default:
+		// 		println("ERRO ao processar collison:\n   type nao reconhecido: '" + consA.id + "' in Main.processPutting()");
+		// 	}
+		// 	break;
+		// 	// C
+		// 	case "connector":
+		// 		pa = relx;pb = relx + consA.tam;pc = rely;pd = rely + consA.tam;
+		// 		switch(consA.id) {
+		// 			// CR
+		// 			case "pipe":
+		// 			if (
+		// 				pow(pow(cons.px - pa,2) + pow(cons.py - pc,2),.5) < cons.r ||
+		// 				pow(pow(cons.px - pb,2) + pow(cons.py - pc,2),.5) < cons.r ||
+		// 				pow(pow(cons.px - pb,2) + pow(cons.py - pd,2),.5) < cons.r ||
+		// 				pow(pow(cons.px - pa,2) + pow(cons.py - pd,2),.5) < cons.r ||
+		// 				pow(pow(cons.px - pa - consA.tam / 2,2) + pow(cons.py - pc - consA.tam / 2,2),.5) < consA.tam / 2 + cons.r) {
+		// 				canPut = false;
+		// 				cons.negativeShined = true; // coloca pra n ficar neg.shined
+		// 				breakar = true;
+		// 			}
+		// 		break;
+		// 		// CC
+		// 		case "connector":
+		// 			if (pow(pow(relx - cons.px,2) + pow(rely - cons.py,2),.5) < consA.r + cons.r) {
+		// 				canPut = false;
+		// 				breakar = true;
+		// 			}
+		// 			break;
+		// 		default:
+		// 		println("ERRO ao processar collison:\n   type nao reconhecido: '" + consA.id + "' in in Main.processPutting()");
+		// 	}
+		// 	break;
+		// 	// macropiece
+		// 	// case "collector":
+		// 	// switch(consA.id) {
+		// 	// 	// CR
+		// 	// 	case "pipe":
+		// 	// 		if (
+		// 	// 			pow(pow(cons.px - pa,2) + pow(cons.py - pc,2),.5) < cons.r ||
+		// 	// 			pow(pow(cons.px - pb,2) + pow(cons.py - pc,2),.5) < cons.r ||
+		// 	// 			pow(pow(cons.px - pb,2) + pow(cons.py - pd,2),.5) < cons.r ||
+		// 	// 			pow(pow(cons.px - pa,2) + pow(cons.py - pd,2),.5) < cons.r ||
+		// 	// 			pow(pow(cons.px - pa - consA.tam / 2,2) + pow(cons.py - pc - consA.tam / 2,2),.5) < consA.tam / 2 + cons.r) {
+		// 	// 			canPut = false;
+		// 	// 			cons.negativeShined = true; // coloca pra n ficar neg.shined
+		// 	// 			breakar = true;
+		// 	// 		}
+		// 	// 		break;
+		// 	// 	// CC
+		// 	// 	case "connector":
+		// 	// 		if (pow(pow(relx - cons.px,2) + pow(rely - cons.py,2),.5) < consA.r + cons.r) {
+		// 	// 			canPut = false;
+		// 	// 			breakar = true;
+		// 	// 		}
+		// 	// 		break;
+		// 	// 	default:
+		// 	// 	println("ERRO ao processar collison:\n   type nao reconhecido: '" + consA.id + "' in in Main.processPutting()");
+		// 	// }
+			
+			
+			
+		// 	default:
+		// 	println("ERRO ao processar collison:\n   type nao reconhecido: '" + cons.id + "' in Main.processPutting()");
+		// }
+		// new
