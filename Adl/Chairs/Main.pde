@@ -7,6 +7,7 @@ Davi_Ungido davi_ung = new Davi_Ungido();
 Moises_beta moises = new Moises_beta();
 // Davi_Harpista davi_hrpst = new Davi_Harpista();
 Modeler modeler = new Modeler("Modelos","Davi_model"); // somente o nome, sem o '.txt' e sem '/'
+Tabernaculos tabs = new Tabernaculos();
 int internLoop = 0;
 
 ArrayList<Modelo> modelosAtuais;
@@ -20,12 +21,17 @@ void setup() {
 	moises.init();
 	davi_ung.init();
 	adl1k.init();
+tabs.init();
 	// davi_hrpst.init();
 	// modeler.init();
 	modelosAtuais = new ArrayList();
-	modelosAtuais.add(adl1k);
+modelosAtuais.add(tabs);
+modelosAtuais.add(adl1k);
+  
+	
 	modelosAtuais.add(moises);   
 	modelosAtuais.add(davi_ung);    
+  
 	size(1000,1000);
 }
 

@@ -1,0 +1,15 @@
+class Planet{
+	float x, y, r;
+	color cor;
+	Planet(float x, float y, float r,color cor){
+		this.x = x;
+		this.y = y;
+		this.r = r;
+		this.cor = cor;
+	}
+	void show(){
+		noStroke();
+		fill(this.cor);
+		circle(this.x, this.y, this.r);
+	}
+}

@@ -1,0 +1,190 @@
+#include <vector>
+#include <cmath>
+using namespace std;
+
+class Number {
+public:
+  int n, x, y, c, p;
+
+  Number(int n, int x, int y, int p, int c) {
+    this->n = n;
+    this->x = x;
+    this->y = y;
+    this->p = p;
+    this->c = c;
+  }
+};
+
+vector<Number> list;
+
+int tela, last = 2;
+float mvx, mvy, zoom = 1;
+bool run = true;
+
+int dir = 0;
+int blk = 1;
+int posblk = 0;
+int qtblk = 1;
+
+int px, py;
+
+int addPrimes(int init, int n) {
+  int qt = 0;
+  int i;
+  for (i = init; i > 0; i++) {
+    switch (dir) {
+      case 0:
+        px++;
+        break;
+      case 1:
+        py--;
+        break;
+      case 2:
+        px--;
+        break;
+      case 3:
+        py++;
+        break;
+    }
+
+    posblk++;
+
+    if (posblk == blk) {
+      posblk = 0;
+      dir = (dir + 1) % 4;
+      qtblk++;
+    }
+    if (qtblk == 2) {
+      blk++;
+      qtblk = 0;
+    }
+
+    int k = prime(i);
+
+    if (k <= 1) {
+
+      Number num(i, px, py, k, 0);
+
+      list.push_back(num);
+
+      qt++;
+    }
+
+    if (qt == n)
+      break;
+  }
+
+  return i + 1;
+}
+
+int loop = 0;
+
+int prime(int n) {
+
+  if (n % 2 == 0 && n != 2)
+    return 2;
+
+  for (int i = 3; i <= sqrt(n); i += 2) {
+
+    if (n % i == 0)
+      return i;
+  }
+
+  return 1;
+}
+int main(){
+  return 0;
+}
+void setup() {
+
+  size(401, 401);
+
+  tela = width;
+
+  fullScreen();
+
+  background(0);
+
+  px = (width - 1) / 2 + 1;
+  py = (height - 1) / 2 + 1;
+}
+
+void draw() {
+
+  scale(zoom);
+  translate(mvx, mvy);
+
+  background(0);
+
+  noStroke();
+
+  int tam = 1;
+
+  for (Number &num : list) {
+    num.c = 1;
+    if (num.p == 1)
+      fill(255);
+
+    else if (num.p == 2)
+      fill(0, 255, 0);
+
+    else
+      break;
+
+    rect(num.x, num.y, tam, tam);
+  }
+
+
+  if (loop == 100) {
+
+  } else if (loop < 100) {
+
+  } else if (loop >= 101 && run) {
+
+    last = addPrimes(last, 10000);
+
+    println("in " + last + " " + list.size());
+  }
+
+  loop++;
+}
+
+void mouseDragged() {
+
+  mvx += (mouseX - pmouseX) / zoom;
+  mvy += (mouseY - pmouseY) / zoom;
+}
+
+void mouseWheel(MouseEvent event) {
+
+  float oldZoom = zoom;
+
+  zoom *= pow(2, -event.getCount);
+  float maxZ = 100;
+  float minZ = 0.01;
+
+  zoom = constrain(zoom, minZ, maxZ);
+
+  mvx = mouseX / zoom - (mouseX / oldZoom - mvx);
+  mvy = mouseY / zoom - (mouseY / oldZoom - mvy);
+}
+
+void keyPressed() {
+
+  int move = 10;
+
+  if (keyCode == LEFT)
+    mvx += move;
+
+  if (keyCode == RIGHT)
+    mvx -= move;
+
+  if (keyCode == UP || key == 'w')
+    mvy += move;
+
+  if (keyCode == DOWN)
+    mvy -= move;
+
+  if (keyCode == ENTER)
+    run = !run;
+}
