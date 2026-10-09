@@ -12,6 +12,7 @@ int internLoop = 0;
 
 ArrayList<Modelo> modelosAtuais;
 int modeloAtual = 0;
+boolean showNumberChair = true;
 
 void setup() {
 	// padrao.init();
@@ -169,13 +170,19 @@ void keyReleased() {
 	}
 }
 void keyPressed() {
-	switch(keyCode) {
+	switch(key) {
 	    case CONTROL:
 	        modeler.ctrlPressed = true;
 	        break;
 	    case SHIFT:
 	        modeler.shiftPressed = true;
 	        break;
+      case 'n':
+        showNumberChair = !showNumberChair;
+        for (Modelo mod : modelosAtuais){
+           mod.showNumberChair = showNumberChair;
+        }
+        break;
 	    case DELETE:
 	        ArrayList<Thing> remover = new ArrayList<Thing>();
 			

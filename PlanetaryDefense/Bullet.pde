@@ -3,7 +3,7 @@ class Bullet extends GameObject{
   float x, y, speed, angle, raio, damage=5;
   String format;
   String localFrom = "space";
-  int marked = 0;
+  int marked = 0,time=millis();
   color cor;
 
   Bullet(String format, float x, float y, float angle, float speed, color cor, float raio) {
@@ -23,6 +23,17 @@ class Bullet extends GameObject{
   boolean update() {
     this.x += this.speed * cos(this.angle*PI/180);
     this.y -= this.speed * sin(this.angle*PI/180);
+		float distAu = dist(this.x, this.y, aurora.x, aurora.y);
+		if (aurora.bareer && distAu >= aurora.raioActionBareer*aurora.r-this.raio && distAu <= aurora.raioActionBareer*aurora.r+this.raio) {
+			float alp,bet,gam,m=abs((aurora.x-this.x)/(aurora.y-this.y));
+			alp = (atan2(aurora.y-this.y, this.x-aurora.x)*180/PI);
+			bet = (this.angle-alp)%180;
+			gam = alp+180-2*bet;
+			this.angle = gam;
+			this.x += this.speed * cos(this.angle*PI/180);
+			this.y -= this.speed * sin(this.angle*PI/180);
+			// println(distAu+" "+alp+" "+bet+" "+gam+" "+x+" "+y);
+		}
     for (int i = 0; i < bullets.size(); i++) {
       if (bullets.get(i) == this) continue;
       if (dist(this.x, this.y, bullets.get(i).x, bullets.get(i).y) <= this.raio+bullets.get(i).raio) {

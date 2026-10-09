@@ -1,136 +1,184 @@
 import java.util.Map;
 
-class Planet{
-	float x, y, r, vida=100;
-	String name;
-	color cor;
-	float angleTurret=90;
-	Bullet bulletTracked = null;
-	HashMap<Bullet,Float> bulletsTrackeds = new HashMap<Bullet,Float>();
-	float vel  = 4;
-	private boolean protecting = false;
-	private int raioAction = 3;
+class Planet {
+  float x, y, r, vida=100;
+  String name;
+  color cor;
+  float angleTurret=90;
+  Bullet bulletTracked = null;
+  HashMap<Bullet, Float> bulletsTrackeds = new HashMap<Bullet, Float>();
+  float vel  = 4;
+  private boolean protecting = false,bareer = false;
+  private int raioActionProtection = 6;
+	private int raioActionBareer = 30;
   private float timeLastCalc = 0;
 
-	Planet(String nome, float x, float y, float r,color cor){
-		this.name = nome;
-		this.x = x;
-		this.y = y;
-		this.r = r;
-		this.cor = cor;
+  Planet(String nome, float x, float y, float r, color cor) {
+    this.name = nome;
+    this.x = x;
+    this.y = y;
+    this.r = r;
+    this.cor = cor;
+  }
+
+  void update() {
+    float dist = 0;
+    Bullet seeing = null;
+    freshTracking();
+
+    if (vida <= 0) {
+      exit();
+    }
+		if (mouseTracking) {
+			this.angleTurret = atan2((mouseX-mvx)-this.x,(mouseY-mvy)-this.y )*180/PI-90;
+    }else if (protecting) {
+      protection();
+    } else {
+      for (int i = 0; i < bullets.size(); i++) {
+        // bullets.get(i).marked = 0;
+        boolean jump = false;
+        for (Map.Entry b : bulletsTrackeds.entrySet()) {
+          if (bullets.get(i) == b) {
+            jump=true;
+            break;
+          }
+        }
+        if (jump) continue;
+        if (bullets.get(i).localFrom != "planet") {
+          float d = dist(this.x, this.y, bullets.get(i).x, bullets.get(i).y);
+          if (d < dist || dist == 0) {
+            dist = d;
+            seeing = bullets.get(i);
+          }
+        }
+      }
+      if (seeing != null) {
+        //
+        angleTurret = calcAngle(seeing);
+        seeing.marked = 1;
+        bulletTracked = seeing;
+      }
+    }
+  }
+
+  private void freshTracking() {
+    ArrayList<Bullet> rems = new ArrayList<Bullet>();
+    for (Map.Entry b : bulletsTrackeds.entrySet()) {
+      if (millis()+10 > (float)b.getValue() && ((Bullet)b.getKey()).exists) {
+        kaboomOn((Bullet)b.getKey());
+        rems.add((Bullet)b.getKey());
+        // println("removing bullet from tracking");
+      } else if (!((Bullet)b.getKey()).exists) {
+        rems.add((Bullet)b.getKey());
+      }
+    }
+    HashMap<Bullet, Float> n_bulletsTrackeds = new HashMap<Bullet, Float>();
+    for (Map.Entry b : bulletsTrackeds.entrySet()) {
+      if (!rems.contains((Bullet)b.getKey())) {
+        n_bulletsTrackeds.put((Bullet)b.getKey(), (float)b.getValue());
+      }
+    }
+    bulletsTrackeds = n_bulletsTrackeds;
+  }
+
+  private void protect() {
+    protecting = !protecting;
+  }
+	private void bereer() {
+		bareer = !bareer;
 	}
 
-	void update(){
-		float dist = 0;
-		Bullet seeing = null;
-		freshTracking();
-		
-		if (vida <= 0){
-			exit();
-		}
-		if (protecting){
-			protection();
-		}else{
-			for (int i = 0; i < bullets.size(); i++){
-			// bullets.get(i).marked = 0;
-			boolean jump = false;
-			for (Map.Entry b : bulletsTrackeds.entrySet()){
-				if(bullets.get(i) == b){
-					jump=true;
-					break;
-				}
-			}
-			if(jump) continue;
-			if(bullets.get(i).localFrom != "planet"){
-				float d = dist(this.x, this.y, bullets.get(i).x, bullets.get(i).y);
-				if(d < dist || dist == 0){
-					dist = d;
-					seeing = bullets.get(i);
-				}
-			}
-		}
-		if(seeing != null){
-			// 
-			angleTurret = calcAngle(seeing);
-			seeing.marked = 1;
-			bulletTracked = seeing;
-		}
-		}
-	}
+  void protection() {
+    Bullet tracked = null;
+    float d = -1;
+    for (int i = 0; i < bullets.size(); i++) {
+      boolean cont = false;
+      Bullet seeing = bullets.get(i);
+      for (Map.Entry b : bulletsTrackeds.entrySet()) {
+        if (seeing == b.getKey()) {
+          cont = true;
+          break;
+        }
+      }
+      if (cont) continue;
+      //
+      if (seeing.localFrom != "planet") {
+        if (dist(this.x, this.y, seeing.x, seeing.y) <= raioActionProtection*this.r) {
+          // seeing.marked = 1;
+          if (d == -1 || dist(this.x, this.y, seeing.x, seeing.y) < d) {
+            d = dist(this.x, this.y, seeing.x, seeing.y);
+            tracked = seeing;
+          }
+        }
+      }
+    }
+    if (tracked != null) {
+      // tracked.marked = 1;
+      bulletTracked = tracked;
+      track(tracked);
+      kaboomOn(tracked);
+    }
+  }
+  private void track(Bullet b) {
+    bulletTracked = b;
+    b.marked = 2;
+    bulletsTrackeds.put(b, millis()+timeLastCalc*1000.0);
+  }
+  private void kaboomOn(Bullet b) {
+    angleTurret = calcAngle(b);
+    kaboom();
+  }
 
-	private void freshTracking(){
-		for (Map.Entry b : bulletsTrackeds.entrySet()){
-			if(millis() > (float)b.getValue()){
-				bulletsTrackeds.remove(b.getKey());
-			}
-		}
-	}
+  float calcAngle(Bullet seeing) {
+    if (seeing==null) return angleTurret;
+    float b = atan2(this.y-seeing.y, seeing.x-this.x)*180/PI, d=seeing.speed*sin((seeing.angle+180-b)/180*PI)/vel;
 
-	private void protect(){
-		protecting = !protecting;
-	}
+    if (abs(d)>1) {
+      // println("o0la");
+      return 0;
+    }
+    d=asin(d);
+    timeLastCalc = dist(this.x, this.y, seeing.x, seeing.y)/(vel*cos(d)+seeing.speed*cos((seeing.angle+180-b)/180*PI))/60;
+    // println(b+" "+d);
+    return b-d*180/PI;
+  }
 
-	void protection(){
-		for (int i = 0; i < bullets.size(); i++){
-			boolean cont = false;
-			Bullet seeing = bullets.get(i);
-			for (Map.Entry b : bulletsTrackeds.entrySet()){
-				if(seeing == b){
-					cont = true;
-					break;
-				}
-			}
-			if(cont) continue;
-			//
-			if(seeing.localFrom != "planet"){
-				if (dist(this.x, this.y, seeing.x, seeing.y) <= raioAction*this.r){
-					// seeing.marked = 1;
-					bulletTracked = seeing;
-					kaboomOn(seeing);
-				}
-			}
-		}
-	}
-	private void kaboomOn(Bullet b){
-		angleTurret = calcAngle(b);
-		bulletTracked.marked = 2;
-		println("Time: "+timeLastCalc);
-		bulletsTrackeds.put(bulletTracked, millis()+timeLastCalc);
-		kaboom();
-	}
-
-	float calcAngle(Bullet seeing){
-		if(seeing==null) return angleTurret;
-		float b = atan2(this.y-seeing.y,seeing.x-this.x)*180/PI,d=asin(seeing.speed*sin((seeing.angle+180-b)/180*PI)/vel);
-		timeLastCalc = dist(this.x, this.y, seeing.x, seeing.y)/(vel*cos(d)+seeing.speed*cos((seeing.angle+180-b)/180*PI))/60;
-		return b-d*180/PI;
-	}
-
-	void show(){
-		noStroke();
-		fill(this.cor);
-		circle(this.x, this.y, this.r*2);
-		stroke(0);
-		line(this.x, this.y, this.x+cos(angleTurret*PI/180)*this.r, this.y-sin(angleTurret*PI/180)*this.r);
-		//
-		textSize(20);
-		fill(0);
-		text(name, this.x-textWidth(name)/2, this.y-10);
-		text("Vida: "+this.vida, this.x-textWidth("Vida: "+this.vida)/2, this.y+10);
-		//
-		if (protecting){
+  void show() {
+    noStroke();
+    fill(this.cor);
+    circle(this.x, this.y, this.r*2);
+    stroke(0);
+    line(this.x, this.y, this.x+cos(angleTurret*PI/180)*this.r, this.y-sin(angleTurret*PI/180)*this.r);
+    //
+    textSize(20);
+    fill(0);
+    text(name, this.x-textWidth(name)/2, this.y-10);
+    text("Vida: "+this.vida, this.x-textWidth("Vida: "+this.vida)/2, this.y+10);
+    //
+    if (protecting) {
+      noFill();
+      stroke(cor);
+      circle(this.x, this.y, raioActionProtection*this.r*2);
+    }
+		if (bareer) {
 			noFill();
 			stroke(cor);
-			circle(this.x, this.y, raioAction*this.r*2);
+			circle(this.x, this.y, raioActionBareer*this.r*2);
 		}
 	}
 
-	void kaboom(){
-		Bullet blt = new Bullet("circle",aurora.x,aurora.y,aurora.angleTurret,vel,#0000FF,2);
-		blt.localFrom = "planet";
-		bullets.add(blt);
-		if (trackBullet){
-			bulletTracking = blt;
-		}
-	}
+  void kaboom() {
+    try {
+      // println("Time: "+timeLastCalc);
+      Bullet blt = new Bullet("circle", aurora.x, aurora.y, aurora.angleTurret, vel, #0000FF, 1f);
+      blt.localFrom = "planet";
+      bullets.add(blt);
+      if (trackBullet) {
+        bulletTracking = blt;
+      }
+    }
+    catch(Exception e) {
+      println("ERRO ao criar bullet: "+e);
+    }
+  }
 }

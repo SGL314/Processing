@@ -31,6 +31,7 @@ public class Menu {
     for (Button bt : buttons) {
       bt.show();
     }
+		// println("Menu: "+name+" active: "+active);
   }
 
   String update(float mx, float my, boolean left, boolean right) {
