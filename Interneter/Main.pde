@@ -16,22 +16,26 @@ import java.io.Serializable;
 float zoom = 1,lastZoom = 1,dragX = 0,dragY = 0;
 // keybinding
 String localMenu = "principal";
+Component inHandComponent = null;
 HashMap<String ,HashMap<String, String[]>> keybinding = new HashMap<String,HashMap<String,String[]>>();
 HashMap<String, String> menuColors = new HashMap<String,String>();
 boolean mouseIsRight = false,mouseIsLeft = false;
 // tecla, muda localMenu (1 yes, 0 no)
 //
 ArrayList<Component> components = new ArrayList<Component>();
+float tamGrid = 250,tamSquare = 10, initialTamSquare = 10;
+
 
 void setup() {
 	size(500,500);
 	frameRate(100);
 	//
-	addButton("principal","#ff0000");
-	addingKeybinding("principal","adding","a","1"); addButton("adding","#48ff00");
-	addingInKeybinding("principal","remove","r","1"); addButton("remove","#e5ff00");
+	addButton("principal","#ff8800");
+	addingKeybinding("principal","adding","a","1"); addButton("adding","#26d30f");
 	addingKeybinding("adding","principal","p","1"); 
 	addingInKeybinding("adding","add-memory","m","0"); addButton("add-memory","#00a2ff");
+	addingInKeybinding("principal","remove","r","1"); addButton("remove","#ec0909");
+	addingKeybinding("remove","principal","p","1"); 
 	/*
 	principal : adding
 	adding : principal
@@ -39,7 +43,8 @@ void setup() {
 }
 
 void draw() {
-	background(0);
+	background(255);
+	formGrid();
 	// n muda position
 	text(localMenu,10,10);
 	buttons();
@@ -52,7 +57,7 @@ void draw() {
 	mouseIsRight = false;mouseIsLeft = false;
 }
 
-// admin
+// admin                  
 void addingKeybinding(String menu,String thing,String key,String code1) {
 	HashMap<String, String[]> _thing = new HashMap<String, String[]>();
 	String[] keys = {key,code1};
@@ -80,11 +85,14 @@ void keyPressed() {
 		println(i + " - " + keybinding.get(localMenu).get(i)[0].toCharArray()[0]);
 		if (key == keybinding.get(localMenu).get(i)[0].toCharArray()[0]) {
 			println("Ativando :" + i);
-			functionner(i,keybinding.get(localMenu).get(i)[1]);
+			functionner(i,keybinding.get(localMenu).get(i)[1],true);
 		}
 	}
 }
-void functionner(String thing,String mode) {
+void functionner(String thing,String mode, boolean doit) {
+	// mode: defines if change menu
+	String lcl = localMenu;
+	//
 	if (mode == "1") {
 		localMenu = thing;
 		println("'localMenu' mudou para " + localMenu);
@@ -93,11 +101,13 @@ void functionner(String thing,String mode) {
 	//
 	float px = mouseX - dragX;
 	float py = mouseY - dragY;
+	if (doit && lcl==localMenu)
 	switch(thing) {
 		case "add-memory":
 			components.add(new Memory("memory","1",1,px,py));
 			break;
 	}
+	
 }
 // buttons
 void buttons() {
@@ -109,12 +119,12 @@ void buttons() {
 		rect(px,py,tam,tam);
 		px += tam + gap;
 	}
-	println("");
+	// println("");
 	// click
 	px = padX;py = padY;
 	for (String subMenu : keybinding.get(localMenu).keySet()) {
 		if (mouseX >= px && mouseX <= px + tam && mouseY >= py && mouseY <= py + tam && mouseIsLeft) {
-			functionner(subMenu,keybinding.get(localMenu).get(subMenu)[1]);
+			functionner(subMenu,keybinding.get(localMenu).get(subMenu)[1],false);
 			// println("Acionado: " + localMenu);
 		}
 		px += tam + gap;
@@ -123,15 +133,32 @@ void buttons() {
 void addButton(String menu, String cor) {
 	menuColors.put(menu,cor);
 }
+// grid
+void formGrid() {
+  // grid geral
+  fill(255, 255, 255);
+  float center = 0;
+  // if (tamGrid/2*tamSquare < width/2)
+  center = width / 2 - tamGrid / initialTamSquare / 2 * tamSquare;
+  // tamSquare/=2;
+  for (int i = 0; i < tamGrid / tamSquare; i++) {
+    stroke(1);
+    for (int j = 0; j < tamGrid / tamSquare; j++) {
+      rect(tamSquare * i + center, tamSquare * j + center, tamSquare, tamSquare);
+    }
+  }
+  // tamSquare *= 2;
+}
 // movement
 void mousePressed() {
 	if (mouseButton == LEFT) {
 		mouseIsRight = false;
 		for (String i : keybinding.get(localMenu).keySet()) {
 		    println(i + " - " + keybinding.get(localMenu).get(i)[0].toCharArray()[0]);
-			if (key == keybinding.get(localMenu).get(i)[0].toCharArray()[0]) {			
+			if (key == keybinding.get(localMenu).get(i)[0].toCharArray()[0] || 
+			keybinding.get(localMenu).get(i)[0]=="ml") {			
 				println("Ativando :" + i);				
-				functionner(i,keybinding.get(localMenu).get(i)[1]);
+				functionner(i,keybinding.get(localMenu).get(i)[1],true);
 			}
 		}
 		mouseIsLeft = true;

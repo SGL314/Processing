@@ -1,5 +1,3 @@
-
-
 class Sphere {
   float x, y;
   float vx, vy, angle;
