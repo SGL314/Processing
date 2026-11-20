@@ -12,31 +12,77 @@ import java.io.IOException;
 import java.util.HashMap; // Importação necessária
 import java.io.Serializable;
 
+// Configs
+int maxDifLoop_doubleClick = 33;
 // movement
-float zoom = 1,lastZoom = 1,dragX = 0,dragY = 0;
+float zoom = 1, lastZoom = 1, dragX = 0, dragY = 0;
 // keybinding
 String localMenu = "principal";
-Component inHandComponent = null;
-HashMap<String ,HashMap<String, String[]>> keybinding = new HashMap<String,HashMap<String,String[]>>();
-HashMap<String, String> menuColors = new HashMap<String,String>();
-boolean mouseIsRight = false,mouseIsLeft = false;
+LinkedHashMap<String, LinkedHashMap<String, String[]>> keybinding = new LinkedHashMap<String, LinkedHashMap<String, String[]>>();
+LinkedHashMap<String, String> menuColors = new LinkedHashMap<String, String>();
+LinkedHashMap<String, String> buttonNames = new LinkedHashMap<String, String>();
+boolean mouseIsRight = false, mouseIsLeft = false;
+// variables
+ArrayList<String> lastsClicks = new ArrayList<String>();
+boolean canPutOnHandComponent = false;
+Component onHandComponent = null;
+Component onOverComponent = null;
+Component onSelectedComponent = null;
+int loop = 0;
+// ConfigurationsNow
+boolean showHeat = false,
+  showEnergyWires = false;
 // tecla, muda localMenu (1 yes, 0 no)
 //
 ArrayList<Component> components = new ArrayList<Component>();
-float tamGrid = 250,tamSquare = 10, initialTamSquare = 10;
-
+ArrayList<Component> componentsToRemove = new ArrayList<Component>();
+ArrayList<Component> componentsToAdd = new ArrayList<Component>();
+float tamGrid = 250, tamSquare = 10, initialTamSquare = 10;
+// pos-variables
+DataBase dtbs = new DataBase();
 
 void setup() {
-	size(500,500);
-	frameRate(100);
-	//
-	addButton("principal","#ff8800");
-	addingKeybinding("principal","adding","a","1"); addButton("adding","#26d30f");
-	addingKeybinding("adding","principal","p","1"); 
-	addingInKeybinding("adding","add-memory","m","0"); addButton("add-memory","#00a2ff");
-	addingInKeybinding("principal","remove","r","1"); addButton("remove","#ec0909");
-	addingKeybinding("remove","principal","p","1"); 
-	/*
+  size(800, 800);
+  frameRate(100);
+  //
+  dtbs.getAll();
+  //
+  try {
+    addButton("principal_Menu Prin.", "#ff8800");
+    {
+      addButton("adding_Novo Comp.", "#26d30f");
+      addingKeybinding("principal", "adding", "a", "1");
+      {
+        addingKeybinding("adding", "principal", "p", "1");
+        addButton("normal-components_Comps. Comuns", "#00ff88");
+        addingInKeybinding("adding", "normal-components", "n", "1");
+        {
+          addingKeybinding("normal-components", "adding", "a", "1");
+          addButton("add-memory_Memoria", "#00a2ff");
+          addingInKeybinding("normal-components", "add-memory", "1", "0");
+        }
+        addButton("energys-components_Comps. de Energia", "#00aeff");
+        addingInKeybinding("adding", "energys-components", "e", "1");
+        {
+          addingKeybinding("energys-components", "adding", "a", "1");
+          addButton("add-source-energy_Fonte de Energia", "#00ff73");
+          addingInKeybinding("energys-components", "add-source-energy", "1", "0");
+          addButton("add-connector-energy_Conector de Energia", "#00ffdd");
+          addingInKeybinding("energys-components", "add-connector-energy", "2", "0");
+          addButton("add-wire-energy_Cabo de Energia", "#00b7ff");
+          addingInKeybinding("energys-components", "add-wire-energy", "3", "0");
+        }
+      }
+      addButton("remove_Remover Comp.", "#ec0909");
+      addingInKeybinding("principal", "remove", "r", "1");
+      {
+        addingKeybinding("remove", "principal", "p", "1");
+      }
+    }
+  }
+  catch (Exception e) {
+  }
+  /*
 	principal : adding
 	adding : principal
 	*/
@@ -44,26 +90,38 @@ void setup() {
 
 void draw() {
 	background(255);
-	formGrid();
-	// n muda position
-	text(localMenu,10,10);
-	buttons();
+	// In Screen
+	
 	//
 	scale(zoom);
 	translate(dragX / zoom,dragY / zoom);
-	//
-	
+	// In Map
+	if (onHandComponent!=null && onHandComponent.coupleComponent!=null){
+		fill(#000000);String texto = "Acoplando";
+		text(texto,onHandComponent.px-textWidth(texto),onHandComponent.py-(textAscent()+textDescent())/2);
+	}
+	formGrid();
 	showComponents();
+	//
+	translate(-dragX / zoom,-dragY / zoom);
+	scale(1/zoom);
+	// In Screen
+	menuTop();
+	text(localMenu,10,10);
 	mouseIsRight = false;mouseIsLeft = false;
+	buttons(true);
+	// Pos-processment
+	updateComponents();
+	loop++;
 }
 
-// admin                  
+// admin
 void addingKeybinding(String menu,String thing,String key,String code1) {
-	HashMap<String, String[]> _thing = new HashMap<String, String[]>();
+	LinkedHashMap<String, String[]> _thing = new LinkedHashMap<String, String[]>();
 	String[] keys = {key,code1};
 	_thing.put(thing,keys);
 	keybinding.put(menu,_thing);
-	// HashMap<String[]> aux = new HashMap<String[]>();
+	// LinkedHashMap<String[]> aux = new LinkedHashMap<String[]>();
 	// aux.add(new String[]{"]","0"});
 	// keybinding.add(local);
 }
@@ -73,68 +131,185 @@ void addingInKeybinding(String menu,String thing,String key,String code1) {
 }
 //
 void showComponents() {
-	circle(100,100,10);
+	onOverComponent = null;
+	float px = (mouseX - dragX) / zoom;
+	float py = (mouseY - dragY) / zoom;
 	for (Component comp : components) {
-		comp.show();
+		if ((comp.name=="connector"||comp.name=="wire")&&!showEnergyWires) continue;
+		overMe(comp,px,py);
+		comp.show("none");
 	}
+	if (onOverComponent!=null) onOverComponent.showCrown(
+		 (localMenu == "remove") ? "crown-remove" : "crown-normal");
+	if (onHandComponent != null) {
+		showOnHandComponent();
+	}else{
+		canPutOnHandComponent = false;
+	}
+	if (onSelectedComponent != null) {
+		onSelectedComponent.show("crown-selected");
+	}
+}
+void showOnHandComponent() {
+	// Detect position by format
+
+	switch (onHandComponent.format) {
+		case "square":
+			onHandComponent.px = ((mouseX - dragX) / zoom
+			- ((mouseX - dragX) / zoom) % (tamSquare / 2));
+			onHandComponent.py = ((mouseY - dragY) / zoom
+			- ((mouseY - dragY) / zoom) % (tamSquare / 2));
+			break;
+	case "circle":
+	onHandComponent.px = ((mouseX - dragX) / zoom 
+	- ((mouseX - dragX) / zoom) % (tamSquare / 2));
+			onHandComponent.py = ((mouseY - dragY) / zoom 
+			- ((mouseY - dragY) / zoom) % (tamSquare / 2));
+	break;
+		default:
+			println("Format not defined in showOnHandComponent() : " + onHandComponent.format);
+	}
+	// Show
+	boolean touching = false;
+	onHandComponent.coupleComponent=null;
+	for (Component comp : components) {
+		touching = onHandComponent.verifyCollision(comp);
+		if (touching) {
+			if (onHandComponent.name=="connector" && onHandComponent.type == "energy" && comp.name!="connector"){ // consegue conectar em qlqr posição
+				onHandComponent.coupleComponent = comp;
+				touching = false;
+				break;
+			}
+		}
+	}
+	canPutOnHandComponent = !touching;
+	onHandComponent.show("none",canPutOnHandComponent);
 }
 
 // keyboard
-void keyPressed() {
+boolean processKey(char key_){
 	for (String i : keybinding.get(localMenu).keySet()) {
 		println(i + " - " + keybinding.get(localMenu).get(i)[0].toCharArray()[0]);
-		if (key == keybinding.get(localMenu).get(i)[0].toCharArray()[0]) {
+		if (key_ == keybinding.get(localMenu).get(i)[0].toCharArray()[0]) {
 			println("Ativando :" + i);
-			functionner(i,keybinding.get(localMenu).get(i)[1],true);
+			processFunctionOfKey(i,keybinding.get(localMenu).get(i)[1],true);
+			return true;
 		}
 	}
+	return false;
 }
-void functionner(String thing,String mode, boolean doit) {
+void keyPressed() {
+	key = (""+key).toLowerCase().toCharArray()[0];
+	// if (!processKey(key))
+	processKey(key);
+	switch (key) {
+		case ESC:
+			exitGame();
+			break;
+		case 'h':
+			showHeat = !showHeat;
+			break;
+		case 'e':
+			showEnergyWires = !showEnergyWires;
+			break;
+	}
+}
+void processFunctionOfKey(String function,String mode, boolean runFunctionKey) {
 	// mode: defines if change menu
+	// 0: does nothing with the menu
+	// 1: change menu
+	//
 	String lcl = localMenu;
 	//
 	if (mode == "1") {
-		localMenu = thing;
+		localMenu = function;
 		println("'localMenu' mudou para " + localMenu);
-		return;
 	}
 	//
 	float px = mouseX - dragX;
 	float py = mouseY - dragY;
-	if (doit && lcl==localMenu)
-	switch(thing) {
-		case "add-memory":
-			components.add(new Memory("memory","1",1,px,py));
+	if (runFunctionKey && mode =="0"){
+		println("Running '"+function+"'");
+		dtbs.formingClasss = true;
+		switch(function) {
+			case "add-memory":
+				onHandComponent = new Memory("1",1,0,0);
+				break;
+			case "add-source-energy":
+				onHandComponent = new SourceEnergy("1",1,0,0);
+				break;
+			case "add-connector-energy":
+				onHandComponent = new Connector("energy",2,1,0,0);
+				break;
+			case "add-wire-energy":
+				onHandComponent = new Wire("energy",20,1,0,0);
+				break;
+			default:
+				println("Function not defined in processFunctionOfKey() : " + function);
+		}
+		dtbs.formingClasss = false;
+	}
+	//
+	boolean inPlaceToPutSomething = false;
+	for(String i : keybinding.get("adding").keySet()) {
+		if (i == localMenu){
+			inPlaceToPutSomething = true;
 			break;
+		}
+	}
+	if (!inPlaceToPutSomething) {
+		onHandComponent = null;
 	}
 	
 }
+
 // buttons
-void buttons() {
-	int tam = 50,padX = 50,px = padX,padY = height - 50 * 2,py = padY,gap = 5;
+boolean buttons(boolean showIt) {
+	int tam = 60,padX = 50,px = padX,padY = height - 50 * 2,py = padY,gap = 5;
 	// show
+	if (showIt){
+		noStroke();
 	for (String subMenu : keybinding.get(localMenu).keySet()) {
 		// print(subMenu + " ");
 		fill(unhex("FF" + menuColors.get(subMenu).substring(1)));
-		rect(px,py,tam,tam);
+		rect(px,py,tam,tam,5);
+		textSize(14);
+		fill(#000000);
+		String[] txts = buttonNames.get(subMenu).split(" ");
+		int alt = 0;
+		for (String txt : txts) {
+			alt += textAscent()+textDescent();
+			text(txt,px + tam/2-textWidth(txt)/2,py + alt+3);
+		}
+		// textSize(14);
+		String texto = keybinding.get(localMenu).get(subMenu)[0];
+		text(texto,px + tam-textWidth(texto)-3,py + tam-3);
 		px += tam + gap;
+	}
 	}
 	// println("");
 	// click
 	px = padX;py = padY;
 	for (String subMenu : keybinding.get(localMenu).keySet()) {
 		if (mouseX >= px && mouseX <= px + tam && mouseY >= py && mouseY <= py + tam && mouseIsLeft) {
-			functionner(subMenu,keybinding.get(localMenu).get(subMenu)[1],false);
+			processFunctionOfKey(subMenu,keybinding.get(localMenu).get(subMenu)[1],true);
 			// println("Acionado: " + localMenu);
+			return true;
 		}
 		px += tam + gap;
 	}
+	return false;
 }
-void addButton(String menu, String cor) {
-	menuColors.put(menu,cor);
+void addButton(String menu, String cor) throws Exception {
+	String[] blk = menu.split("_");
+	if (blk.length!=2) throw new Exception("Error in addButton() : " + menu);
+	menuColors.put(blk[0],cor);
+	buttonNames.put(blk[0],blk[1]);
 }
+
 // grid
 void formGrid() {
+	//
   // grid geral
   fill(255, 255, 255);
   float center = 0;
@@ -149,28 +324,93 @@ void formGrid() {
   }
   // tamSquare *= 2;
 }
-// movement
+
+// game
+void addComponent(Component comp_, boolean copy) {
+	Component comp = null;
+	if (copy) comp = comp_.copy();
+	else comp = comp_;
+	componentsToAdd.add(comp);
+}
+void updateComponents() {
+	for (Component comp : componentsToRemove) {
+		components.remove(comp);
+	}
+	for (Component comp : componentsToAdd) {
+		components.add(comp);
+	}
+	componentsToRemove.clear();
+	componentsToAdd.clear();
+}
+void exitGame() {
+	dtbs.saveAll();
+	exit();
+}
+void menuTop(){
+	noStroke();
+	fill(#DEDEDE);
+	int espArea = 50;
+	rect(width/4,0,width/2,espArea,10);
+	// HEat
+	int p =0,tamArea = 75,gap=5;
+	fill(#D3068F);
+	rect(width/4 + gap+p*(tamArea+gap),gap,tamArea,espArea-2*gap,10);
+	textSize(16);
+	fill(#000000);
+	text("Heat 'h'",width/4 + gap*2+p*(tamArea+gap),textAscent()+gap*2+textDescent());
+	// Energy
+	p++;
+	fill(#007ADB);
+	rect(width/4 + gap+p*(tamArea+gap),gap,tamArea,espArea-2*gap,10);
+	textSize(16);
+	fill(#000000);
+	text("Energy 'e'",width/4 + gap*2+p*(tamArea+gap),textAscent()+gap*2+textDescent());
+}
+
+// MOUSE ------------------------------------
 void mousePressed() {
 	if (mouseButton == LEFT) {
 		mouseIsRight = false;
-		for (String i : keybinding.get(localMenu).keySet()) {
-		    println(i + " - " + keybinding.get(localMenu).get(i)[0].toCharArray()[0]);
-			if (key == keybinding.get(localMenu).get(i)[0].toCharArray()[0] || 
-			keybinding.get(localMenu).get(i)[0]=="ml") {			
-				println("Ativando :" + i);				
-				functionner(i,keybinding.get(localMenu).get(i)[1],true);
+		mouseIsLeft = true;
+		// processKey('#');
+		if (!buttons(false)){
+			if (onHandComponent != null && canPutOnHandComponent) {
+				if (onHandComponent.coupleComponent==null) addComponent(onHandComponent,true);
+				else{
+					Component cp = onHandComponent.copy();
+					onHandComponent.coupleComponent.energysConnections.add(cp);
+					componentsToAdd.add(cp);
+				}
+				println("Componente adicionado");
+			}
+			if (onOverComponent != null) {
+				if (localMenu == "remove") componentsToRemove.add(onOverComponent);
+				else onSelectedComponent = onOverComponent;
 			}
 		}
-		mouseIsLeft = true;
 	}else if (mouseButton == RIGHT) {
 		mouseIsRight = true;
 		mouseIsLeft = false;
+		buttons(false);
+		if (lastsClicks.size() > 1) {
+			String[] blk = lastsClicks.get(lastsClicks.size() - 1).split("-");
+			if (blk[0].equals("R") && (loop-Integer.parseInt(blk[1]))<=maxDifLoop_doubleClick) {
+				onHandComponent = null;
+				onSelectedComponent = null;
+			}
+		}
+	}
+	lastsClicks.add(((mouseIsLeft)?"L":"R") + "-" + loop);
+	if (lastsClicks.size() > 2) {
+		lastsClicks.remove(0);
 	}
 }
 void mouseDragged() {
-	// translate(mouseX-pmouseX,);
-	dragX += mouseX - pmouseX;
-	dragY += mouseY - pmouseY;
+	// draglate(mouseX-pmouseX,);
+	if (mouseButton == RIGHT){
+		dragX += mouseX - pmouseX;
+		dragY += mouseY - pmouseY;
+	}
 }
 void mouseWheel(MouseEvent event) {
 	// translate(dragX*zoom,dragY*zoom);
@@ -179,7 +419,7 @@ void mouseWheel(MouseEvent event) {
 	int drx = (int)dragX;
 	int dry = (int)dragY;
 	
-	lastZoom = zoom; 
+	lastZoom = zoom;
 	lastZoom *= pow(2,event.getCount() * ( -1));
 	
 	zoom = lastZoom;
@@ -194,4 +434,30 @@ void mouseWheel(MouseEvent event) {
 		dragY = y - ( -(dry + height / 2) / 2 + height / 2);
 		// println((-dragX+drx)+" : "+(-dragY+dry)+" | "+zoom);
 	}
+}
+
+boolean overMe(Component comp,float px, float py) {
+	// Detect position by format
+	// if (onOverComponent != null) return false;
+	switch (comp.format) {
+		case "square":
+			boolean v1 = comp.px-comp.tam/2<= px && px <= comp.px + comp.wid-comp.tam/2;
+			boolean v2 = comp.py-comp.tam/2<= py && py <= comp.py + comp.hei-comp.tam/2;
+			if (v1 && v2){
+				onOverComponent = comp;
+				return true;
+			}
+			break;
+		case "circle":
+			float d = dist(px,py,comp.px,comp.py);
+			if (d <= comp.raw) {
+				onOverComponent = comp;
+				
+				return true;
+			}
+			break;
+		default:
+			println("Format not defined in showOnHandComponent() : " + comp.format);
+	}
+	return false;
 }

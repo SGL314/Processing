@@ -247,8 +247,7 @@ void mouseWheel(MouseEvent event) {
 void mouseAutomatic() {
 	boolean overed = false;
 	float pax,pbx,px,pay,pby,py;
-	px = (mouseX - transX) / zoom;
-	py = (mouseY - transY) / zoom;
+	
 	for (Construction c : constructions) {
 		if (overed) {c.shined = false;continue;}
 		if (overMe(px,py,c)){
@@ -817,7 +816,7 @@ boolean	toggleMenu(String menuName) {
 	println("ERRO	ao	processar menu : \n   menu nao reconhecido : '" + menuName + "'");
 	return	false;
 }
-void	modusMenu(String	menuName,boolean active) {
+void modusMenu(String	menuName,boolean active) {
 	for	(Menu	menu	 : 	menus)	{
 		if	(menu.name.equals(menuName)) {
 			menu.active	 = 	active;
@@ -825,7 +824,7 @@ void	modusMenu(String	menuName,boolean active) {
 		}
 	}
 }
-void	showMenus()	{
+void showMenus()	{
 	if	(onHandConstruction!= null) {
 		if	(Cfg.menu_putting.active ==  false) Cfg.menu_putting.active = true;
 	}
